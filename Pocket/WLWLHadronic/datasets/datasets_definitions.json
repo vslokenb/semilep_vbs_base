@@ -1,0 +1,33 @@
+{
+    "VBSWLWLToJets": {
+        "sample": "VBSWLWLToJets",
+        "json_output": "VBSWLWLToJets.json",
+        "files": [
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_0_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_1_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_2_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_3_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_4_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_5_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_6_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_7_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_8_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_9_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_10_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_11_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_12_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_13_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_14_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_15_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_16_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_17_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_18_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_19_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_20_nanoAOD.root",
+            "root://eosuser.cern.ch//eos/user/w/wbuitrag/VBS/Local_Production/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS/root/nanoAOD/VBSWLWLToJets_M_5f_LO_FXFX_Run3Summer23wmLHEGS_21_nanoAOD.root"
+        ],
+        "isMC": true,
+        "xsec": 0.01979,
+        "year": "2023_preBPix"
+    }
+}
