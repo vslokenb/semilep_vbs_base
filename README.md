@@ -33,9 +33,54 @@ Step 1: Run the following command in your lxplus terminal to enter an interactiv
 
 ```
 apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
--B /tmp -B /eos/cms/ -B /etc/sysconfig/ngbauth-submit \
--B ${XDG_RUNTIME_DIR} --env KRB5CCNAME="FILE:${XDG_RUNTIME_DIR}/krb5cc" \
-/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+                -B /tmp  -B /eos/cms/  -B /etc/sysconfig/ngbauth-submit \
+                -B ${XDG_RUNTIME_DIR}  --env KRB5CCNAME="FILE:${XDG_RUNTIME_DIR}/krb5cc" \
+    /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+
+```
+
+<br>
+
+Step 2: Choose the version
+
+The last part of the command (...pocketcoffea:lxplus-el9-stable) allows you to choose the version of the image you want to use. Although the stable version is the most recommended, you can change it to latest if you need the latest updates.
+
+Once you are inside the environment, no installation is necessary. PocketCoffea scripts are available globally, so you can start running your analysis now.
+
+
+Step 3:  Check the installation
+
+Once you have accessed the Apptainer environment, you can confirm that PocketCoffea is ready to use. Simply run the following command in the terminal:
+
+<br>
+
+```
+pocket-coffea
+
+```
+
+<br>
+
+If everything is configured correctly, you will see an output similar to this:
+
+<br>
+
+```
+
+Singularity> pocket-coffea 
+
+    ____             __        __  ______      ________
+   / __ \____  _____/ /_____  / /_/ ____/___  / __/ __/__  ____ _
+  / /_/ / __ \/ ___/ //_/ _ \/ __/ /   / __ \/ /_/ /_/ _ \/ __ `/
+ / ____/ /_/ / /__/ ,< /  __/ /_/ /___/ /_/ / __/ __/  __/ /_/ /
+/_/    \____/\___/_/|_|\___/\__/\____/\____/_/ /_/  \___/\__,_/
+
+
+Running PocketCoffea version 0.9.9
+- Documentation page:  https://pocketcoffea.readthedocs.io/
+- Repository:          https://github.com/PocketCoffea/PocketCoffea
+
+Run with --help option for the list of available commands 
 
 ```
 
