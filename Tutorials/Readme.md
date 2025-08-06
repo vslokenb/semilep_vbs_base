@@ -1,6 +1,6 @@
 # Introductory Tutorial: Fundamentals for pocket-coffea - Reconstructing the Z Boson
 
-## Introduction: 
+## Introduction 
 
 ### Why this tutorial?
 
