@@ -87,7 +87,7 @@ Run with --help option for the list of available commands
 This output with the logo and software version confirms that the PocketCoffea environment is active and ready to be used. Now you can start running your analysis.
 
 
-# Manual installation in a Python environment
+# Manual installation in a Python environment (Alternative)
 
 If you only need to run PocketCoffea on your local machine and not on batch processing systems like HTCondor, you can install the package directly in a Python environment. You have several options for this, such as conda or virtualenv.
 
@@ -108,22 +108,15 @@ cd PocketCoffea
 
 Step 2: Create and activate a Python environment
 
-Now, you must set up a Python environment to isolate the package dependencies. Choose one of the following options:
-
-Option A: Using LCG and venv.
-
-This option is useful if you want to use a base LCG environment to avoid downloading many packages.
-
-1. Create the environment (first time only):
+To avoid conflicts with pre-installed LCG packages, you must create a new virtual environment without inheriting the system's packages.
 
 <br>
 
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_103/x86_64-centos7-gcc11-opt/setup.sh
-python -m venv --system-site-packages myenv
 
-
-# python3 -m venv --system-site-packages myenv
+# Create a new virtual environment named 'myenv'
+python3 -m venv myenv
 
 ```
 
@@ -140,7 +133,7 @@ source myenv/bin/activate
 
 <br>
    
-3. Install PocketCoffea and Dependencies
+Step 3: Install PocketCoffea and Dependencies
 
 With your new virtual environment active, use pip to install PocketCoffea in editable mode. This command will also download and install all of the required dependencies (such as coffea, numba, and rucio-clients) directly into your myenv environment.
 
@@ -191,3 +184,6 @@ Run with --help option for the list of available commands
 ```
 
 <br>
+
+
+For more detailed installation instructions, please refer to the official PocketCoffea documentation: https://pocketcoffea.readthedocs.io/en/stable/installation.html.
