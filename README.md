@@ -1,5 +1,3 @@
-# Pocket_Coffea_Tutorial
-
 # Installation Pocket Coffea in your system lxplus
 
 The simplest and most recommended way to use PocketCoffea in an environment like CERN lxplus is through an Apptainer image. This method is crucial to ensure a stable working environment with all dependencies pre-installed, especially if you plan to scale your analysis on the HTCondor system.
