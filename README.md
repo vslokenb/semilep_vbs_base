@@ -30,12 +30,15 @@ To start working with PocketCoffea in lxplus, you only need to execute one comma
 Step 1: Run the following command in your lxplus terminal to enter an interactive environment (singularity) with PocketCoffea.
 
 <br>
-'''
+
+```
 apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
 -B /tmp -B /eos/cms/ -B /etc/sysconfig/ngbauth-submit \
 -B ${XDG_RUNTIME_DIR} --env KRB5CCNAME="FILE:${XDG_RUNTIME_DIR}/krb5cc" \
 /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
-'''
+
+```
+
 <br>
 
 # Day 1
