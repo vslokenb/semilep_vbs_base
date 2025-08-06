@@ -12,7 +12,7 @@ Upon completion of this exercise, you will not only have performed a start-to-fi
 
 ### Final objective:
 
-* Perform a manual analysis of the Z disintegration to $\mu +$ $\mu -$.
+* Perform a manual analysis of the Z $\rightarrow$ $\mu +$ $\mu -$.
 
 * Understand the basic workflow: loading, selection, calculation and visualization.
 
