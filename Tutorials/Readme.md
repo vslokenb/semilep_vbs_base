@@ -18,4 +18,4 @@ Upon completion of this exercise, you will not only have performed a start-to-fi
 
 * Measure the properties of the Z boson by model fitting.
 
-### For this tutorial we will work with the Jupyter notebook HandsOn_Muons_Jagged_ragged_Awkward_Arrays.ipynb
+### For this tutorial we will work with the Jupyter notebook [HandsOn_Muons_Jagged_ragged_Awkward_Arrays.ipynb]
