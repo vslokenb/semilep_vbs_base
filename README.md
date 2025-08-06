@@ -87,6 +87,17 @@ Run with --help option for the list of available commands
 This output with the logo and software version confirms that the PocketCoffea environment is active and ready to be used. Now you can start running your analysis.
 
 
+# Manual installation in a Python environment
+
+
+
+
+
+
+
+
+
+
 # Day 1
 
 use of:
