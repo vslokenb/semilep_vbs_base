@@ -89,29 +89,105 @@ This output with the logo and software version confirms that the PocketCoffea en
 
 # Manual installation in a Python environment
 
+If you only need to run PocketCoffea on your local machine and not on batch processing systems like HTCondor, you can install the package directly in a Python environment. You have several options for this, such as conda or virtualenv.
+
+Step 1: Clone the repository
+
+Clone the PocketCoffea repository from GitHub to the location of your choice.
+
+<br>
+
+```
+git clone git@github.com:PocketCoffea/PocketCoffea.git
+cd PocketCoffea
+
+```
+
+<br>
 
 
+Step 2: Create and activate a Python environment
+
+Now, you must set up a Python environment to isolate the package dependencies. Choose one of the following options:
+
+Option A: Using LCG and venv.
+
+This option is useful if you want to use a base LCG environment to avoid downloading many packages.
+
+1. Create the environment (first time only):
+
+<br>
+
+```
+source /cvmfs/sft.cern.ch/lcg/views/LCG_103/x86_64-centos7-gcc11-opt/setup.sh
+python -m venv --system-site-packages myenv
 
 
+# python3 -m venv --system-site-packages myenv
+
+```
+
+<br>
+
+2. Activates the environment:
+
+<br>
+
+```
+source myenv/bin/activate
+
+```
+
+<br>
+   
+3. Install PocketCoffea and Dependencies
+
+With your new virtual environment active, use pip to install PocketCoffea in editable mode. This command will also download and install all of the required dependencies (such as coffea, numba, and rucio-clients) directly into your myenv environment.
+
+<br>
+
+```
+pip install -e .
+
+```
+
+<br>
+
+4. Verify the Installation
+
+After the installation is complete, you can test it by running the pocket-coffea command. This should display the PocketCoffea welcome message and version number.
+
+<br>
+
+```
+# Run PocketCoffea from your environment
+pocket-coffea
+
+```
+
+<br>
+
+If the command runs successfully, you'll see an output similar to this, confirming that PocketCoffea is installed and ready to use:
+
+<br>
+
+```
+
+Singularity> pocket-coffea 
+
+    ____             __        __  ______      ________
+   / __ \____  _____/ /_____  / /_/ ____/___  / __/ __/__  ____ _
+  / /_/ / __ \/ ___/ //_/ _ \/ __/ /   / __ \/ /_/ /_/ _ \/ __ `/
+ / ____/ /_/ / /__/ ,< /  __/ /_/ /___/ /_/ / __/ __/  __/ /_/ /
+/_/    \____/\___/_/|_|\___/\__/\____/\____/_/ /_/  \___/\__,_/
 
 
+Running PocketCoffea version 0.9.9
+- Documentation page:  https://pocketcoffea.readthedocs.io/
+- Repository:          https://github.com/PocketCoffea/PocketCoffea
 
+Run with --help option for the list of available commands 
 
+```
 
-# Day 1
-
-use of:
-
-* Uproot
-* Jagged, ragged, Awkward Arrays
-* Lorentz vectors
-* Histogram manipulations
-* Coffea
-* Hands On - Muons_Jagged_ragged_Awkward_Arrays
-
-# Day 2
-
-Pocket Coffea Tutorial.
-* ZTomumu
-* WWTo4Q (Hands On) [In Progress]
-
+<br>
