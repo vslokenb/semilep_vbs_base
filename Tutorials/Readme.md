@@ -12,8 +12,10 @@ Upon completion of this exercise, you will not only have performed a start-to-fi
 
 ### Final objective:
 
-* Perform a manual analysis of the Z $\rightarrow$ $\mu +$ $\mu -$.
+* Perform a manual analysis of the Z $\rightarrow$ $\mu +$ $\mu - process$.
 
 * Understand the basic workflow: loading, selection, calculation and visualization.
 
 * Measure the properties of the Z boson by model fitting.
+
+### For this tutorial we will work with the Jupyter notebook HandsOn_Muons_Jagged_ragged_Awkward_Arrays.ipynb
