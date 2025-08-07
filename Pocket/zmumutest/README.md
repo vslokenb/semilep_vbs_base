@@ -64,6 +64,156 @@ The file datasets/datasets_definitions.json contains these definitions. It is a 
 
 ```
 
+Important keys:
+
+* sample: Internal label to group events (very useful for plotting).
+
+* json_output: Path where the final file with the list of .root files will be saved.
+
+* das_names: The official name of the dataset in DAS.
+
+* metadata: Crucial information such as the year, if it is Monte Carlo (isMC), the effective section (xsec), and for data, the era.
+
+b) Creation of the "Filesets
+
+Once the .json is defined, we use a pocket-coffea command to fetch these datasets from the Grid and generate the final files (called “filesets”) with the complete lists of files.
+
+First, make sure you have a valid Grid proxy:
+
+```bash
+
+voms-proxy-init -voms cms -rfc --valid 168:0
+
+```
+
+Now, run the command to build the datasets:
+
+```bash
+
+# This command reads the .json, queries the Grid and creates the filesets
+pocket-coffea build-datasets --cfg datasets/datasets_definitions.json
+
+# If you are at CERN, it is useful to restrict the search to nearby Tiers
+pocket-coffea build-datasets --cfg datasets/datasets_definitions.json -rs 'T[123]_(FR|IT|BE|CH|DE)_\w+'
+
+```
+
+This will create two files for each dataset in the datasets/ folder: one with direct paths to a Grid site and one with the _redirector.json suffix, which uses a global redirector and is more portable. We will use the redirector ones in our configuration.
+
+### 2. Analysis configuration (config.py and .yaml)
+
+Here we define the physics of our analysis. pocket-coffea distinguishes between Parameters (general definitions like triggers, lepton IDs) and Configuration (a specific analysis with the cuts and histograms).
+
+a) Parameters (.yaml)
+
+Parameters are defined in .yaml files to keep the configuration clean and modular.
+
+Object Preselection: In params/object_preselection.yaml, we specify the criteria to define what is a “good” muon or a “good” jet.
+
+```bash
+
+# params/object_preselection.yaml
+object_preselection:
+  Muon:
+    pt: 15
+    eta: 2.4
+    iso: 0.25 # PFIsoLoose
+    id: tightId
+  Jet:
+    dr_lepton: 0.4
+    pt: 30
+    eta: 2.4
+    jetId: 2
+
+```
+
+#### Triggers: In params/triggers.yaml we define the HLT triggers we want to apply.
+
+b) The Main Configuration File (config.py)
+
+This is the brain of our analysis. Here the Configurator class is instantiated, which groups all the information.
+
+Parameters Load: At the beginning of the file, we load the parameters from the .yaml.
+
+```bash
+
+# config.py
+from pocket_coffea.parameters import defaults
+# ...
+default_parameters = defaults.get_default_parameters()
+parameters = defaults.merge_parameters_from_files(
+ default_parameters,
+ "params/object_preselection.yaml",
+ "params/triggers.yaml",
+ update=True
+)
+
+```
+
+### 2. Configurator Instance: We create the cfg object that the framework will look for.
+
+```bash
+
+# config.py
+from pocket_coffea.utils.configurator import Configurator
+# ...
+
+cfg = Configurator(
+ parameters = parámetros,
+
+    datasets = {
+ "jsons": [
+ "datasets/DATA_SingleMuon_redirector.json",
+ "datasets/DYJetsToLL_M-50_redirector.json"
+ ],
+ "filter": {
+ "samples": ["DATA_SingleMuon", "DYJetsToLL_M-50"],
+ "year": ['2018']
+ }
+ },
+
+    workflow = ZmumuBaseProcessor, # Nuestra clase de análisis
+
+    # Aquí se definen los cortes, categorías, pesos e histogramas
+    # ... ver abajo ...
+)
+
+```
+
+### 3. Definition of Selections (Cuts):
+
+Cuts are defined in a list. For Z $\rightarrow$ $\mu$ $\mu$ analysis:
+
+Skim: A first filter to reduce data. We ask for at least 1 muon and apply the SingleMuon trigger.
+
+Preselection: The main selection. We ask for exactly 2 muons of opposite charge, with a cut at the leader pt and at the invariant mass.
+
+Categorization: We divide the events that pass the preselection into categories. Here, only a baseline category that does not apply additional cuts.
+
+### 4. Definition of Weights and Variations:
+Here we activate the weights for the simulation (lumi, xsec, pileup, etc.) and the systematic variations we want to propagate.
+
+```bash
+
+# config.py
+# ... dentro de Configurator ...
+ weights = {
+ "common": {
+ "inclusive": ["genWeight", "lumi", "XS", "pileup", "sf_mu_id", "sf_mu_iso"],
+ }
+    },
+ variations = {
+ "pesos": {
+ "común": {"inclusive": ["pileup", "sf_mu_id", "sf_mu_iso"] },
+ }
+    },
+
+```
+
+
+
+
+
 
 
 
