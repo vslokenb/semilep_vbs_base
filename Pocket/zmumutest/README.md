@@ -1,3 +1,66 @@
+# PocketCoffea Tutorial: Z $\rightarrow$ $\mu$ $\mu$
+
+Welcome to this hands-on tutorial on pocket-coffea. This guide is designed to take you through a complete particle physics analysis, from defining the datasets to creating the final plots. The goal is to learn the workflow and philosophy behind this framework.
+
+The analysis we will perform as an example is the reconstruction of the Z boson from its decay into two muons (Z $\rightarrow$ $\mu$ $\mu$), using open data and simulation of the CMS detector.
+
+## General Workflow
+
+The analysis process in pocket-coffea is divided into four major steps that we will follow in this tutorial:
+
+1. Dataset Preparation: we will define the datasets (Monte Carlo samples and real data) and use the pocket-coffea tools to find the paths to the corresponding files in the Grid.
+
+2. Analysis Configuration: We will create the configuration files (.py and .yaml) where all the physics logic is specified: object preselection, event selection, histograms, weights, etc.
+
+3. Running the Processor: We will launch the coffea processor to iterate over all the events, apply our selections and save the results (histograms) in an output file.
+
+4. Plot Creation: We will use pocket-coffea's plotting tools to read the results and generate the final graphs of our analysis.
+
+### 1. Preparation of the Datasets (.json)
+
+The first step is to tell the framework where to find the data we want to analyze.
+
+a) Definition of the Datasets
+
+In pocket-coffea, this is done through a .json definitions file. This file acts as a master map that tells the framework what to look for in the CMS DAS.
+
+For our analysis of Z $\rightarrow$ $\mu +$ $\mu -$, we will use a sample simulation (Monte Carlo) of DYJetsToLL (the signal process) and real SingleMuon collision data.
+
+The file datasets/datasets_definitions.json contains these definitions. It is a dictionary where each entry defines a sample:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Full analysis example - Simple Z->mumu 
 
 
