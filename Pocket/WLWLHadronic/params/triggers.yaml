@@ -1,12 +1,14 @@
 HLT_triggers:
-  2016_PreVFP: ???
-
-  2016_PostVFP: ???
-  "2017": ???
-  
-  "2018":
-    SingleEle:
-      - Ele32_WPTight_Gsf
-      - Ele28_eta2p1_WPTight_Gsf_HT150
-    SingleMuon: 
+  "2022_preEE":
+    SingleMuon:
       - IsoMu24
+    EGamma: 
+      - Ele32_WPTight_Gsf
+      - Photon200
+
+  "2022_postEE":
+    SingleMuon:
+      - IsoMu24
+    EGamma:
+      - Ele32_WPTight_Gsf
+      - Photon200
