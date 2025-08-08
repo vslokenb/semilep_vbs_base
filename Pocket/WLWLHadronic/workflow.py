@@ -12,20 +12,13 @@ from pocket_coffea.lib.objects import (
 )
 
 
-class ZmumuBaseProcessor(BaseProcessorABC):
+class VBSWWBaseProcessor(BaseProcessorABC):
     def __init__(self, cfg: Configurator):
         super().__init__(cfg)
 
 
     def apply_object_preselection(self, variation):
-        '''
-        The ttHbb processor cleans
-          - Electrons
-          - Muons
-          - Jets -> JetGood
-          - BJet -> BJetGood
 
-        '''
         # Include the supercluster pseudorapidity variable
         electron_etaSC = self.events.Electron.eta + self.events.Electron.deltaEtaSC
         self.events["Electron"] = ak.with_field(
@@ -44,17 +37,27 @@ class ZmumuBaseProcessor(BaseProcessorABC):
         )
         self.events["LeptonGood"] = leptons[ak.argsort(leptons.pt, ascending=False)]
 
+        self.events["ll"] = get_dilepton(
+            self.events.ElectronGood, self.events.MuonGood
+        )
+
         self.events["JetGood"], self.jetGoodMask = jet_selection(
-            self.events, "Jet", self.params, 
-            year=self._year, 
-            leptons_collection="LeptonGood"
+            self.events, "Jet", self.params, "LeptonGood"
         )
         self.events["BJetGood"] = btagging(
             self.events["JetGood"], self.params.btagging.working_point[self._year], wp=self.params.object_preselection.Jet.btag.wp)
 
-        self.events["ll"] = get_dilepton(
-            self.events.ElectronGood, self.events.MuonGood
-        )
+        jj_pairs = ak.combinations(self.events.JetGood, 2, fields=["jet1", "jet2"])
+        jj_pairs["mass"] = (jj_pairs.jet1 + jj_pairs.jet2).mass
+        idx_vbs_jets = ak.argmax(jj_pairs.mass, axis=1, keepdims=True)
+        vbs_jets_pair = jj_pairs[idx_vbs_jets]
+
+        self.events["vbsjets"] = vbs_jets_pair
+        self.events["vbsjets"] = ak.with_field(self.events.vbsjets, abs(self.events.vbsjets.jet1.eta - self.events.vbsjets.jet2.eta), where="delta_eta")
+
+        self.events["vbsjet_1"] = self.events.vbsjets.jet1
+        self.events["vbsjet_2"] = self.events.vbsjets.jet2
+        
 
     def count_objects(self, variation):
         self.events["nMuonGood"] = ak.num(self.events.MuonGood)
@@ -66,6 +69,6 @@ class ZmumuBaseProcessor(BaseProcessorABC):
         self.events["nBJetGood"] = ak.num(self.events.BJetGood)
         # self.events["nfatjet"]   = ak.num(self.events.FatJetGood)
 
-    # Function that defines common variables employed in analyses and save them as attributes of `events`
     def define_common_variables_before_presel(self, variation):
-        self.events["JetGood_Ht"] = ak.sum(abs(self.events.JetGood.pt), axis=1)
+        pass
+       # self.events["JetGood_Ht"] = ak.sum(abs(self.events.JetGood.pt), axis=1)
