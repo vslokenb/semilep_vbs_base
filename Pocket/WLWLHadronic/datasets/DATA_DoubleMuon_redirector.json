@@ -1,0 +1,67 @@
+{
+    "DoubleMuon_2022_EraA": {
+        "metadata": {
+            "das_names": "['/DoubleMuon/Run2022A-22Sep2023-v1/NANOAOD']",
+            "sample": "DoubleMuon",
+            "year": "2022",
+            "isMC": "False",
+            "primaryDataset": "DoubleMuon",
+            "era": "A",
+            "nevents": "25309",
+            "size": "24068511"
+        },
+        "files": [
+            "root://xrootd-cms.infn.it///store/data/Run2022A/DoubleMuon/NANOAOD/22Sep2023-v1/40000/00db7c01-8c20-4e65-8994-d59259accbc9.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022A/DoubleMuon/NANOAOD/22Sep2023-v1/40000/d5ff089b-8efa-43bf-9043-52623eeba734.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022A/DoubleMuon/NANOAOD/22Sep2023-v1/40000/f43915b3-ac9e-4f1e-80ca-5ddd2e672d11.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022A/DoubleMuon/NANOAOD/22Sep2023-v1/40000/ed558583-c098-4352-8740-fc8450a63719.root"
+        ]
+    },
+    "DoubleMuon_2022_EraB": {
+        "metadata": {
+            "das_names": "['/DoubleMuon/Run2022B-22Sep2023-v1/NANOAOD']",
+            "sample": "DoubleMuon",
+            "year": "2022",
+            "isMC": "False",
+            "primaryDataset": "DoubleMuon",
+            "era": "B",
+            "nevents": "929009",
+            "size": "750948173"
+        },
+        "files": [
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/84c8629a-d8bc-4240-bff1-26879f64ff66.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/9f836a89-ef29-45d7-a7cb-a2a1f8c2fab4.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/ca5a953b-3ae9-4385-a4c4-e324250ba303.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/a0451013-5dbf-4604-8786-365bb32db70e.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/c2764d9f-284f-4b60-9788-8a2322ca387e.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/d408e7ac-473b-4e1a-af8e-ef92b945877a.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022B/DoubleMuon/NANOAOD/22Sep2023-v1/40000/90abcb45-f7c4-449b-8a19-f1f408591327.root"
+        ]
+    },
+    "DoubleMuon_2022_EraC": {
+        "metadata": {
+            "das_names": "['/DoubleMuon/Run2022C-22Sep2023-v1/NANOAOD']",
+            "sample": "DoubleMuon",
+            "year": "2022",
+            "isMC": "False",
+            "primaryDataset": "DoubleMuon",
+            "era": "C",
+            "nevents": "4646904",
+            "size": "4121944908"
+        },
+        "files": [
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/de69b9b7-0d30-4fc8-bcea-b28aa90d8a02.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/e3344f85-3607-4829-8467-2b08003175c8.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/07343197-78e4-40c3-ac6f-06f469b44a4e.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/b81154b6-d507-4419-9f0e-4391a36c5561.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/9f317280-5380-49f7-8a30-3e3bcd48dc9c.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/e51a19bc-f6b4-4369-b166-4cd519e8afa4.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/bbfa5e3e-9080-43c4-ad61-f335ac9171fc.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/2b44d923-636c-4b95-92b6-b8bc73f36f88.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/85dec90a-b8dd-4385-8cd2-5d2b70f5990f.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/50000/5356d2d8-14a7-4b3f-a723-a46538c18520.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/410000/5662d520-0d35-4551-8f05-c9483dd0b60e.root",
+            "root://xrootd-cms.infn.it///store/data/Run2022C/DoubleMuon/NANOAOD/22Sep2023-v1/40000/f99d3867-5178-48ad-abd5-574877de5293.root"
+        ]
+    }
+}
