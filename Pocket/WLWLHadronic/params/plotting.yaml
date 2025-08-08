@@ -1,5 +1,13 @@
 plotting_style:
-
   labels:
-    DYJetsToLL: DY
+    DATA_SingleMuon: Data
+    DATA_EGamma: Data
+    VBS_WW_LNuQQ: "VBS WW (Semileptonic)" 
+    
+  color:
+    DATA_SingleMuon: "#000000"
+    DATA_EGamma: "#000000"
+    VBS_WW_LNuQQ: "#FF0000"
 
+  is_signal:
+    VBS_WW_LNuQQ: true
