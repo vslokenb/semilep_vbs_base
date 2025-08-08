@@ -4,7 +4,7 @@ from pocket_coffea.lib.cut_functions import get_nObj_min, get_HLTsel, get_nPVgoo
 from pocket_coffea.parameters.cuts import passthrough
 from pocket_coffea.parameters.histograms import *
 import workflow
-from workflow import ZmumuBaseProcessor
+from workflow import VBSWWBaseProcessor
 from pocket_coffea.lib.weights.common import common_weights
 
 # Register custom modules in cloudpickle to propagate them to dask workers
@@ -17,7 +17,6 @@ from custom_cut_functions import *
 import os
 localdir = os.path.dirname(os.path.abspath(__file__))
 
-# Loading default parameters
 from pocket_coffea.parameters import defaults
 default_parameters = defaults.get_default_parameters()
 defaults.register_configuration_dir("config_dir", localdir+"/params")
@@ -33,25 +32,29 @@ parameters = defaults.merge_parameters_from_files(default_parameters,
 cfg = Configurator(
     parameters = parameters,
     datasets = {
-        "jsons": [f"{localdir}/datasets/DATA_SingleMuon.json",
-                  f"{localdir}/datasets/DYJetsToLL_M-50.json"
+        "jsons": [f"{localdir}/datasets/DATA_DoubleMuon.json",
+                  f"{localdir}/datasets/DATA_EGamma.json",
+                  f"{localdir}/datasets/DATA_MuonEG.json",
+                  f"{localdir}/datasets/VBS-SSWW_PolarizationLL_TuneCP5_13p6TeV_madgraph-pythia8.json"
                     ],
         "filter" : {
-            "samples": ["DATA_SingleMuon",
-                        "DYJetsToLL"],
+            "samples": ["DATA_DoubleMuon",
+                        "DATA_EGamma",
+                        "DATA_MuonEG",
+                        "VBS-SSWW_PolarizationLL_TuneCP5_13p6TeV_madgraph-pythia8"],
             "samples_exclude" : [],
-            "year": ['2018']
+            "year": ['2022_preEE', '2022_postEE']
         }
     },
 
-    workflow = ZmumuBaseProcessor,
+    workflow = VBSWWBaseProcessor,
 
-    skim = [get_nPVgood(1), eventFlags, goldenJson, # basic skims
-            get_nObj_min(1, 18., "Muon"),
-            # Asking only SingleMuon triggers since we are only using SingleMuon PD data
-            get_HLTsel(primaryDatasets=["SingleMuon"])], 
+    skim = [get_nPVgood(1), eventFlags, goldenJson,
+            nLepton_skim_cut,
+            
+            get_HLTsel(primaryDatasets=["DoubleMuon", "EGamma", "MuonEG"])], 
     
-    preselections = [dimuon_presel],
+    preselections = [vbs_ss_dilepton_presel],
     categories = {
         "baseline": [passthrough],
     },
@@ -62,7 +65,7 @@ cfg = Configurator(
         "common": {
             "inclusive": ["genWeight","lumi","XS",
                           "pileup",
-                          "sf_mu_id","sf_mu_iso",
+                          "sf_mu_id","sf_mu_iso", "sf_ele_id", "sf_ele_reco"
                           ],
             "bycategory" : {
             }
@@ -75,7 +78,7 @@ cfg = Configurator(
         "weights": {
             "common": {
                 "inclusive": [  "pileup",
-                                "sf_mu_id", "sf_mu_iso"
+                                "sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco"
                               ],
                 "bycategory" : {
                 }
@@ -87,14 +90,15 @@ cfg = Configurator(
 
     
    variables = {
-        **muon_hists(coll="MuonGood", pos=0),
-        **count_hist(name="nElectronGood", coll="ElectronGood",bins=3, start=0, stop=3),
-        **count_hist(name="nMuonGood", coll="MuonGood",bins=3, start=0, stop=3),
-        **count_hist(name="nJets", coll="JetGood",bins=8, start=0, stop=8),
-        **count_hist(name="nBJets", coll="BJetGood",bins=8, start=0, stop=8),
-        **jet_hists(coll="JetGood", pos=0),
-        **jet_hists(coll="JetGood", pos=1),
+        **muon_hists(coll="LeptonGood", pos=0, name="leading_lepton"),
+        **count_hist(name="nLeptonGood", coll="LeptonGood",bins=4, start=0, stop=4),
+        **count_hist(name="nJets", coll="JetGood",bins=10, start=0, stop=10),
+        **count_hist(name="nBJets", coll="BJetGood",bins=5, start=0, stop=5),
+        **jet_hists(coll="JetGood", pos=0, name='leading_jet'),
         "mll" : HistConf( [Axis(coll="ll", field="mass", bins=100, start=0, stop=200, label=r"$M_{\ell\ell}$ [GeV]")] ),
+        "mjj_vbs": HistConf([Axis(coll="vbsjets", field="mass", bins=50, start=200, stop=2500, label=r"$M_{jj}^{VBS}$ [GeV]")]),
+        "delta_eta_vbs": HistConf([Axis(coll="vbsjets", field="delta_eta", bins=20, start=2.5, stop=8, label=r"$|\Delta\eta_{jj}^{VBS}|$")]),
+        "met": HistConf([Axis(coll="MET", field="pt", bins=50, start=0, stop=400, label=r"$p_{T}^{miss}$ [GeV]")] ),
     }
 )
 
