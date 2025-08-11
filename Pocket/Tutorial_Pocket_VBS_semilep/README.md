@@ -97,11 +97,11 @@ Q5. Change the b-jet veto to allow events with one b-jet. How does mjj(W had) ch
 Hint: Running the Code
 Example run:
 
-'''bash
+```bash
 pocket-coffea run --cfg example_config_semileptonic.py \
                   -o output_test \
                   -e futures \
                   --scaleout 4 \
                   --limit-files 1 \
                   --limit-chunks 2
-'''bash
+```
