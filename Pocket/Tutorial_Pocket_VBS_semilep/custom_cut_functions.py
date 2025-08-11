@@ -3,36 +3,30 @@ import awkward as ak
 import numpy as np
 from pocket_coffea.lib.cut_definition import Cut
 
-# ---------- Skim: ≥1 leptón cualquiera (mu/e) ----------
+# ---------- Skim: ≥1 leptón  (mu/e) ----------
 def nLepton_skim(events, params, **kwargs):
     return (ak.num(events.Muon) + ak.num(events.Electron)) >= 1
 
 nLepton_skim_cut = Cut(name="nLepton_skim", params={}, function=nLepton_skim)
 
-# ---------- Preselección semileptónica VBS ----------
+# ---------- Preselection semileptonic VBS ----------
 def select_vbs_semileptonic(events, params, **kwargs):
-    """
-    Espera que el workflow haya creado:
-      - events.LeptonGood, JetGood, BJetGood
-      - events.vbsjets (con .jet1/.jet2, .mass y delta_eta)
-      - events.w_had_jets (para la categoría whad_peak, no se usa aquí)
-    """
-    # Escalares por evento
+    
+    
     one_lep = (events.nLeptonGood == 1)
     four_j  = (events.nJetGood    >= 4)
     met_cut = (events.MET.pt      >  params["met_pt"])
 
-    # vbs scalars
+    
     mjj_vbs   = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass", None)), np.nan)
     deta_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
 
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    # veto b opcional
+    # veto b optional
     b_veto = (events.nBJetGood == 0) if params.get("apply_b_veto", True) else True
 
-    # leptón central entre los dos VBS jets (opcional)
     if params.get("require_lep_central", False):
         lep = ak.firsts(events.LeptonGood)
         j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
@@ -64,15 +58,15 @@ vbs_semileptonic_presel = Cut(
     function=select_vbs_semileptonic,
 )
 
-# ---------- Categoría: ventana de masa del W hadrónico ----------
+
 def in_whad_window(events, params, **kwargs):
-    # w_had_jets.mass es lista de len=1 → a escalar
+
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
     within = np.where(np.isnan(wmass), False, np.abs(wmass - 80.4) < params["mjj_w_window"])
     return ak.values_astype(within, np.bool_)
 
 whad_window_cut = Cut(
     name="whad_window",
-    params={"mjj_w_window": 15.0},  # se corresponde con la ventana usada en los ejemplos
+    params={"mjj_w_window": 15.0},  
     function=in_whad_window,
 )
