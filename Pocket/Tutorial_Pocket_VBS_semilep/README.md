@@ -37,7 +37,7 @@ cd Tutorial_Pocket_VBS_semilep
 
 # (Optional) If using Singularity
 singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
-''' bash
+´´´ bash
 
 ## 2. Datasets 
 
