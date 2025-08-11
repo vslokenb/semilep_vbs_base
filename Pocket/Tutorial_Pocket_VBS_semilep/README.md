@@ -93,3 +93,15 @@ Q2. The hadronic W mass window is set to ±15 GeV around 80.4. What happens if y
 Q3. Add a histogram for ΔR between the two hadronic W jets.
 Q4. Change the lepton centrality requirement (require_lep_central) to True. What is the effect?
 Q5. Change the b-jet veto to allow events with one b-jet. How does mjj(W had) change?
+
+Hint: Running the Code
+Example run:
+
+'''bash
+pocket-coffea run --cfg example_config_semileptonic.py \
+                  -o output_test \
+                  -e futures \
+                  --scaleout 4 \
+                  --limit-files 1 \
+                  --limit-chunks 2
+'''bash
