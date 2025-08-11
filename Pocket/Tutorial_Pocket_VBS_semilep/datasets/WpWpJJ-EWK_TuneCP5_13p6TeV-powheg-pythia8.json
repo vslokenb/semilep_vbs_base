@@ -1,0 +1,40 @@
+{
+    "WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8_2022_postEE": {
+        "metadata": {
+            "das_names": "['/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM']",
+            "sample": "WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",
+            "year": "2022_postEE",
+            "isMC": "True",
+            "xsec": "1.0",
+            "nevents": "498564",
+            "size": "1239860422"
+        },
+        "files": [
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/001cb975-396d-4d86-bdb0-fe5ca9c350a9.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/08d24deb-1983-4843-a40c-5b3664242f59.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/0a5eedd9-6f65-4cc9-9ae0-c9ba75fe0b6b.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/20d57b08-fac5-43e1-a0c6-f3cb174762bc.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/24a25fef-bdd3-4ba1-96cc-6297951b43a4.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/2e8e3bc7-a3cd-4aa0-ab49-d4d877b8343c.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/2f2b53b0-e92c-4a92-a79e-f7207ec6444d.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/3d7d08ef-631a-424d-8202-e0da94925dfc.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/5d3b8c0a-3779-4622-acba-3c333d21dc59.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/6f6bebf6-e566-4632-afe7-f97104c9a4e5.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/7d37661b-8e72-49ee-99ae-4ca85cecc2f6.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/83df8ff7-f894-4f74-9df5-c3f5a461bdef.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/8e7f1d1b-ec2d-450e-b5cf-d6c61bebfe8f.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/a0a03533-9470-4d38-a910-50461d0f76be.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/a98d93be-d856-4ed5-ad68-0d8cab03f860.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/af7bde97-b26e-4d20-a802-2615f88a463d.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/ba8d2978-d678-4fe6-a533-f161b4f2ca43.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/c2274958-37f7-4971-b495-5c9567cfc1eb.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/d483072a-5eea-4750-85bc-5dd12877dd55.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/d5c4a40d-ebb1-4e7b-a2d5-d85b1bff63e5.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/e41344da-5365-449f-97ea-706ce35b7dfd.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/eb44880e-b921-49c7-9a8b-c49158c3f0a6.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/f2be9d40-4665-42cf-91fb-fbdf0311c1d7.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/fc6f2771-ba04-4a39-8bef-3235fcca4560.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/Run3Summer22EENanoAODv12/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/NANOAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2530000/ff0e9053-5ca6-4919-a2ca-86466ab541e7.root"
+        ]
+    }
+}

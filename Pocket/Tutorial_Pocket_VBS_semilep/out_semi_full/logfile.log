@@ -1,0 +1,3 @@
+[INFO    ] Working on datasets: ['WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8_2022_postEE', 'WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8_2022_postEE']
+[INFO    ] Total number of events: 997843
+[INFO    ] Reducing chunksize from 150000 to 124730 for datasets

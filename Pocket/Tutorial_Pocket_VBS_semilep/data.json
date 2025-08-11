@@ -1,0 +1,22 @@
+{
+  "TTTo2L2Nu_TuneCP5_14TeV-powheg-pythia8": {
+    "sample": "TTTo2L2Nu_TuneCP5_14TeV-powheg-pythia8",
+    "json_output": "datasets/TTTo2L2Nu_TuneCP5_14TeV-powheg-pythia8.json",
+    "files": [
+      {
+        "das_names": [
+          "/TTTo2L2Nu_TuneCP5_14TeV-powheg-pythia8/Run3Summer19NanoAOD-2021Scenario_106X_mcRun3_2021_realistic_v3-v2/NANOAODSIM"
+        ],
+        "metadata": {
+          "year": "",
+          "isMC": true,
+          "xsec": 1.0,
+          "das_names": [
+            "/TTTo2L2Nu_TuneCP5_14TeV-powheg-pythia8/Run3Summer19NanoAOD-2021Scenario_106X_mcRun3_2021_realistic_v3-v2/NANOAODSIM"
+          ],
+          "sample": "TTTo2L2Nu_TuneCP5_14TeV-powheg-pythia8"
+        }
+      }
+    ]
+  }
+}

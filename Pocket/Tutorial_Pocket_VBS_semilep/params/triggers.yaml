@@ -1,0 +1,16 @@
+# params/triggers.yaml
+
+HLT_triggers:
+  "2022_preEE":
+    SingleMuon:
+      - IsoMu24
+    EGamma: 
+      - Ele32_WPTight_Gsf
+      - Photon200
+
+  "2022_postEE":
+    SingleMuon:
+      - IsoMu24
+    EGamma:
+      - Ele32_WPTight_Gsf
+      - Photon200
