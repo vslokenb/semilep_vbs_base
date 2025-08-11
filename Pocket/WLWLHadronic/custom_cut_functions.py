@@ -1,40 +1,77 @@
+# custom_cut_functions.py
 import awkward as ak
+import numpy as np
 from pocket_coffea.lib.cut_definition import Cut
 
-def vbs_ss_dilepton(events, params, year, sample, **kwargs):
-
-    # Masks for VBS Channel with two leptons with the same charge
-    mask_2lep = (events.nLeptonGood == 2)
-
-    mask_ss = (events.ll.charge != 0)
-
-    mask_pt_lead = (ak.firsts(events.LeptonGood.pt) > params["pt_leading_lepton"])
-
-    mask_z_veto = (abs(events.ll.mass - 91.2) > params["mll_z_veto"])
-
-    mask_jets = (events.nJetGood >= params["n_jets"])
-
-    mask = ( mask_2lep & mask_ss & mask_pt_lead & mask_z_veto & mask_jets )
-
-    # Pad None values with False
-    return ak.where(ak.is_none(mask), False, mask)
-
-vbs_ss_dilepton_presel = Cut(
-    name="vbs_ss_dilepton",
-    params={
-        "pt_leading_lepton": 25,
-        "mll_z_veto": 15, 
-        "n_jets": 2,     
-    },
-    function=vbs_ss_dilepton,
-)
-
+# ---------- Skim: ≥1 leptons (mu/e) ----------
 def nLepton_skim(events, params, **kwargs):
-    '''
-    Este corte de skim selecciona eventos con al menos 2 leptones
-    (muones O electrones) en el evento crudo.
-    '''
-    nlep = ak.num(events.Muon, axis=1) + ak.num(events.Electron, axis=1)
-    return nlep >= 2
+    return (ak.num(events.Muon) + ak.num(events.Electron)) >= 1
 
 nLepton_skim_cut = Cut(name="nLepton_skim", params={}, function=nLepton_skim)
+
+# ---------- Preselection semileptonic VBS ----------
+def select_vbs_semileptonic(events, params, **kwargs):
+    """
+   Wait that  workflow created:
+      - events.LeptonGood, JetGood, BJetGood
+      - events.vbsjets (con .jet1/.jet2, .mass y delta_eta)
+      - events.w_had_jets 
+    """
+    one_lep = (events.nLeptonGood == 1)
+    four_j  = (events.nJetGood    >= 4)
+    met_cut = (events.MET.pt      >  params["met_pt"])
+
+    mjj_vbs   = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass", None)), np.nan)
+    deta_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+
+    cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+
+    # veto b optional
+    b_veto = (events.nBJetGood == 0) if params.get("apply_b_veto", True) else True
+
+    # central leptons between the two VBS jets
+    if params.get("require_lep_central", False):
+        lep = ak.firsts(events.LeptonGood)
+        j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
+        j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
+
+        j1_eta = ak.fill_none(getattr(j1, "eta", None), np.nan)
+        j2_eta = ak.fill_none(getattr(j2, "eta", None), np.nan)
+        lep_eta = ak.fill_none(getattr(lep, "eta", None), np.nan)
+
+        eta_min = np.minimum(j1_eta, j2_eta)
+        eta_max = np.maximum(j1_eta, j2_eta)
+        lep_central = (~np.isnan(lep_eta)) & (~np.isnan(eta_min)) & (~np.isnan(eta_max)) & \
+                      (lep_eta > eta_min) & (lep_eta < eta_max)
+    else:
+        lep_central = True
+
+    mask = one_lep & four_j & met_cut & cut_mjj & cut_deta & b_veto & lep_central
+    return ak.values_astype(mask, np.bool_)
+
+vbs_semileptonic_presel = Cut(
+    name="vbs_semileptonic",
+    params={
+        "met_pt": 40.0,
+        "mjj_vbs": 500.0,
+        "delta_eta_vbs": 2.5,
+        "apply_b_veto": True,
+        "require_lep_central": False,
+    },
+    function=select_vbs_semileptonic,
+)
+
+# ----------  Window mass for the W hadronic ----------
+def in_whad_window(events, params, **kwargs):
+    # w_had_jets.mass es lista de len=1 → a escalar
+    wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
+    within = np.where(np.isnan(wmass), False, np.abs(wmass - 80.4) < params["mjj_w_window"])
+    return ak.values_astype(within, np.bool_)
+
+whad_window_cut = Cut(
+    name="whad_window",
+    params={"mjj_w_window": 15.0},  
+    function=in_whad_window,
+)
+
