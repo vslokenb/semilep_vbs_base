@@ -30,14 +30,14 @@ Studying this process is essential for probing the Electroweak Symmetry Breaking
 ### 1. Environment
 You can run this tutorial on **lxplus** or any system with Docker/Singularity support and PocketCoffea installed.
 
-```bash
+'''bash
 # Clone the tutorial repository
 git clone https://github.com/<your-github-user>/Tutorial_Pocket_VBS_semilep.git
 cd Tutorial_Pocket_VBS_semilep
 
 # (Optional) If using Singularity
 singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
- ´´´bash
+'''
 
 ## 2. Datasets 
 
