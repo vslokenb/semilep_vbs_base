@@ -252,11 +252,12 @@ Once everything works, you can launch it on the whole dataset:
 
 ```bash
 
-pocket-coffea run --cfg config.py --executor dask@lxplus --scaleout 10 -o output_dask
+pocket-coffea run --cfg example_config.py --executor dask@lxplus --scaleout 10 -o output_dask --worker-image /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
 
 ```
 
 This will generate an output folder (e.g. output_dask) with the results in a .coffea file and copies of your settings to ensure reproducibility.
+The default singularity container in pocket-coffea is `pocketcoffea:lxplus-el9-latest` so it needs to be manually overridden to match our singularity image.
 
 ## 4. Creating the Plots 
 
