@@ -63,27 +63,26 @@ Open Dataset-discovery-CLI
 pocket-coffea dataset-discovery-cli
 ```
 
-Hint: Key_words Datasets:
-  * 
-  * 
+**Hint:** Key_words Datasets:
+  * /WpWpJJ*/Run3*/NANOAODSIM - Dataset # 1 - XS = 0.02093
+  * /WmWmJJ*/Run3*/NANOAODSIM - Dataset # 1 - XS = 0.007868
   
-
 ### Tutorial Structure:
 
 We will work with three main scripts:
 
-example_config_semileptonic.py
+1. example_config_semileptonic.py
 Configures PocketCoffea:
 * Loads datasets and parameters
 * Sets up skimming and preselections
 * Defines histograms
 
-custom_cut_functions.py
+2. custom_cut_functions.py
 Defines:
 * nLepton_skim_cut: requires ≥1 good lepton
 * vbs_semileptonic_presel: VBS-like preselections
 
-workflow.py
+3. workflow.py
 Implements VBSWWBaseProcessor:
 * Applies object preselection
 * Reconstructs VBS jets and hadronic W boson
