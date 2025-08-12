@@ -266,7 +266,7 @@ Use the make-plots command:
 
 ```bash
 
-pocket-coffea make-plots -i output_all.coffea --cfg output_dask/parameters_dump.yaml -o plots_dask
+pocket-coffea make-plots -i output_all.coffea --cfg parameters_dump.yaml -o plots_dask
 
 ```
 
