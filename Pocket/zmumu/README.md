@@ -266,7 +266,7 @@ Use the make-plots command:
 
 ```bash
 
-pocket-coffea make-plots -i output_dask/output_all.coffea --cfg output_dask/parameters_dump.yaml -o plots_dask
+pocket-coffea make-plots -i output_all.coffea --cfg parameters_dump.yaml -o plots
 
 ```
 
@@ -279,7 +279,7 @@ Key arguments:
 * -o: The output folder for the graphics.
 
 
-# Exercise: Strengthen Z $\rightarrow$ $\mu$ $\mu$ selection and plot $\Delta R$  in PocketCoffea  
+# Exercise: Z $\rightarrow$ $\mu$ $\mu$ selection and plot $\Delta R$  in PocketCoffea  
 
 Starting point
 Original files:
