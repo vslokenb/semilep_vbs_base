@@ -14,7 +14,7 @@ The analysis process in pocket-coffea is divided into four major steps that we w
 
 3. Running the Processor: We will launch the coffea processor to iterate over all the events, apply our selections and save the results (histograms) in an output file.
 
-4. Plot Creation: We will use pocket-coffea's plotting tools to read the results and generate the final graphs of our analysis.
+4. Plot Creation: We will use pocket-coffea's plotting tools to read the results and generate the final plots of our analysis.
 
 ### 1. Preparation of the Datasets (.json)
 
@@ -76,7 +76,7 @@ Important keys:
 
 b) Creation of the "Filesets
 
-Once the .json is defined, we use a pocket-coffea command to fetch these datasets from the Grid and generate the final files (called “filesets”) with the complete lists of files.
+Once the .json is defined, we use a pocket-coffea command to fetch these datasets from the Grid and generate the final files (called “datasets”) with the complete lists of files.
 
 First, make sure you have a valid Grid proxy:
 
