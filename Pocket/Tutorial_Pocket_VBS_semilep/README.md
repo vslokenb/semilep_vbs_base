@@ -1,4 +1,4 @@
-# VBS W±W± Semileptonic Analysis with PocketCoffea
+# VBS $W \pm W \pm$ Semileptonic Analysis with PocketCoffea
 
 ## Overview
 
