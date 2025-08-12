@@ -278,3 +278,74 @@ Key arguments:
 
 * -o: The output folder for the graphics.
 
+
+# Exercise: Strengthen Z $\rightarrow$ $\mu$ $\mu$ selection and plot ΔR  in PocketCoffea  
+
+Starting point
+Original files:
+
+workflow.py
+custom_cut_functions.py
+example_config.py
+params/object_preselection.yaml, params/triggers.yaml, params/plotting.yaml
+Do not change object_preselection.yaml or triggers.yaml for this exercise.
+
+1) Preselection Z $\rightarrow$ $\mu$ $\mu$ within the cut 
+
+Objective: that the Z $\rightarrow$ $\mu$ $\mu$ cut does not depend on events.ll and is robust.
+
+In custom_cut_functions.py:
+
+A. In the dimuon preselection function:
+* Construct muon pairs per event using combinations of MuonGood.
+* Define and apply minimum pT for leading and subleading muons (values from parameters).
+* Require opposite charge between the two muons in the pair.
+* Compute dR(mu,mu) per pair and apply a minimum.
+* Compute mll of the pair and apply window [low, high] (values from parameters).
+
+The final mask at the event level must accept if any pair meets all criteria.
+Be sure to handle None values by returning False in those cases.
+
+B. In the Cut corresponding to dimuon, add the new keys needed for the following to params:
+* pT of the leading and subleading muon
+* Minimum dR
+* Mass window (low, high)
+* 
+Keep everything parameterized (no hardcoding in the code).
+Verification:
+Run a smoke test. The cut should not crash and should filter events reasonably.
+
+```bash
+
+pocket-coffea run --cfg example_config.py --test -o outputs/test
+
+```
+
+2) Plot dR(mu,mu)
+   
+Objective: produce a histogram of dR between the two selected muons.
+
+A — Define the variable (workflow):
+In workflow.py, without changing the construction of ll, calculate a scalar dR_mumu per event:
+* Construct μμ pairs (MuonGood combinations).
+* Obtain dR per pair.
+* To have one value per event, select the one from the corresponding pair (if there are exactly two muons, there will be only one pair).
+* Fill in events without a pair with a sentinel value (e.g., -1).
+* Save the result as self.events[“dR_mumu”].
+  
+B — Histogram (config):
+In example_config.py, add an entry in variables to histogram dR_mumu:
+* coll="events"
+* Typical range: 0–6, ~60 bins
+* Axis label: dR(mu,mu)
+Verification:
+Run a short run and generate plots.
+Verify that the dR figure exists in plots/.../dr_mumu_*.png.
+If you use zpeak, compare baseline vs zpeak and comment on differences.
+
+```bash
+
+pocket-coffea run --cfg example_config.py --test -o outputs/test
+
+```
+
