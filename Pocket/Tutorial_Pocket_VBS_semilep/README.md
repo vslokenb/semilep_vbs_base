@@ -4,24 +4,25 @@
 
 This hands-on tutorial will guide you through performing a semileptonic **Vector Boson Scattering (VBS)** W±W± analysis using the [PocketCoffea](https://github.com/PocketCoffea) framework.
 
-![VBS WW Semilptonic](semilep.png)
-
 You will learn how to:
-- Configure PocketCoffea for a physics analysis.
-- Select physics objects (jets, leptons, MET).
-- Apply VBS-like preselections for the semileptonic channel.
-- Reconstruct the hadronic W boson and compute its kinematic variables.
-- Make histograms and explore distributions.
-- Understand how this connects to **jet tagging** (e.g., ParticleNet).
 
----
+- Configure PocketCoffea for VBS Semileptonic Analysis.
+- Select physics objects (jets, leptons, MET).
+- Apply VBS-like preselections for the semileptonic channel (Central Jets, Forward Jets and Central Leptons).
+- Reconstruct the hadronic and leptonic W boson and compute its kinematic variables.
+- Make histograms and explore distributions.
+  
+------
 
 ## Physics Motivation
 
-Vector Boson Scattering is a rare electroweak process where two vector bosons (here W±W±) are produced with two forward tagging jets. The semileptonic channel has:
-- One **leptonic W** (W → lν)  
-- One **hadronic W** (W → jj)  
+Vector Boson Scattering is a rare electroweak process where two vector bosons (here $W \pm W\pm$) are produced with two forward tagging jets. The semileptonic channel has:
+
+- One **leptonic W** ($W \rightarrow l \mu$)  
+- One **hadronic W** (W \rightarrow jj)  
 - Two forward **VBS jets**  
+
+![VBS WW Semilptonic](semilep.png)
 
 Studying this process is essential for probing the Electroweak Symmetry Breaking (EWSB) mechanism and searching for deviations from the Standard Model.
 
@@ -34,11 +35,18 @@ You can run this tutorial on **lxplus** or any system with Docker/Singularity su
 
 ```bash
 # Clone the tutorial repository
-git clone https://github.com/<your-github-user>/Tutorial_Pocket_VBS_semilep.git
+git clone https://github.com/wbuitrago/Pocket_Coffea_Tutorial.git
 cd Tutorial_Pocket_VBS_semilep
 
-# (Optional) If using Singularity
-singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
+# Proxy Grid
+voms-proxy-init -voms cms -rfc --valid 168:0
+
+# Open PocketCoffea in the singularity
+apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
+                -B /tmp  -B /eos/cms/  -B /etc/sysconfig/ngbauth-submit \
+                -B ${XDG_RUNTIME_DIR}  --env KRB5CCNAME="FILE:${XDG_RUNTIME_DIR}/krb5cc" \
+    /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+
 ```
 
 ## 2. Datasets 
@@ -46,7 +54,19 @@ singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/cof
 For this tutorial, we use two signal MC datasets:
 * /WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM
 * /WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM
-* JSON files describing the dataset locations are in the datasets/ folder.
+
+**Exercise**:
+Generate the json file for the  two MC samples.
+
+Open Dataset-discovery-CLI
+```bash
+pocket-coffea dataset-discovery-cli
+```
+
+Hint: Key_words Datasets:
+  * 
+  * 
+  
 
 ### Tutorial Structure:
 
@@ -107,3 +127,4 @@ pocket-coffea run --cfg example_config_semileptonic.py \
                   --limit-files 1 \
                   --limit-chunks 2
 ```
+Tutorial made by: Hayden Richard Hollenbeck & David Buitrago Ceballos
