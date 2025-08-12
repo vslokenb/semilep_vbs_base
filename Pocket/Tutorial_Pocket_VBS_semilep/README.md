@@ -109,11 +109,18 @@ We will proceed step-by-step:
 * eta distribution of leptons
 
 ```bash
+
+# Run PocketCoffea Configuration 
 pocket-coffea run --cfg example_config_semileptonic.py \
-                  -o output_test \
+                  -o output_semilep \
                   -e futures \
                   --scaleout 4 \
                   --limit-files 1 \
                   --limit-chunks 2
+
+# MakePlots
+cd output_semilep
+pocket-coffea make-plots -i output_all.coffea --cfg parameters_dump.yaml -o plots
+
 ```
 Tutorial made by: Hayden Richard Hollenbeck & David Buitrago Ceballos
