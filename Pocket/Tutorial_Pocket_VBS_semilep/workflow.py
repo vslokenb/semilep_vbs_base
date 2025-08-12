@@ -65,9 +65,10 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         vbs_j = ak.fill_none(getattr(v2, "idx", None), -1)
 
         nonvbs_mask = (ev.JetGood.idx != vbs_i) & (ev.JetGood.idx != vbs_j)
-        jets_nonvbs = ev.JetGood[nonvbs_mask]
+        ev["CentralJets"] = ev.JetGood[nonvbs_mask]
+        ev["CentralJetsGood"] = ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4]
 
-        pairs_w = ak.combinations(jets_nonvbs, 2, fields=["jet1", "jet2"])
+        pairs_w = ak.combinations(ev.CentralJetsGood, 2, fields=["jet1", "jet2"])
         pairs_w["mass"] = (pairs_w.jet1 + pairs_w.jet2).mass
 
         target_mw = 80.4
@@ -100,3 +101,4 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nLeptonGood"]   = ev.nMuonGood + ev.nElectronGood
         ev["nJetGood"]      = ak.num(ev.JetGood)
         ev["nBJetGood"]     = ak.num(ev.BJetGood)
+        ev["nCentralJetsGood"] = ak.num(ev.CentralJetsGood)

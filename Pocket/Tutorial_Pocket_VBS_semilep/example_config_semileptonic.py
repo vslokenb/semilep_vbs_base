@@ -78,6 +78,7 @@ cfg = Configurator(
      
         "nJets":      HistConf([Axis(coll="events", field="nJetGood", bins=12, start=0, stop=12, label="N(jets)")]),
         "nBJets":     HistConf([Axis(coll="events", field="nBJetGood", bins=6, start=0, stop=6, label="N(bjets)")]),
+        "nCentralJets": HistConf([Axis(coll="events", field="nCentralJetsGood", bins=12, start=0, stop=12, label="N(Central Jets)")]),
         # MET and mT
         "met":        HistConf([Axis(coll="MET", field="pt", bins=50, start=0, stop=250, label=r"$p_T^{miss}$ [GeV]")]),
         "mt_w_lep":   HistConf([Axis(coll="events", field="mt_w_leptonic", bins=50, start=0, stop=200, label=r"$m_T(W_{lep})$ [GeV]")]),
