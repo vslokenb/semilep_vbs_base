@@ -2,7 +2,7 @@
 
 Welcome to this hands-on tutorial on pocket-coffea. This guide is designed to take you through a complete particle physics analysis, from defining the datasets to creating the final plots. The goal is to learn the workflow and philosophy behind this framework.
 
-The analysis we will perform as an example is the reconstruction of the Z boson from its decay into two muons (Z $\rightarrow$ $\mu$ $\mu$), using open data and simulation of the CMS detector.
+The analysis we will perform as an example is the reconstruction of the Z boson from its decay into two muons (Z $\rightarrow$ $\mu$ $\mu$), using data and simulation of the CMS detector.
 
 ## General Workflow
 
