@@ -279,7 +279,7 @@ Key arguments:
 * -o: The output folder for the graphics.
 
 
-# Exercise: Strengthen Z $\rightarrow$ $\mu$ $\mu$ selection and plot $\DeltaR$  in PocketCoffea  
+# Exercise: Strengthen Z $\rightarrow$ $\mu$ $\mu$ selection and plot $\Delta R$  in PocketCoffea  
 
 Starting point
 Original files:
