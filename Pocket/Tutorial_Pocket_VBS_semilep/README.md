@@ -4,6 +4,8 @@
 
 This hands-on tutorial will guide you through performing a semileptonic **Vector Boson Scattering (VBS)** W±W± analysis using the [PocketCoffea](https://github.com/PocketCoffea) framework.
 
+![VBS WW Semilptonic](semilep.png)
+
 You will learn how to:
 - Configure PocketCoffea for a physics analysis.
 - Select physics objects (jets, leptons, MET).
