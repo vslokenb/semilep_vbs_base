@@ -108,17 +108,6 @@ We will proceed step-by-step:
 * dR between hadronic W jets
 * eta distribution of leptons
 
-Exercises:
-
-Q1. In custom_cut_functions.py, we cut on mjj_vbs > 500. What happens if you lower it to 300?
-Q2. The hadronic W mass window is set to ±15 GeV around 80.4. What happens if you remove this window?
-Q3. Add a histogram for ΔR between the two hadronic W jets.
-Q4. Change the lepton centrality requirement (require_lep_central) to True. What is the effect?
-Q5. Change the b-jet veto to allow events with one b-jet. How does mjj(W had) change?
-
-Hint: Running the Code
-Example run:
-
 ```bash
 pocket-coffea run --cfg example_config_semileptonic.py \
                   -o output_test \
