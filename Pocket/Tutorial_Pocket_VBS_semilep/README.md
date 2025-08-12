@@ -105,8 +105,8 @@ We will proceed step-by-step:
 * Change mjj(VBS) cut
 * See how distributions change
 4. Add new plots:
-* dR between hadronic W jets
-* eta distribution of leptons
+* $\Delta R$ between hadronic W jets
+* $\eta$ distribution of leptons
 
 ```bash
 
