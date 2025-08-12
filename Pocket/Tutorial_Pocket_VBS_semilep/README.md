@@ -58,8 +58,9 @@ For this tutorial, we use two signal MC datasets:
 **Exercise**:
 Generate the json file for the  two MC samples.
 
-Open Dataset-discovery-CLI
 ```bash
+Open Dataset-discovery-CLI
+
 pocket-coffea dataset-discovery-cli
 ```
 
