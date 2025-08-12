@@ -1,25 +1,28 @@
-# VBS W±W± Semileptonic Analysis with PocketCoffea
+# VBS $W \pm W \pm$ Semileptonic Analysis with PocketCoffea
 
 ## Overview
 
 This hands-on tutorial will guide you through performing a semileptonic **Vector Boson Scattering (VBS)** W±W± analysis using the [PocketCoffea](https://github.com/PocketCoffea) framework.
 
 You will learn how to:
-- Configure PocketCoffea for a physics analysis.
-- Select physics objects (jets, leptons, MET).
-- Apply VBS-like preselections for the semileptonic channel.
-- Reconstruct the hadronic W boson and compute its kinematic variables.
-- Make histograms and explore distributions.
-- Understand how this connects to **jet tagging** (e.g., ParticleNet).
 
----
+- Configure PocketCoffea for VBS Semileptonic Analysis.
+- Select physics objects (jets, leptons, MET).
+- Apply VBS-like preselections for the semileptonic channel (Central Jets, Forward Jets and Central Leptons).
+- Reconstruct the hadronic and leptonic W boson and compute its kinematic variables.
+- Make histograms and explore distributions.
+  
+------
 
 ## Physics Motivation
 
-Vector Boson Scattering is a rare electroweak process where two vector bosons (here W±W±) are produced with two forward tagging jets. The semileptonic channel has:
-- One **leptonic W** (W → lν)  
-- One **hadronic W** (W → jj)  
+Vector Boson Scattering is a rare electroweak process where two vector bosons (here $W \pm W\pm$) are produced with two forward tagging jets. The semileptonic channel has:
+
+- One **leptonic W** ($W \rightarrow l \mu$)  
+- One **hadronic W** (W \rightarrow jj)  
 - Two forward **VBS jets**  
+
+![VBS WW Semilptonic](semilep.png)
 
 Studying this process is essential for probing the Electroweak Symmetry Breaking (EWSB) mechanism and searching for deviations from the Standard Model.
 
@@ -32,11 +35,18 @@ You can run this tutorial on **lxplus** or any system with Docker/Singularity su
 
 ```bash
 # Clone the tutorial repository
-git clone https://github.com/<your-github-user>/Tutorial_Pocket_VBS_semilep.git
+git clone https://github.com/wbuitrago/Pocket_Coffea_Tutorial.git
 cd Tutorial_Pocket_VBS_semilep
 
-# (Optional) If using Singularity
-singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
+# Proxy Grid
+voms-proxy-init -voms cms -rfc --valid 168:0
+
+# Open PocketCoffea in the singularity
+apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
+                -B /tmp  -B /eos/cms/  -B /etc/sysconfig/ngbauth-submit \
+                -B ${XDG_RUNTIME_DIR}  --env KRB5CCNAME="FILE:${XDG_RUNTIME_DIR}/krb5cc" \
+    /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+
 ```
 
 ## 2. Datasets 
@@ -44,24 +54,36 @@ singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/cof
 For this tutorial, we use two signal MC datasets:
 * /WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM
 * /WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM
-* JSON files describing the dataset locations are in the datasets/ folder.
 
+**Exercise**:
+Generate the json file for the  two MC samples.
+
+```bash
+Open Dataset-discovery-CLI
+
+pocket-coffea dataset-discovery-cli
+```
+
+**Hint:** Key_words Datasets:
+  * /WpWpJJ*/Run3*/NANOAODSIM - Dataset # 1 - XS = 0.02093
+  * /WmWmJJ*/Run3*/NANOAODSIM - Dataset # 1 - XS = 0.007868
+  
 ### Tutorial Structure:
 
 We will work with three main scripts:
 
-example_config_semileptonic.py
+1. example_config_semileptonic.py
 Configures PocketCoffea:
 * Loads datasets and parameters
 * Sets up skimming and preselections
 * Defines histograms
 
-custom_cut_functions.py
+2. custom_cut_functions.py
 Defines:
 * nLepton_skim_cut: requires ≥1 good lepton
 * vbs_semileptonic_presel: VBS-like preselections
 
-workflow.py
+3. workflow.py
 Implements VBSWWBaseProcessor:
 * Applies object preselection
 * Reconstructs VBS jets and hadronic W boson
@@ -83,25 +105,22 @@ We will proceed step-by-step:
 * Change mjj(VBS) cut
 * See how distributions change
 4. Add new plots:
-* dR between hadronic W jets
-* eta distribution of leptons
-
-Exercises:
-
-Q1. In custom_cut_functions.py, we cut on mjj_vbs > 500. What happens if you lower it to 300?
-Q2. The hadronic W mass window is set to ±15 GeV around 80.4. What happens if you remove this window?
-Q3. Add a histogram for ΔR between the two hadronic W jets.
-Q4. Change the lepton centrality requirement (require_lep_central) to True. What is the effect?
-Q5. Change the b-jet veto to allow events with one b-jet. How does mjj(W had) change?
-
-Hint: Running the Code
-Example run:
+* $\Delta R$ between hadronic W jets
+* $\eta$ distribution of leptons
 
 ```bash
+
+# Run PocketCoffea Configuration 
 pocket-coffea run --cfg example_config_semileptonic.py \
-                  -o output_test \
+                  -o output_semilep \
                   -e futures \
                   --scaleout 4 \
                   --limit-files 1 \
                   --limit-chunks 2
+
+# MakePlots
+cd output_semilep
+pocket-coffea make-plots -i output_all.coffea --cfg parameters_dump.yaml -o plots
+
 ```
+Tutorial made by: Hayden Richard Hollenbeck & David Buitrago Ceballos
