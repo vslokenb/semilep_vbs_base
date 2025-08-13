@@ -163,6 +163,13 @@ The pocket-coffea GitHub repository is useful for finding documentation about va
 Try looking up in libraries based on the `import pocketcoffea.module.submodule` in the `pocket_coffea/lib` folder
 [https://github.com/PocketCoffea/PocketCoffea/tree/main/pocket\_coffea](https://github.com/PocketCoffea/PocketCoffea/tree/main/pocket_coffea).
 
+If you want to know the content in you NANOAOD, you can check for your specific version of NANOAOD:
+https://cms-nanoaod-integration.web.cern.ch/autoDoc/
+For NANOAODV12:
+https://cms-nanoaod-integration.web.cern.ch/autoDoc/NanoAODv15/2024/size_TTH-Hto2G_Par-M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2.html
+
+
+
 Defaults are usually stored in `.yaml` files in the repository, which are also useful to examine.
 
 ### Acknowledgements
