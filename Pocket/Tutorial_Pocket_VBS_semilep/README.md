@@ -19,8 +19,8 @@ You will learn how to:
 Vector Boson Scattering is a rare electroweak process where two vector bosons (here $W \pm W\pm$) are produced with two forward tagging jets. The semileptonic channel has:
 
 - One **leptonic W** ($W \rightarrow l \mu$)  
-- One **hadronic W** (W \rightarrow jj)  
-- Two forward **VBS jets**  
+- One **hadronic W** (W \rightarrow jj)  -> Central Jets $|\eta| < 2.5$
+- Two forward **VBS jets**  mjj > 500 MeV, |$\eta > 2.5$ |
 
 ![VBS WW Semilptonic](semilep.png)
 
