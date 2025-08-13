@@ -81,7 +81,7 @@ You can create now you dataser, with buildataset:
 mkdir dataset
 pocket-coffea build-datasets --cfg datasets/datasets_definitions.json
 ```
-  
+
 ### Tutorial Structure:
 
 We will work with three main scripts:
