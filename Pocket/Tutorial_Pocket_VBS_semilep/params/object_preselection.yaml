@@ -16,7 +16,6 @@ object_preselection:
   Jet:
     dr_lepton: 0.4
     pt: 30
-    # CORRECCIÓN: Aumentar la aceptación en eta para incluir los jets VBS "forward"
     eta: 4.7 
     jetId: 2
     puId:
