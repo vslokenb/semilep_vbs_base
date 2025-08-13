@@ -58,9 +58,9 @@ For this tutorial, we use two signal MC datasets:
 **Exercise**:
 Generate the json file for the  two MC samples.
 
-```bash
 Open Dataset-discovery-CLI
 
+```bash
 pocket-coffea dataset-discovery-cli
 ```
 
@@ -95,6 +95,7 @@ We will proceed step-by-step:
 
 1. Load the configuration and inspect available datasets.
 2. Run with a small subset (--limit-files 1 --limit-chunks 2) to check everything works.
+* Use the `--test` flag with `pocket-coffea run`
 3. Inspect histograms for:
 * Number of jets
 * MET
@@ -123,4 +124,30 @@ cd output_semilep
 pocket-coffea make-plots -i output_all.coffea --cfg parameters_dump.yaml -o plots
 
 ```
+
+### Troubleshooting
+
+If you can't find files in your apptainer image, you may need to explicitly bind the local directory to the image:
+```bash
+apptainer shell -B $(pwd) -B /afs -B /cvmfs/cms.cern.ch \
+                -B /tmp  -B /eos/cms/  -B /etc/sysconfig/ngbauth-submit \
+                -B ${XDG_RUNTIME_DIR}  --env KRB5CCNAME="FILE:${XDG_RUNTIME_DIR}/krb5cc" \
+    /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+```
+
+Using the `dask@lxplus` executor in the above apptainer image requires specifying that the worker node also uses the stable pocket coffea image:
+```bash
+pocket-coffea run --cfg example_config.py --executor dask@lxplus --scaleout 10 -o output_dask --worker-image /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+```
+
+### Documentation
+
+The pocket-coffea GitHub repository is useful for finding documentation about various functions used through the exercise.
+Try looking up in libraries based on the `import pocketcoffea.module.submodule` in the `pocket_coffea/lib` folder
+[https://github.com/PocketCoffea/PocketCoffea/tree/main/pocket\_coffea](https://github.com/PocketCoffea/PocketCoffea/tree/main/pocket_coffea).
+
+Defaults are usually stored in `.yaml` files in the repository, which are also useful to examine.
+
+### Acknowledgements
+
 Tutorial made by: Hayden Richard Hollenbeck & David Buitrago Ceballos
