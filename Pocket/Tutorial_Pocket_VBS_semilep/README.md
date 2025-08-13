@@ -36,7 +36,7 @@ You can run this tutorial on **lxplus** or any system with Docker/Singularity su
 ```bash
 # Clone the tutorial repository
 git clone https://github.com/wbuitrago/Pocket_Coffea_Tutorial.git
-cd Tutorial_Pocket_VBS_semilep
+cd Pocket_Coffea_Tutorial/pocket/Tutorial_Pocket_VBS_semilep
 
 # Proxy Grid
 voms-proxy-init -voms cms -rfc --valid 168:0
@@ -52,8 +52,8 @@ apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
 ## 2. Datasets 
 
 For this tutorial, we use two signal MC datasets:
-* /WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM
-* /WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM
+* /WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM (/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE)
+* /WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM (/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE)
 
 **Exercise**:
 Generate the json file for the  two MC samples.
