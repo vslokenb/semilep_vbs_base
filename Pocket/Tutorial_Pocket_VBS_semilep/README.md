@@ -67,6 +67,20 @@ pocket-coffea dataset-discovery-cli
 **Hint:** Key_words Datasets:
   * /WpWpJJ*/Run3*/NANOAODSIM - Dataset # 1 - XS = 0.02093
   * /WmWmJJ*/Run3*/NANOAODSIM - Dataset # 1 - XS = 0.007868
+
+1. Step. Query (Enter) -> Key words Datasets.
+2. Select (Enter) --> Select your dataset
+3. Replicas (Enter) --> choose your dataset
+4. Choose (Enter) --> Choose your replica
+5. Follow with next Sample or if you finish to select all your samples, you can save.
+6. save (Enter) --> save as a json file
+
+You can create now you dataser, with buildataset:
+
+```bash
+mkdir dataset
+pocket-coffea build-datasets --cfg datasets/datasets_definitions.json
+```
   
 ### Tutorial Structure:
 
