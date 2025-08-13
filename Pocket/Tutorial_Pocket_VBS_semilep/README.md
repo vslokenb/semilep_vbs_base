@@ -79,7 +79,7 @@ You can create now you dataser, with buildataset:
 
 ```bash
 mkdir dataset
-pocket-coffea build-datasets --cfg datasets/datasets_definitions.json
+pocket-coffea build-datasets --cfg ¨Name_of_your_datasets_definitions.json¨
 ```
 
 ### Tutorial Structure:
