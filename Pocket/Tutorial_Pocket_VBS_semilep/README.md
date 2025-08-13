@@ -133,6 +133,9 @@ pocket-coffea run --cfg example_config_semileptonic.py \
                   --limit-files 1 \
                   --limit-chunks 2
 
+#For test use this command
+pocket-coffea run --cfg example_config_semileptonic.py --test -o outputs/test
+
 # MakePlots
 cd output_semilep
 pocket-coffea make-plots -i output_all.coffea --cfg parameters_dump.yaml -o plots
@@ -151,7 +154,7 @@ apptainer shell -B $(pwd) -B /afs -B /cvmfs/cms.cern.ch \
 
 Using the `dask@lxplus` executor in the above apptainer image requires specifying that the worker node also uses the stable pocket coffea image:
 ```bash
-pocket-coffea run --cfg example_config.py --executor dask@lxplus --scaleout 10 -o output_dask --worker-image /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+pocket-coffea run --cfg example_config_semileptonic.py --executor dask@lxplus --scaleout 10 -o output_dask --worker-image /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
 ```
 
 ### Documentation
