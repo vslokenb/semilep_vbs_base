@@ -1,0 +1,28 @@
+{
+    "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2017": {
+        "metadata": {
+            "das_names": "['/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM']",
+            "sample": "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            "year": "2017",
+            "era": "B",
+            "isMC": "True",
+            "xsec": "0.9114",
+            "nevents": "5926000",
+            "size": "10818127119"
+        },
+        "files": [
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/0E0CEF97-2A67-3141-9639-84DF0A96E89C.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/24B904DC-198A-D34E-9828-6BD36A1FA513.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/24E305DD-6846-0747-988E-3EFC78135C98.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/2F19B034-F6BA-434D-80C9-22614544D092.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/5F5AE1A6-CA3F-2040-89D8-D89A1421BA93.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/6B0DA473-796A-194E-900A-DFDEBF6CDE31.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/6F5747B4-C5C8-3D47-8DD7-8EFF32D0FD28.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/78881EC6-2DD0-384E-B793-15F6E84C6E2A.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/93CBB879-C8B1-0B47-8BFB-7C5FB41B5162.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/9B83C6DE-3334-7C4F-A338-2F9B5199282C.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/A96EDFEB-5F93-2D44-AEC4-41C0F4B242C0.root",
+            "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIIFall17NanoAODv7/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/140000/E9EFE794-CB76-E844-8212-438EB8AF0429.root"
+        ]
+    }
+}

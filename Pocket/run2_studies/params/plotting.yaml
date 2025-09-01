@@ -1,0 +1,69 @@
+plotting_style:
+  labels_mc:
+    DATA_SingleMuon: "Data"
+    DATA_EGamma:     "Data"
+    DYJetsToLL_M-50_TuneCP5_13p6TeV-madgraphMLM-pythia8: "DY → ℓℓ"
+    WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8: "W⁺W⁺ EWK (sig)"
+    WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8: "W⁻W⁻ EWK (sig)"
+    TT_TuneCP5_13p6TeV_powheg-pythia8: "Ttbar (bkg)"
+    WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "W+W- to jj lv (sig)"
+    WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "W+W- to lv jj (sig)"
+    WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "W-W- to lv jj (sig)"
+    WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "W+W+ to lv jj (sig)"
+    WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: "W to lv (bkg)"
+    ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8: "ZZ to ll qq (bkg)"
+    WWtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8: "WW to lv qq (bkg)"
+    WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "W-Z to lv jj (sig)"
+    WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "W+Z to lv jj (sig)"
+    TTto2L2Nu_TuneCP5_ERDOn_13p6TeV_powheg-pythia8: "ttbar to lv lv (bkg)"
+    TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8: "ttbar to lv qq (bkg)"
+    DYto2L-2Jets_MLL-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: "DY to ll jj (bkg)"
+    DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: "DY to ll jj (bkg, mll = 50)"
+
+
+  color:
+    DATA_SingleMuon: "#000000"
+    DATA_EGamma:     "#000000"
+    WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "#3f90da"
+    WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "#ffa90e"
+    WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "#bd1f01"
+    WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "#832db6"
+    WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: "#a96b59"
+    WWtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8: "#e76300"
+    WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "#a96b59"
+    WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: "#e76300"
+    TTto2L2Nu_TuneCP5_ERDOn_13p6TeV_powheg-pythia8: "#3f90da"
+    TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8: "#ffa90e"
+    DYto2L-2Jets_MLL-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: "#bd1f01"
+    DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: "#bd1f08"
+
+  is_signal:
+    WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: true
+    WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: true
+    WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: true
+    WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: true
+    WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: false
+    ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8: false
+    WWtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8: false
+    WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: true
+    WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8: true
+    TTto2L2Nu_TuneCP5_ERDOn_13p6TeV_powheg-pythia8: false
+    TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8: false
+    DYto2L-2Jets_MLL-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: false
+    DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8: false
+  samples_groups:
+    background:
+      - WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8
+      - ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8
+      - WWtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8
+      - TTto2L2Nu_TuneCP5_ERDOn_13p6TeV_powheg-pythia8
+      - TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8
+      - DYto2L-2Jets_MLL-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8
+      - DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8
+    signal:
+      - WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8
+      - WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8
+      - WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8
+      - WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8
+      - WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8
+      - WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8

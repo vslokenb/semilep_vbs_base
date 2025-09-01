@@ -1,0 +1,18 @@
+{
+   "WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+    "sample": "WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8",
+    "json_output": "datasets/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8.json",
+    "files": [
+      {
+        "das_names": [
+          "/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": true,
+          "xsec": 67710.0
+        }
+      }
+    ]
+  }
+}

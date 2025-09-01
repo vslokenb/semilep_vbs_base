@@ -1,0 +1,213 @@
+Defaults within PocketCoffea:
+
+btag:
+    '2017':
+        reference:
+            btagging_WP: https://btv-wiki.docs.cern.ch/ScaleFactors/UL2017/
+        btagging_algorithm: btagDeepFlavB
+        btagging_WP:
+            L: 0.0532
+            M: 0.3040
+            H: 0.7476
+        bbtagging_algorithm: btagDDBvL
+        bbtagging_WP: 0.86
+        bbtagSF_DDBvL_M1_loPt: 0.82
+        bbtagSF_DDBvL_M1_loPt_up: 0.86
+        bbtagSF_DDBvL_M1_loPt_down: 0.77
+        bbtagSF_DDBvL_M1_hiPt: 0.77
+        bbtagSF_DDBvL_M1_hiPt_up: 0.83
+        bbtagSF_DDBvL_M1_hiPt_down: 0.67
+    '2022_postEE':
+      reference:
+        btagging_WP: https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22EE/
+      btagging_algorithm: btagDeepFlavB
+      btagging_WP:
+        L: 0.0614
+        M: 0.3196
+        T: 0.7300
+        XT: 0.8184
+        XXT: 0.9542
+      bbtagging_algorithm: btagDDBvL
+      bbtagging_WP: 0.86
+      bbtagSF_DDBvL_M1_loPt: 0.81
+      bbtagSF_DDBvL_M1_loPt_up: 0.88
+      bbtagSF_DDBvL_M1_loPt_down: 0.76
+      bbtagSF_DDBvL_M1_hiPt: 0.76
+      bbtagSF_DDBvL_M1_hiPt_up: 0.82
+      bbtagSF_DDBvL_M1_hiPt_down: 0.71
+event_flags:
+    "2017":
+        - "goodVertices"
+        - "globalSuperTightHalo2016Filter"
+        - "HBHENoiseFilter"
+        - "HBHENoiseIsoFilter"
+        - "EcalDeadCellTriggerPrimitiveFilter"
+        - "BadPFMuonFilter"
+    "2022_postEE":
+        - "goodVertices"
+        - "globalSuperTightHalo2016Filter"
+        - "EcalDeadCellTriggerPrimitiveFilter"
+        - "BadPFMuonFilter"
+        - "BadPFMuonDzFilter"
+        - "hfNoisyHitsFilter"
+        - "eeBadScFilter"
+        - "ecalBadCalibFilter"
+jec_factors:
+    '2017': 
+        'MC': 'Summer19UL17_V5_MC',
+        'Data': 
+            'B': 'Summer19UL17_RunB_V5_DATA',
+            'C': 'Summer19UL17_RunC_V5_DATA',
+            'D': 'Summer19UL17_RunD_V5_DATA',
+            'E': 'Summer19UL17_RunE_V5_DATA',
+            'F': 'Summer19UL17_RunF_V5_DATA',
+    '2022':
+        long list found at https://github.com/PocketCoffea/PocketCoffea/tree/6625e9d3b2c5273486a385bf7f53b5bf2de4e11a/pocket_coffea/parameters/jec
+btag_SF:
+    '2017':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2017_UL/btagging.json.gz
+        name: "deepJet_shape"
+    '2022_postEE':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2022_Summer22EE/btagging.json.gz
+        name: "deepJet_shape"
+ctag_SF:
+    '2017':
+        SF_file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2017_UL/ctagging.json.gz
+        Calib_file: "${default_params_dir:}/ctagSF_calibrationSF.json"
+        name: "deepJet_shape"
+    '2022_postEE':
+        SF_file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2022_27Jun2023EE/ctagging.json.gz
+        Calib_file: "${default_params_dir:}/ctagSF_calibrationSF.json"
+        name: "deepJet_shape"
+jet_puId:
+    '2017':
+            file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2017_UL/jmar.json.gz
+            working_point:
+                L: 4
+                M: 6
+                T: 7
+            name: PUJetID_eff
+vetomaps:
+    '2022_postEE':
+            file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2022_Summer22EE/jetvetomaps.json.gz
+            name: "Summer22EE_23Sep2023_RunEFG_V1"
+jetcalibration_differences...
+
+electron_sf:
+    '2017':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2017_UL/electron.json.gz
+        name: UL-Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20: RecoAbove20
+    '2022_postEE':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2022_Summer22EE/electron.json.gz
+        name: Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+muon_sf:
+    '2017':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LooseRelIso_DEN_TightIDandIPCut
+          trigger: NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight
+    '2022_postEE':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          # trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+lumi:
+    "2017" : 41529.0,
+    "2022_postEE" : 27700
+MET_xy:
+    MC:
+        "2017": [[-0.300155,  1.906080], [0.300213, -2.022320]]
+        "2022": ???
+photon_sf:
+    '2017':
+          id: UL-Photon-ID-SF
+          pxseed: UL-Photon-PixVeto-SF
+    '2022_postEE':
+          id: UL-Photon-ID-SF
+          pxseed: UL-Photon-PixVeto-SF
+pileup_json:
+    '2017':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2017_UL/puWeights.json.gz
+        name: Collisions17_UltraLegacy_goldenJSON
+    '2022_postEE': 
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2022_Summer22EE/puWeights.json.gz
+        name: Collisions2022_359022_362760_eraEFG_GoldenJson
+
+object_preselection:
+    '2017':
+        Muon:
+            pt: 15
+            eta: 2.4
+            iso: 0.25  
+            id: tightId
+        Jet:
+            dr_lepton: 0.4
+            pt: 30
+            eta: 4.7 
+            jetId: 2
+            puId:
+            wp: L
+            value: 4
+            maxpt: 50.0
+        btag:
+            wp: M
+        Electron:
+            pt: 15
+            eta: 2.4
+            iso: 0.06
+            id: mvaFall17V2Iso_WP80
+    '2022_postEE':
+        Muon:
+            pt: 15
+            eta: 2.4
+            iso: 0.25  
+            id: tightId
+        Jet:
+            dr_lepton: 0.4
+            pt: 30
+            eta: 4.7 
+            jetId: 2
+            puId:
+            wp: L
+            value: 4
+            maxpt: 50.0
+            btag:
+                wp: M
+        Electron:
+            pt: 15
+            eta: 2.4
+            iso: 0.06
+            id: mvaIso_WP80
+   
+HLT_triggers:
+    "2022_postEE":
+        SingleMuon:
+        - IsoMu24
+        EGamma:
+        - Ele32_WPTight_Gsf
+        - Photon200
+    "2017":
+        SingleEle:
+        - Ele32_WPTight_Gsf
+        - Ele28_eta2p1_WPTight_Gsf_HT150
+        SingleMuon: 
+        - IsoMu24
+
+cuts:
+    - |mjj^W - 80.4| < 15
+    - one_lep = (events.nLeptonGood == 1)
+    - four_j  = (events.nJetGood    >= 4)
+    - met_cut = (events.MET.pt      >  30.0)
+    - mjj_vbs  > 500
+    - deta_vbs > 2.5
+    - b veto (currently turned on)
+    - 1 central lepton (currently off)
+        - (lep_eta > eta_min) & (lep_eta < eta_max)
+        - eta_min/max defined from vbs jet 1, jet 2 (ie from resolved hadronic W)
+
+

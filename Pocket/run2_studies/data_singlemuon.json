@@ -1,0 +1,83 @@
+{
+  "SingleMuon": {
+    "sample": "SingleMuon",
+    "json_output": "datasets/SingleMuon.json",
+    "files": [
+      {
+        "das_names": [
+          "/SingleMuon/Run2017B-02Apr2020-v1/NANOAOD"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": false,
+          "primaryDataset": "SingleMuon",
+          "era": "B",
+          "das_names": [
+            "/SingleMuon/Run2017B-02Apr2020-v1/NANOAOD"
+          ],
+          "sample": "SingleMuon"
+        }
+      },
+      {
+        "das_names": [
+          "/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": false,
+          "primaryDataset": "SingleMuon",
+          "era": "C",
+          "das_names": [
+            "/SingleMuon/Run2017C-02Apr2020-v1/NANOAOD"
+          ],
+          "sample": "SingleMuon"
+        }
+      },
+      {
+        "das_names": [
+          "/SingleMuon/Run2017D-02Apr2020-v1/NANOAOD"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": false,
+          "primaryDataset": "SingleMuon",
+          "era": "D",
+          "das_names": [
+            "/SingleMuon/Run2017D-02Apr2020-v1/NANOAOD"
+          ],
+          "sample": "SingleMuon"
+        }
+      },
+      {
+        "das_names": [
+          "/SingleMuon/Run2017E-02Apr2020-v1/NANOAOD"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": false,
+          "primaryDataset": "SingleMuon",
+          "era": "E",
+          "das_names": [
+            "/SingleMuon/Run2017E-02Apr2020-v1/NANOAOD"
+          ],
+          "sample": "SingleMuon"
+        }
+      },
+      {
+        "das_names": [
+          "/SingleMuon/Run2017F-02Apr2020-v1/NANOAOD"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": false,
+          "primaryDataset": "SingleMuon",
+          "era": "F",
+          "das_names": [
+            "/SingleMuon/Run2017F-02Apr2020-v1/NANOAOD"
+          ],
+          "sample": "SingleMuon"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+    "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2017": {
+        "metadata": {
+            "das_names": "['/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM']",
+            "sample": "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            "year": "2017",
+            "era": "B",
+            "isMC": "True",
+            "xsec": "0.0879",
+            "nevents": "588000",
+            "size": "1094969095"
+        },
+        "files": [
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/120000/661DA95A-8F3D-6C4A-9A36-7AF1EC345621.root",
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/120000/E9A29EA2-E661-2F43-992B-1E065366BBF9.root",
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/120000/798BB8B0-B57A-804F-8565-EC1AA68E891B.root",
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/120000/5F41B9FC-A751-A740-B5F2-E92D692E0610.root",
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/120000/D91B8474-B1C7-9D4D-9A1C-0715C4FACF04.root",
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/2710000/CDB3A2FD-2926-8543-B871-826C6A17A95E.root"
+        ]
+    }
+}
