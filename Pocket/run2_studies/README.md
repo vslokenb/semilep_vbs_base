@@ -1,18 +1,6 @@
 # VBS $W \pm W \pm$ Semileptonic Analysis with PocketCoffea
 
-## Overview
 
-This hands-on tutorial will guide you through performing a semileptonic **Vector Boson Scattering (VBS)** W±W± analysis using the [PocketCoffea](https://github.com/PocketCoffea) framework.
-
-You will learn how to:
-
-- Configure PocketCoffea for VBS Semileptonic Analysis.
-- Select physics objects (jets, leptons, MET).
-- Apply VBS-like preselections for the semileptonic channel (Central Jets, Forward Jets and Central Leptons).
-- Reconstruct the hadronic and leptonic W boson and compute its kinematic variables.
-- Make histograms and explore distributions.
-  
-------
 
 ## Physics Motivation
 
@@ -51,12 +39,10 @@ apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
 
 ## 2. Datasets 
 
-For this tutorial, we use two signal MC datasets:
-* /WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM (/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE)
-* /WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8/.../NANOAODSIM (/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE)
+Current, FULL run 2 datasets cards are in `dataset_configs` directory. Need to implement xsec by hand, as well as add year metadata. Lumi is scaled normally per year, else need to add correction factor.
 
-**Exercise**:
-Generate the json file for the  two MC samples.
+
+To view list of possible datasets, use:
 
 Open Dataset-discovery-CLI
 
@@ -102,26 +88,6 @@ Implements VBSWWBaseProcessor:
 * Applies object preselection
 * Reconstructs VBS jets and hadronic W boson
 * Computes helper variables for plotting
-
-Hands-On plan
-
-We will proceed step-by-step:
-
-1. Load the configuration and inspect available datasets.
-2. Run with a small subset (--limit-files 1 --limit-chunks 2) to check everything works.
-* Use the `--test` flag with `pocket-coffea run`
-3. Inspect histograms for:
-* Number of jets
-* MET
-* mjj(VBS jets)
-* mjj(W hadronic)
-* Modify preselections:
-* Change MET cut
-* Change mjj(VBS) cut
-* See how distributions change
-4. Add new plots:
-* $\Delta R$ between hadronic W jets
-* $\eta$ distribution of leptons
 
 ```bash
 
