@@ -39,7 +39,7 @@ apptainer shell -B /afs -B /cvmfs/cms.cern.ch \
 
 ## 2. Datasets 
 
-Current, FULL run 2 datasets cards are in `dataset_configs` directory. Need to implement xsec by hand, as well as add year metadata. Lumi is scaled normally per year, else need to add correction factor.
+Current, FULL run 2 datasets cards are in `dataset_configs` directory. Need to implement xsec by hand, as well as add year metadata. Lumi is scaled normally per year, else need to add correction factor. Both most useful cards have `run2` in the title.
 
 
 To view list of possible datasets, use:
@@ -89,11 +89,18 @@ Implements VBSWWBaseProcessor:
 * Reconstructs VBS jets and hadronic W boson
 * Computes helper variables for plotting
 
+
+### How to run?
+
+Choose output directory, choose proper datasets to process in `example_config_semileptonic.py` file, and run the below command.
+
+Then, navigate to output directory to make plots.
+
 ```bash
 
 # Run PocketCoffea Configuration 
 pocket-coffea run --cfg example_config_semileptonic.py \
-                  -o output_semilep \
+                  -o YOUR_OUTPUT_DIR \
                   -e futures \
                   --scaleout 4 \
                   --limit-files 1 \
@@ -122,6 +129,13 @@ Using the `dask@lxplus` executor in the above apptainer image requires specifyin
 ```bash
 pocket-coffea run --cfg example_config_semileptonic.py --executor dask@lxplus --scaleout 10 -o output_dask --worker-image /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
 ```
+###
+
+Potentially useful scripts:
+
+- if you need to combine output `.coffea` files, there is a handy script in `outputs/mix_years.py`. Great for combining different eras of preselection or HLT.
+
+- if you need a nice list of all of the dataset names for entry into your config files,the `easy_config_list.py` file is your new best friend. It should print everything you need for filling out the config run script.
 
 ### Documentation
 
@@ -142,4 +156,4 @@ Defaults are usually stored in `.yaml` files in the repository, which are also u
 
 ### Acknowledgements
 
-Tutorial made by: Hayden Richard Hollenbeck & David Buitrago Ceballos
+Tutorial made by: Hayden Richard Hollenbeck & David Buitrago Ceballos (local edits made by V. Slokenbergs
