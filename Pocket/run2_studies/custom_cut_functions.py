@@ -14,9 +14,9 @@ def select_vbs_semileptonic(events, params, **kwargs):
     
     
     one_lep = (events.nLeptonGood == 1)
-    four_j  = (events.nJetGood    >= 4)
+    four_j  = (events.nJetGood    >= 2)
     met_cut = (events.MET.pt      >  params["met_pt"])
-    
+
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < params["wjj_pt"])
     
@@ -74,3 +74,18 @@ whad_window_cut = Cut(
     params={"mjj_w_window": 15.0},  
     function=in_whad_window,
 )
+
+def in_msd_window_fatjet(events, params, **kwargs):
+    fj1_msd = ak.fill_none(getattr(events.w_fatjet, "msd", None), np.nan)
+    wlo, whi = params["msd_w_window"]
+    sel = (~np.isnan(fj1_msd)) & (fj1_msd > wlo) & (fj1_msd < whi)
+    return ak.values_astype(sel, np.bool_)
+
+
+msd_window_cut = Cut(
+    name="msd_window",
+    params={"msd_w_window": (65.0,105.0)},  
+    function=in_msd_window_fatjet,
+    )
+
+

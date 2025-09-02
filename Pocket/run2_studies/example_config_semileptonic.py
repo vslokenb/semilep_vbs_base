@@ -13,6 +13,8 @@ from custom_cut_functions import (
     nLepton_skim_cut,
     vbs_semileptonic_presel,
     whad_window_cut,
+    #central_fj_cut,
+    msd_window_cut
 )
 
 cloudpickle.register_pickle_by_value(workflow)
@@ -170,6 +172,8 @@ cfg = Configurator(
     categories={
         "baseline": [passthrough],
         "whad_peak": [whad_window_cut],  # |mjj^W - 80.4| < window
+        #"central_jet_cuts": [central_fj_cut],
+        "boosted_jet_in_window": [msd_window_cut],
     },
 
    
@@ -184,6 +188,9 @@ cfg = Configurator(
         "nJets":      HistConf([Axis(coll="events", field="nJetGood", bins=12, start=0, stop=12, label="N(jets)")]),
         "nBJets":     HistConf([Axis(coll="events", field="nBJetGood", bins=6, start=0, stop=6, label="N(bjets)")]),
         "nCentralJets": HistConf([Axis(coll="events", field="nCentralJetsGood", bins=12, start=0, stop=12, label="N(Central Jets)")]),
+        "nFatJets": HistConf([Axis(coll="events", field="nFatJetGood", bins=4, start=0, stop=4, label="N(Fat Jets)")]),
+        "nFatJetCentral": HistConf([Axis(coll="events", field="nFatJetCentral", bins=4, start=0, stop=4, label="N(Central Fat Jets)")]),
+
         # MET and mT
         "met":        HistConf([Axis(coll="MET", field="pt", bins=50, start=0, stop=250, label=r"$p_T^{miss}$ [GeV]")]),
         "met_phi":    HistConf([Axis(coll="MET", field="phi", bins=50, start=-4, stop=4, label=r"$\phi^{miss}$ [GeV]")]),
@@ -214,5 +221,14 @@ cfg = Configurator(
         "pt_w_lep":   HistConf([Axis(coll="events", field="w_lep_pt", bins=40, start=0.0, stop=300.0, label=r"$p_T^{W\,lep}$ [GeV]")]),
         "phi_w_lep":   HistConf([Axis(coll="events", field="w_lep_phi", bins=32, start=-4.0, stop=4.0, label=r"$\phi^{W\,lep}$ ")]),
         "m_ll":   HistConf([Axis(coll="ll", field="m_ll", bins=50, start=0, stop=200.0, label=r"$m_{ll}$ [GeV]")]),
+        "lead_wlep_wjet1_dR": HistConf([Axis(coll="events", field="lead_wlep_wjet1_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_1)^{W}$")]),
+        "lead_wlep_wjet2_dR": HistConf([Axis(coll="events", field="lead_wlep_wjet2_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_2)^{W}$")]),
+        "lead_wlep_wfatjet1_dR": HistConf([Axis(coll="events", field="lead_wlep_wfatjet1_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lJ_1)^{W}$")]),
+
+        # # W fat jet
+        "fj_pt":    HistConf([Axis(coll="w_fatjet", field="pt",  bins=60, start=150, stop=1000, label=r"$p_T(J^{W})$ [GeV]")]),
+        "fj_eta":   HistConf([Axis(coll="w_fatjet", field="eta", bins=48, start=-2.4, stop=2.4,   label=r"$\eta(J^{W})$")]),
+        "fj_msd":   HistConf([Axis(coll="w_fatjet", field="msd", bins=40, start=0,   stop=200,   label=r"$m_{SD}(J^{W})$ [GeV]")]),
+
     },
 )

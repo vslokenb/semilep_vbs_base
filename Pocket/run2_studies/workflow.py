@@ -37,6 +37,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #print(ev.LeptonGood.fields)
         ev["JetGood"], _ = jet_selection(ev, "Jet", self.params, "LeptonGood")
         ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
+        fj = ev.FatJet
+        fj_mask = (fj.pt > 150) & (abs(fj.eta) < 2.4) 
+        ev["FatJetGood"] = fj[fj_mask]
 
         # b-tagging 
         ev["BJetGood"] = btagging(
@@ -47,12 +50,17 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         # ------------- VBS tagging jets -------------
         has4j = ak.num(ev.JetGood) >= 4
+        has3j = ak.num(ev.JetGood) >= 2 #keep it at 3 st we can separate fj vs ak4 jets!
+        hasfatjet = ak.num(ev.FatJetGood) ==1
         has2l = ak.num(ev.LeptonGood) == 2
         jj = ak.combinations(ev.JetGood, 2, fields=["jet1", "jet2"])
         jj["mass"] = (jj.jet1 + jj.jet2).mass
 
         idx_vbs = ak.argmax(jj.mass, axis=1, keepdims=True)
-        ev["vbsjets"] = ak.mask(jj[idx_vbs], has4j)
+        #if hasfatjet:
+        #    ev["vbsjets"] = ak.mask(jj[idx_vbs], has3j)
+        #else:
+        ev["vbsjets"] = ak.mask(jj[idx_vbs], has3j)
 
         v1 = ak.firsts(ev.vbsjets.jet1)
         v2 = ak.firsts(ev.vbsjets.jet2)
@@ -61,6 +69,41 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["vbsjets", "delta_eta"] = np.abs(v1.eta - v2.eta)
         ev["vbs_dR"] = ak.fill_none(v1.delta_r(v2), np.nan)
 
+        # ------ Boosted jet -------------
+        
+
+        # Apply mask to get FatJetGood for central events only
+        j1_eta = ak.fill_none(getattr(v1, "eta", None), np.nan)
+        j2_eta = ak.fill_none(getattr(v2, "eta", None), np.nan)
+        eta_min = np.minimum(j1_eta, j2_eta)
+        eta_max = np.maximum(j1_eta, j2_eta)
+
+        fj_eta = ak.fill_none(getattr(ev.FatJetGood, "eta", None), np.nan)
+        central_mask = (
+            (~np.isnan(fj_eta)) & (~np.isnan(eta_min)) & (~np.isnan(eta_max))
+            & (fj_eta > eta_min) & (fj_eta < eta_max)
+        )
+        ev["FatJetCentral"] = ev.FatJetGood[central_mask]
+        fjc = ev.FatJetCentral[ak.argsort(ev.FatJetCentral.pt, ascending=False)]
+        ev["nFatJetCentral"] = ak.num(fjc)
+
+        fj1 = ak.firsts(fjc[:, 0:1])
+
+        def _tau21(fj):
+             t1 = ak.fill_none(getattr(fj, "tau1", None), np.nan)
+             t2 = ak.fill_none(getattr(fj, "tau2", None), np.nan)
+             return ak.where((t1 > 0) & np.isfinite(t1), t2 / t1, np.nan)
+        ev["w_fatjet"] = ak.zip(
+            {
+                "pt":    ak.fill_none(getattr(fj1, "pt",        None), np.nan),
+                "eta":   ak.fill_none(getattr(fj1, "eta",       None), np.nan),
+                "msd":   ak.fill_none(getattr(fj1, "msoftdrop", None), np.nan),
+                "tau21": _tau21(fj1),
+            },
+            depth_limit=1, ##### THIS DEPTH LIMIT THING IS KEY ELSE BREAKS
+        )
+
+            
         # ------------- W hadronic (resolved) -------------
         vbs_i = ak.fill_none(getattr(v1, "idx", None), -1)
         vbs_j = ak.fill_none(getattr(v2, "idx", None), -1)
@@ -68,10 +111,12 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         nonvbs_mask = (ev.JetGood.idx != vbs_i) & (ev.JetGood.idx != vbs_j)
         ev["CentralJets"] = ev.JetGood[nonvbs_mask]
         ev["CentralJetsGood"] = ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4]
+        
 
         pairs_w = ak.combinations(ev.CentralJetsGood, 2, fields=["jet1", "jet2"])
         pairs_w["mass"] = (pairs_w.jet1 + pairs_w.jet2).mass
         pairs_w["deta"] = (pairs_w.jet1 - pairs_w.jet2).eta
+
 
         target_mw = 80.4
         best_w_idx = ak.argmin(np.abs(pairs_w.mass - target_mw)/target_mw + np.abs(pairs_w.deta), axis=1, keepdims=True) #ADD EXTRA CUT FOR ETA MIN TOO
@@ -79,7 +124,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["w_had_jets"] = ak.mask(pairs_w[best_w_idx], has4j)
         ev["w_had_jets", "mass"] = (ev.w_had_jets.jet1 + ev.w_had_jets.jet2).mass
         ev["w_had_jets", "pt"] = (ev.w_had_jets.jet1 + ev.w_had_jets.jet2).pt
-
+        
 
         # dR btw the two jets for W_had
         wj1 = ak.firsts(ev.w_had_jets.jet1)
@@ -98,6 +143,11 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["mt_w_leptonic"] = np.sqrt(
             2.0 * lead_lep.pt * ev.MET.pt * (1.0 - np.cos(lead_lep.delta_phi(ev.MET)))
         )
+       
+        ev["lead_wlep_wfatjet1_dR"] = ak.fill_none(lead_lep.delta_r(fj1), np.nan)
+        ev["lead_wlep_wjet1_dR"] = ak.fill_none(lead_lep.delta_r(wj1), np.nan)
+        ev["lead_wlep_wjet2_dR"] = ak.fill_none(lead_lep.delta_r(wj2), np.nan)
+        
         ############ mll check
         ll = ak.combinations(ev.LeptonGood, 2, fields=["lep1", "lep2"])
         ll["m_ll"] = (ll.lep1 + ll.lep2).mass
@@ -127,3 +177,5 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nJetGood"]      = ak.num(ev.JetGood)
         ev["nBJetGood"]     = ak.num(ev.BJetGood)
         ev["nCentralJetsGood"] = ak.num(ev.CentralJetsGood)
+        ev["nFatJetGood"] = ak.num(ev.FatJetGood)
+        ev["nFatJetCentral"] = ak.num(ev.FatJetCentral) if hasattr(ev, "FatJetCentral") else 0
