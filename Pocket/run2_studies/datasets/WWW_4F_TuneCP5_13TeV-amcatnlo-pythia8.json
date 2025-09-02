@@ -1,0 +1,17 @@
+{
+    "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2017": {
+        "metadata": {
+            "das_names": "['/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_EXT_102X_mc2017_realistic_v8-v1/NANOAODSIM']",
+            "sample": "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+            "year": "2017",
+            "isMC": "True",
+            "xsec": "0.2086",
+            "nevents": "232300",
+            "size": "459127445"
+        },
+        "files": [
+            "root://eoscms.cern.ch//eos/cms/store/mc/RunIIFall17NanoAODv7/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_EXT_102X_mc2017_realistic_v8-v1/260000/82FB85D0-164E-3741-A01E-F4750655E35D.root",
+            "root://eoscms.cern.ch//eos/cms/store/mc/RunIIFall17NanoAODv7/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_EXT_102X_mc2017_realistic_v8-v1/260000/A91AC909-50E5-6043-9438-2ACFA74EDDA3.root"
+        ]
+    }
+}

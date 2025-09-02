@@ -71,13 +71,14 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         pairs_w = ak.combinations(ev.CentralJetsGood, 2, fields=["jet1", "jet2"])
         pairs_w["mass"] = (pairs_w.jet1 + pairs_w.jet2).mass
+        pairs_w["deta"] = (pairs_w.jet1 - pairs_w.jet2).eta
 
         target_mw = 80.4
-        best_w_idx = ak.argmin(np.abs(pairs_w.mass - target_mw), axis=1, keepdims=True)
+        best_w_idx = ak.argmin(np.abs(pairs_w.mass - target_mw)/target_mw + np.abs(pairs_w.deta), axis=1, keepdims=True) #ADD EXTRA CUT FOR ETA MIN TOO
 
         ev["w_had_jets"] = ak.mask(pairs_w[best_w_idx], has4j)
         ev["w_had_jets", "mass"] = (ev.w_had_jets.jet1 + ev.w_had_jets.jet2).mass
-        
+        ev["w_had_jets", "pt"] = (ev.w_had_jets.jet1 + ev.w_had_jets.jet2).pt
 
 
         # dR btw the two jets for W_had
