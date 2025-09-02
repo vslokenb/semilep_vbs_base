@@ -41,13 +41,12 @@ def select_vbs_semileptonic(events, params, **kwargs):
 
         eta_min = np.minimum(j1_eta, j2_eta)
         eta_max = np.maximum(j1_eta, j2_eta)
-        lep_central = (lep.pt > 35.0)
-        #lep_central = (~np.isnan(lep_eta)) & (~np.isnan(eta_min)) & (~np.isnan(eta_max)) & \
-                      #(lep_eta > eta_min) & (lep_eta < eta_max)
+        #lep_central = 
+        lep_central = (~np.isnan(lep_eta)) & (~np.isnan(eta_min)) & (~np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) & (lep.pt > 35.0)
     else:
         lep_central = True
 
-    mask = one_lep & four_j & met_cut & cut_mjj & cut_deta & b_veto & lep_central
+    mask = one_lep & four_j & met_cut & cut_mjj & cut_deta & b_veto & lep_central & wjj_pt_cut
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(
