@@ -1,0 +1,26 @@
+# params/object_preselection.yaml
+
+object_preselection:
+  Muon:
+    pt: 35
+    eta: 2.4
+    iso: 0.15  
+    id: tightId
+  Jet:
+    dr_lepton: 0.3
+    pt: 30
+    eta: 4.7
+    jetId: 6
+    puId:
+      wp: L
+      value: 4
+      maxpt: 50.0
+    btag:
+      wp: M
+  Electron:
+    pt: 30
+    eta: 2.4
+    iso: 0.06
+    id: mvaFall17V2Iso_WP90
+
+  

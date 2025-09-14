@@ -1,0 +1,29 @@
+{
+    "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV_": {
+        "metadata": {
+            "das_names": "['/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/RunIIAutumn18NanoAODv7-Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/NANOAODSIM']",
+            "sample": "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV",
+            "year": "",
+            "isMC": "True",
+            "xsec": "5.561",
+            "nevents": "11319000",
+            "size": "20183096218"
+        },
+        "files": [
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/261BFC5B-1355-534B-967B-A48AF9C83C3E.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/263789A4-6A0C-AD4C-B35A-65A7558097A5.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/2822039A-5898-F141-B96C-7A80FEFC578C.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/35464DA9-CCB3-4648-A5E0-674DDA416E2C.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/4536C079-B575-4D48-B726-492444C94E2E.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/4C927945-9D28-D444-9979-C520AF92F6CB.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/6832A8CF-E8C4-D34B-B2CE-BD817F951802.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/906DF58C-93A8-7B4F-8CC9-87AD84215606.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/926FA146-3F5C-7D48-8810-E818069F3EEC.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/A1107629-67A4-164E-B3E1-9C02FD30A067.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/CDB89D68-AC66-A445-B962-670CB00E6DD5.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/D4E6CA9A-D510-2C46-B52A-6225E017E0D5.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/E51FD6F1-BC28-244B-879F-EB6EEF7FEE88.root",
+            "root://cms-se0.kipt.kharkov.ua//dpm/kipt.kharkov.ua/home/cms/store/mc/RunIIAutumn18NanoAODv7/WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/60000/EAB75900-BB90-D740-B53E-6E0C9E1402E9.root"
+        ]
+    }
+}

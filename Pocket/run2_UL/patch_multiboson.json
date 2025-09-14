@@ -1,0 +1,22 @@
+{
+  "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8": {
+    "sample": "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
+    "json_output": "datasets/WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8.json",
+    "files": [
+      {
+        "das_names": [
+          "/WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM"
+        ],
+        "metadata": {
+          "year": "2017",
+          "isMC": true,
+          "xsec": 58.59,
+          "das_names": [
+            "/WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM"
+          ],
+          "sample": "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8"
+        }
+      }
+    ]
+  }
+}

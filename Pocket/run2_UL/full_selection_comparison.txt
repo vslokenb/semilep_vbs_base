@@ -1,0 +1,208 @@
+Defaults within PocketCoffea:
+
+btag:
+    '2017':
+        reference:
+            btagging_WP: https://btv-wiki.docs.cern.ch/ScaleFactors/UL2017/
+        btagging_algorithm: btagDeepFlavB # NEED TO CHANGE to just btagDeepB
+        btagging_WP:
+            L: 0.0532 #0.1355 CSV value
+            M: 0.3040   #0.4506 CSV value
+            H: 0.7476   #0.7738 CSV value
+        bbtagging_algorithm: btagDDBvL 
+        bbtagging_WP: 0.86
+        bbtagSF_DDBvL_M1_loPt: 0.82
+        bbtagSF_DDBvL_M1_loPt_up: 0.86
+        bbtagSF_DDBvL_M1_loPt_down: 0.77
+        bbtagSF_DDBvL_M1_hiPt: 0.77
+        bbtagSF_DDBvL_M1_hiPt_up: 0.83
+        bbtagSF_DDBvL_M1_hiPt_down: 0.67
+event_flags:
+    "2017":
+        - "goodVertices"
+        - "globalSuperTightHalo2016Filter"
+        - "HBHENoiseFilter"
+        - "HBHENoiseIsoFilter"
+        - "EcalDeadCellTriggerPrimitiveFilter"
+        - "BadPFMuonFilter"
+    "2022_postEE":
+        - "goodVertices"
+        - "globalSuperTightHalo2016Filter"
+        - "EcalDeadCellTriggerPrimitiveFilter"
+        - "BadPFMuonFilter"
+        - "BadPFMuonDzFilter"
+        - "hfNoisyHitsFilter"
+        - "eeBadScFilter"
+        - "ecalBadCalibFilter"
+jec_factors:
+    '2017': 
+        'MC': 'Summer19UL17_V5_MC',
+        'Data': 
+            'B': 'Summer19UL17_RunB_V5_DATA',
+            'C': 'Summer19UL17_RunC_V5_DATA',
+            'D': 'Summer19UL17_RunD_V5_DATA',
+            'E': 'Summer19UL17_RunE_V5_DATA',
+            'F': 'Summer19UL17_RunF_V5_DATA',
+    '2022':
+        long list found at https://github.com/PocketCoffea/PocketCoffea/tree/6625e9d3b2c5273486a385bf7f53b5bf2de4e11a/pocket_coffea/parameters/jec
+btag_SF:
+    '2017':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2017_UL/btagging.json.gz
+        name: "deepJet_shape"
+    '2022_postEE':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2022_Summer22EE/btagging.json.gz
+        name: "deepJet_shape"
+ctag_SF:
+    '2017':
+        SF_file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2017_UL/ctagging.json.gz
+        Calib_file: "${default_params_dir:}/ctagSF_calibrationSF.json"
+        name: "deepJet_shape"
+    '2022_postEE':
+        SF_file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/BTV/2022_27Jun2023EE/ctagging.json.gz
+        Calib_file: "${default_params_dir:}/ctagSF_calibrationSF.json"
+        name: "deepJet_shape"
+jet_puId:
+    '2017':
+            file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2017_UL/jmar.json.gz
+            working_point:
+                L: 4
+                M: 6
+                T: 7
+            name: PUJetID_eff
+vetomaps:
+    '2022_postEE':
+            file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2022_Summer22EE/jetvetomaps.json.gz
+            name: "Summer22EE_23Sep2023_RunEFG_V1"
+jetcalibration_differences...
+
+electron_sf:
+    '2017':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2017_UL/electron.json.gz
+        name: UL-Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20: RecoAbove20
+    '2022_postEE':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2022_Summer22EE/electron.json.gz
+        name: Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+muon_sf:
+    '2017':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LooseRelIso_DEN_TightIDandIPCut
+          trigger: NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight
+    '2022_postEE':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          # trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+lumi:
+    "2017" : 41529.0,
+    "2022_postEE" : 27700
+MET_xy:
+    MC:
+        "2017": [[-0.300155,  1.906080], [0.300213, -2.022320]]
+        "2022": ???
+photon_sf:
+    '2017':
+          id: UL-Photon-ID-SF
+          pxseed: UL-Photon-PixVeto-SF
+    '2022_postEE':
+          id: UL-Photon-ID-SF
+          pxseed: UL-Photon-PixVeto-SF
+pileup_json:
+    '2017':
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2017_UL/puWeights.json.gz
+        name: Collisions17_UltraLegacy_goldenJSON
+    '2022_postEE': 
+        file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2022_Summer22EE/puWeights.json.gz
+        name: Collisions2022_359022_362760_eraEFG_GoldenJson
+
+
+##########################
+###### INTERESTING DETAILS
+##########################
+
+object_preselection:
+    GoodObjects:
+        {
+        Muon:
+            pt: 15
+            eta: 2.4
+            iso: 0.15  
+            id: tightId
+        Jet:
+            dr_lepton: 0.3
+            pt: 30
+            eta: 4.7
+            jetId: 6
+            puId:
+                wp: L
+                value: 4
+                maxpt: 50.0
+            btag:
+                wp: L
+        Electron:
+            pt: 15
+            eta: 2.4
+            iso: 0.06
+            id: mvaFall17V2Iso_WP90 
+            }
+
+    'LooseLepton':
+        "Electron": {
+            "pt": 10.0,
+            "eta": 2.4,
+            "iso": 0.06,
+            "id": "mvaFall17V2Iso_WPL",
+        },
+        "Muon": {
+            "pt": 10.0,
+            "eta": 2.4,
+            "id": "tightId",
+            "iso": 0.25,
+        },
+   
+HLT_triggers:
+    "2017":
+        SingleEle:
+        - Ele32_WPTight_Gsf
+        SingleMuon: 
+        - IsoMu27
+
+cuts:
+    preselect:
+        - one_lep = (events.nLeptonGood == 1)
+        - loose lepton < 2
+        - puppimet_cut = (events.PuppiMET.pt      >  30.0)
+        - mjj_vbs  > 500
+        - deta_vbs > 2.5
+        - nBJetGood == 0 (DeepFlavB loose working point)
+        - mT_w < 185
+        - vbs jet1 pt > 50
+    resolved:
+        - |mjj^W - 85| < 15
+        - four_j  = (events.nJetGood    >= 4)
+        - w_jj pt < 200
+        - n(candidate fat jet) == 0
+    boosted:
+        - nFatJetCandidate == 1
+        - fatjet pt > 200
+        - |mjj^W - 92.5| < 20   
+        - dR (lead lep vs. fat jet) > 0.8
+
+collection definitions:
+    - ev["JetGood"], _ = jet_selection(ev, "Jet", self.params, "2017","LeptonLoose")
+    - fj_mask = (fj.pt > 180) & (abs(fj.eta) < 2.4) 
+        ev["FatJetGood"] = fj[fj_mask]
+    - ev["BJetGood"] = btagging(
+            ev.JetGood[abs(ev.JetGood.eta) < 2.4],
+            self.params.btagging.working_point[self._year],
+            wp=self.params.object_preselection.Jet.btag.wp,
+        )
+    - ev["vbsjets"] = ak.mask(jj[maximum_dijet_mass], has2j)
+    - candidate fat jet: tau21 < 0.45 && eta in between vbs jets 
+    - ev['CentralJetsGood']= ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4] AND jet_idx != vbs jet_idx
+    - choose res w candidates best_w_idx = ak.argmin(np.abs(pairs_w.mass - target_mw)/target_mw + np.abs(pairs_w.deta), axis=1, keepdims=True) 
