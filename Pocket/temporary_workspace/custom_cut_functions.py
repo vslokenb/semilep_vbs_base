@@ -66,7 +66,7 @@ def select_vbs_semileptonic(events, params, **kwargs):
     #     lep_central = True
 
     ht_mask = (events.LHE.HT <= 70.)
-    mask = one_lep & met_cut & two_j & cut_mt_w & b_veto & ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
+    mask = one_lep & met_cut & two_j & cut_mt_w & b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(
