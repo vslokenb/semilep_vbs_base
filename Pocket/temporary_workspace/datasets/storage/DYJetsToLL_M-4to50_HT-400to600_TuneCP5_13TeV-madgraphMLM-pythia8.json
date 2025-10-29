@@ -1,0 +1,19 @@
+{
+    "DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8_2017": {
+        "metadata": {
+            "das_names": "['/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM']",
+            "sample": "DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "year": "2017",
+            "isMC": "True",
+            "xsec": "5.697",
+            "nevents": "2067660",
+            "size": "4082211750"
+        },
+        "files": [
+            "root://cmsio2.rc.ufl.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/81C45182-BB80-A645-AB5B-9DA4E06B1D2B.root",
+            "root://cmsio2.rc.ufl.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/9FDB5EAF-8451-1142-AD1D-1FD002F608D1.root",
+            "root://cmsio2.rc.ufl.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/ADD64AB0-8B3C-4448-BAD9-FF421824D32D.root",
+            "root://cmsio2.rc.ufl.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/C573C59D-DB7A-F94C-B472-7100B8B387CB.root"
+        ]
+    }
+}

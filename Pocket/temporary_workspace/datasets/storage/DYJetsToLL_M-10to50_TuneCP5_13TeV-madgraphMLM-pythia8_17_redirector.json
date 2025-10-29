@@ -1,0 +1,17 @@
+{
+    "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_17_2017": {
+        "metadata": {
+            "das_names": "['/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/NANOAODSIM']",
+            "sample": "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
+            "year": "2017",
+            "isMC": "True",
+            "xsec": "18610.0",
+            "nevents": "316134",
+            "size": "246009601"
+        },
+        "files": [
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/110000/A9A39F76-E650-514B-8216-14BA33903A8B.root",
+            "root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_new_pmx_102X_mc2017_realistic_v8-v1/110000/609AADDD-6878-7140-8A9A-E6D50A7D64FB.root"
+        ]
+    }
+}

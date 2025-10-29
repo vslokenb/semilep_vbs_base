@@ -5,7 +5,7 @@
             "sample": "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8",
             "year": "2017",
             "isMC": "True",
-            "xsec": "61526.7",
+            "xsec": "53940.0",
             "nevents": "26454101",
             "size": "30031820732"
         },

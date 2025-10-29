@@ -5,7 +5,7 @@
             "sample": "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             "year": "2017",
             "isMC": "True",
-            "xsec": "57.48",
+            "xsec": "55.25",
             "nevents": "14313274",
             "size": "29107317550"
         },

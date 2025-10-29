@@ -5,7 +5,7 @@
             "sample": "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
             "year": "2017",
             "isMC": "True",
-            "xsec": "0.0879",
+            "xsec": "0.09183",
             "nevents": "1972000",
             "size": "4220463189"
         },

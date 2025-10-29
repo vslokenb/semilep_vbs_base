@@ -1,0 +1,19 @@
+{
+    "DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8_2017": {
+        "metadata": {
+            "das_names": "['/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv7-PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/NANOAODSIM']",
+            "sample": "DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "year": "2017",
+            "isMC": "True",
+            "xsec": "1.85",
+            "nevents": "1988861",
+            "size": "4395788283"
+        },
+        "files": [
+            "root://cmsxrootd.hep.wisc.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/84CA4EBB-3775-A54E-8A81-2F50C0A10646.root",
+            "root://cmsxrootd.hep.wisc.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/A91B1240-DDCD-CC48-8525-3EDA6A059C19.root",
+            "root://cmsxrootd.hep.wisc.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/E0BA8F0C-F40C-B541-B310-EA10F1AED504.root",
+            "root://cmsxrootd.hep.wisc.edu:1094//store/mc/RunIIFall17NanoAODv7/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1/100000/FDC0202F-44A5-E245-8088-311CC2AEAC24.root"
+        ]
+    }
+}

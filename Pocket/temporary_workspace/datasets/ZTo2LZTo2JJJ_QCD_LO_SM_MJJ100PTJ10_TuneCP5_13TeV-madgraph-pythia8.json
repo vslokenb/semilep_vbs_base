@@ -5,7 +5,7 @@
             "sample": "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
             "year": "2017",
             "isMC": "True",
-            "xsec": "0.3756",
+            "xsec": "0.3341",
             "nevents": "2000000",
             "size": "4638059619"
         },

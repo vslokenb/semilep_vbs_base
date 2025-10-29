@@ -5,7 +5,7 @@
             "sample": "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
             "year": "2017",
             "isMC": "True",
-            "xsec": "0.4062",
+            "xsec": "0.4611",
             "nevents": "27662138",
             "size": "73704749090"
         },

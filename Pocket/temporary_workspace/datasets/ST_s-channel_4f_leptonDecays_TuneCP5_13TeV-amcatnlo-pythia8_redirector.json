@@ -5,7 +5,7 @@
             "sample": "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
             "year": "2017",
             "isMC": "True",
-            "xsec": "3.364",
+            "xsec": "3.549",
             "nevents": "13620000",
             "size": "22561990396"
         },

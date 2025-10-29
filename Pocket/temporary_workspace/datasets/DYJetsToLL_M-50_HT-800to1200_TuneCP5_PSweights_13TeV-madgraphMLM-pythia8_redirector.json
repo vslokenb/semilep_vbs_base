@@ -5,7 +5,7 @@
             "sample": "DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             "year": "2017",
             "isMC": "True",
-            "xsec": "0.5598",
+            "xsec": "0.63",
             "nevents": "4347168",
             "size": "12550158490"
         },
