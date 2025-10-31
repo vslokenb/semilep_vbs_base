@@ -29,7 +29,7 @@ met_skim_cut = Cut(name="met_skim", params={}, function=met_skim)
 def select_vbs_semileptonic(events, params, **kwargs):
     
     #pu_pv_corrections = (events.PV.npvsGood < 55) | (events.PV.npvsGood > 60) 
-    one_lep = (events.nLeptonGood ==1)
+    one_lep = (events.nMuonGood ==1)
     
     two_j  = (events.nJetGood30    >= 2)
     met_cut = (events.PuppiMET.pt      >  params["met_pt"]) #USE PUPPIMET NOT PF MET
@@ -64,10 +64,10 @@ def select_vbs_semileptonic(events, params, **kwargs):
     #     lep_central = (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) & (lep.pt > 35.0) & j1_pt_min
     # else:
     #     lep_central = True
-    #one_loosest_lep = (ak.num(events.Muon) == 1) #& (ak.num(events.Electron) == 0)
+    one_loosest_lep = (ak.num(events.Muon) == 1) #& (ak.num(events.Electron) == 0)
 
     ht_mask = (events.LHE.HT <= 70.)
-    mask = one_lep & met_cut & two_j & cut_mt_w #& b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
+    mask = one_loosest_lep #one_lep #& met_cut & two_j & cut_mt_w & b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(

@@ -1,6 +1,9 @@
 # workflow.py
 import awkward as ak
+import os
+from datetime import datetime
 import numpy as np
+import pandas as pd
 from pocket_coffea.workflows.base import BaseProcessorABC
 from pocket_coffea.utils.configurator import Configurator
 from pocket_coffea.lib.objects import lepton_selection, jet_selection, btagging, soft_lepton_selection
@@ -17,9 +20,24 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         - Reconstructs the hadronic W with two non-VBS jets that minimize |m-80.4|
         - Calculates auxiliary variables for histograms (mt, pt/eta, dR, etc.)
     """
+    def process(self, events):
+        # --- Fix buggy genWeight here ---
+        dataset = events.metadata["dataset"]
+        if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in dataset:
+            events["genWeight"] = np.sign(events.genWeight)
+       
+        # IMPORTANT PATCH DUE TO BUGGY GEN WEIGHT IN UL GENWEIGHT nanoaodv9!
+        self.events = events
+        return super().process(events)
 
     def __init__(self, cfg: Configurator):
+        #self.outputdir = getattr(cfg, "outputdir", None) #or cfg.get("outputdir", "./outputs")
         super().__init__(cfg)
+        
+    # def accumulator(self):
+    #     acc = super().accumulator()
+    #     acc["mva_df"] = []
+    #     return acc
 
     # 1) object-level preselection
     def apply_object_preselection(self, variation):
@@ -478,7 +496,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #     return ak.where(valid, (target_eta - mid) / gap, np.nan)
         
         ev['z_lep'] = ak.fill_none(zeppenfeld(lead_lep, v1,v2),np.nan)
-        ev['z_fat'] = ak.fill_none(zeppenfeld(wfj, v1b,v2b),np.nan)
+        ev['z_fat'] = ak.fill_none(zeppenfeld(wfj, v1,v2),np.nan)
 
         #print(ev.z_lep, "zeppenfeld")
         #print(ev.z_fat, "zeppen boost")
@@ -534,6 +552,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         
         ev['neutrino_pz'] = ak.fill_none(solve_neutrino_pz(lead_lep, ev.PuppiMET),np.nan)
         ev['neutrino_eta'] = ak.fill_none(np.arcsinh(ev.neutrino_pz / ev.PuppiMET.pt),np.nan)
+        ev['lead_wlep_neutrino_deta']  = np.abs(lead_lep.eta - ev.neutrino_eta)
+        ev['lead_wlep_neutrino_dR'] = np.sqrt(ev.lead_wlep_neutrino_deta**2 + ev.lead_wlep_MET_dphi**2)
         ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
 
         ev['centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
@@ -550,26 +570,36 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
 
         ev["ht_sum"] = ak.sum(ev.Jet.pt, axis=1)
-        #genJetIdx_nested = ev.Jet.genJetIdx
 
-        # # Replace empty lists with [-1] (meaning: no match)
-        # genJetIdx_fixed = ak.fill_none(
-        #     ak.firsts(genJetIdx_nested, axis=1), 
-        #     -1
-        # )
+        # features = {
+        #     # "mjj_vbs": ak.to_numpy(ak.flatten(ev.vbsjets.mass, axis=None)),
+        #     # "detajj_vbs": ak.to_numpy(ak.flatten(ev.vbsjets.delta_eta, axis=None)),
+        #     # "z_lep": ak.to_numpy(ev.z_lep),
+        #     # "centrality_resolved": ak.to_numpy(ev.centrality_resolved),
+        #     #"centrality_boosted": ak.to_numpy(ev.centrality_boosted),
+        #     # "qgl_vbs1": ak.to_numpy(ev.qgl_vbs1_resolved),
+        #     # "qgl_vbs2": ak.to_numpy(ev.qgl_vbs2_resolved),
+        #     "mt_w_leptonic": ak.to_numpy(ev.mt_w_leptonic),
+        #     # "lead_lep_pt": ak.to_numpy(ev.w_lep_pt),
+        #     # "lead_lep_eta": ak.to_numpy(ev.w_lep_eta),
+        #     "nJetGood": ak.to_numpy(ak.num(ev.JetGood)),
+        #     # "pt_tag1": ak.to_numpy(ev.vbsjet1_pt),
+        #     # "pt_tag2": ak.to_numpy(ev.vbsjet2_pt),
+        #     # "vjj_pt": ak.to_numpy(ak.flatten(ev.w_had_jets.pt, axis=None)),
+        #     # "dR_wjj": ak.to_numpy(ev.w_had_dR),
+        #     # "pNet_ZQCD": ak.to_numpy(ak.flatten(ev.candidate_boost.particleNet_ZvsQCD, axis=None)),
+        #     # "pNet_WQCD": ak.to_numpy(ak.flatten(ev.candidate_boost.particleNet_WvsQCD, axis=None)),
+        # }
 
-        # # Optional: debug print
-        # print("Fixed genJetIdx:", genJetIdx_fixed)
+        # # Attach metadata like dataset name and year
+        # features["dataset"] = np.full(len(features["nJetGood"]), self._sample)
+        # features["year"] = np.full(len(features["nJetGood"]), self._year)
 
-        # # Create mask for valid matches
-        # valid_mask = (genJetIdx_fixed >= 0) & (genJetIdx_fixed < ak.num(ev.GenJet))
+        # # Store the DataFrame for later saving
+        # df = pd.DataFrame(features)
 
-        # # Safe indexing
-        # safe_genJetIdx = ak.where(valid_mask, genJetIdx_fixed, -1)
-        # matched_genjets = ak.where(valid_mask, ev.GenJet[safe_genJetIdx], None)
+        # self._accumulator["mva_df"].append(df)
 
-        # Save result to events
-        #ev['matched_gen_to_b'] = ev.GenJet[genJetIdx_nested]
 
         #ev['qgl_fatjet'] = ak.fill_none(wfj.qgl,np.nan)
         
@@ -593,3 +623,34 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nElectronLoose"] = ak.num(ev.ElectronLoose)
         ev["nLeptonLoose"]   = ev.nMuonLoose + ev.nElectronLoose
         #ev["nOtherJetsBoost"]    =ak.num(ev.CentralJetGoodBoostedFS)
+
+########### VERY BASIC MVA OUTPUT CONFIGURATION ######################
+    # def postprocess(self,accumulator):
+    #     """
+    #     Called by coffea at the end of processing (after all chunks are merged).
+    #     Handles:
+    #       - rescaling histograms
+    #       - writing metadata
+    #       - optional user-level custom exports (like MVA datasets)
+    #     """
+    #     #import os
+
+    #     # --- [1] Call parent postprocess first (or last) ---
+    #     # You can call it first to ensure histograms and metadata are handled
+    #     super().postprocess(accumulator)
+
+    #     if "mva_df" in accumulator and len(accumulator["mva_df"]) > 0:
+    #         full_df = pd.concat(accumulator["mva_df"], ignore_index=True)
+
+    #         output_dir = os.path.join("./outputs", "mva_datasets")
+    #         os.makedirs(output_dir, exist_ok=True)
+
+    #         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    #         file_path = os.path.join(output_dir, f"mva_dataset_{timestamp}.parquet")
+
+    #         full_df.to_parquet(file_path, index=False)
+    #         print(f"[MVA export] Saved {len(full_df)} events to {file_path}")
+    #     else:
+    #         print("[MVA export] No MVA data found or empty; skipping export.")
+
+    #     return accumulator

@@ -3,9 +3,11 @@ import os, cloudpickle
 from pocket_coffea.utils.configurator import Configurator
 from pocket_coffea.lib.cut_functions import get_HLTsel, get_nPVgood, goldenJson, eventFlags
 from pocket_coffea.parameters.cuts import passthrough
-from pocket_coffea.parameters.histograms import HistConf, Axis
+from pocket_coffea.parameters.histograms import *
 from pocket_coffea.lib.weights.common import common_weights
 from pocket_coffea.parameters import defaults
+from pocket_coffea.lib.columns_manager import ColOut
+
 import numpy as np
 import awkward as ak
 from pocket_coffea.lib.weights import WeightWrapper, WeightData, WeightDataMultiVariation, WeightLambda
@@ -66,7 +68,20 @@ cloudpickle.register_pickle_by_value(custom_cut_functions)
 localdir = os.path.dirname(os.path.abspath(__file__))
 
 
-default_parameters = defaults.get_default_parameters()
+default_parameters = defaults.get_default_parameters( 
+    group_tags={"EGM": 
+        {   "Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15":"latest", 
+            "Run3-23DSep23-Summer23BPix-NanoAODv12": "latest",
+            "Run3-23CSep23-Summer23-NanoAODv12": "latest",
+            "Run3-22EFGSep23-Summer22EE-NanoAODv12": "latest",
+            "Run3-22CDSep23-Summer22-NanoAODv12": "latest",
+            "Run2-2018-UL-NanoAODv9": "latest",
+            "Run2-2017-UL-NanoAODv9": "latest",
+            "Run2-2016preVFP-UL-NanoAODv9": "latest",
+            "Run2-2016postVFP-UL-NanoAODv9": "latest"
+        }
+    }
+)
 defaults.register_configuration_dir("config_dir", localdir + "/params")
 parameters = defaults.merge_parameters_from_files(
     default_parameters,
@@ -159,7 +174,7 @@ cfg = Configurator(
             #########
             ## RUN 2 BKG
             #########
-            # #"DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
             # # "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # #"DYJetsToLL_M-4to50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -178,8 +193,8 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            # # #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             
             
@@ -189,8 +204,8 @@ cfg = Configurator(
             # "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
             # "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
 
-            "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-            "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+            # "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+            # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
 
             # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
             # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
@@ -206,8 +221,8 @@ cfg = Configurator(
             # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            # # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
             # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
@@ -233,7 +248,7 @@ cfg = Configurator(
             
            
             # ###### SIGNAL #########
-            # "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
             # "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
             # "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
             # "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
@@ -275,7 +290,7 @@ cfg = Configurator(
         #"whad_peak_mu": [whad_window_cut_mu],  # |mjj^W - 80.4| < window
         "boosted_jet_in_window_mu": [msd_window_cut_mu],
         "whad_withbveto_mu":  [whad_window_cut_bveto_mu],
-   
+
     },
 
    
@@ -341,16 +356,19 @@ cfg = Configurator(
         "mt_w_lep":   HistConf([Axis(coll="events", field="mt_w_leptonic", bins=30, start=0, stop=200, label=r"$m_T(W_{lep})$ [GeV]")]),
         "neutrino_pz":  HistConf([Axis(coll="events", field="neutrino_pz", bins=50, start=0, stop=250, label=r"$p_z^{\nu}$ [GeV]")]),
         "neutrino_eta":  HistConf([Axis(coll="events", field="neutrino_eta", bins=32, start=-4.0, stop=4.0, label=r"$\eta^{\nu}$ [GeV]")]),
+        "neutrino_deta": HistConf([Axis(coll="events", field="lead_wlep_neutrino_deta", bins=32, start=0, stop=4.0, label=r"$\delta\eta^{l,\nu}$")]),
+        "neutrino_dR": HistConf([Axis(coll="events", field="lead_wlep_neutrino_dR", bins=32, start=0.0, stop=4, label=r"$\delta R^{l,\nu}$")]),
+       
 
         # Tagging jets (VBS)
-        "mjj_vbs":    HistConf([Axis(coll="vbsjets", field="mass", bins=50, start=300, stop=4000, label=r"$M_{jj}^{VBS}$ [GeV]")]),
-        "deta_vbs":   HistConf([Axis(coll="vbsjets", field="delta_eta", bins=36, start=0, stop=9.0, label=r"$|\Delta\eta_{jj}^{VBS}|$")]),
-        "dR_vbs":     HistConf([Axis(coll="events", field="vbs_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(jj)^{VBS}$")]),
-        "dR_fj_vbs1":     HistConf([Axis(coll="events", field="vbs1_fj_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(J^W)^{VBS_1}$")]),
-        "dR_fj_vbs2":     HistConf([Axis(coll="events", field="vbs2_fj_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(J^W)^{VBS_2}$")]),
-        "mjj_vbs_boost":    HistConf([Axis(coll="vbsjets_boost", field="mass", bins=50, start=300, stop=4000, label=r"$M_{jj}^{VBS_{boost}}$ [GeV]")]),
-        "deta_vbs_boost":   HistConf([Axis(coll="vbsjets_boost", field="delta_eta", bins=36, start=0, stop=9.0, label=r"$|\Delta\eta_{jj}^{VBS_{boost}}|$")]),
-        "dR_vbs_boost":     HistConf([Axis(coll="events", field="vbs_boost_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(jj)^{VBS_{boost}}$")]),
+        "mjj_vbs":    HistConf([Axis(coll="vbsjets", field="mass", bins=50, start=300, stop=4000, label=r"$M_{jj}^{forward}$ [GeV]")]),
+        "deta_vbs":   HistConf([Axis(coll="vbsjets", field="delta_eta", bins=36, start=0, stop=9.0, label=r"$|\Delta\eta_{jj}^{forward}|$")]),
+        "dR_vbs":     HistConf([Axis(coll="events", field="vbs_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(jj)^{forward}$")]),
+        "dR_fj_vbs1":     HistConf([Axis(coll="events", field="vbs1_fj_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(J^W \,j_{forward_1})$")]),
+        "dR_fj_vbs2":     HistConf([Axis(coll="events", field="vbs2_fj_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(J^W\,j_{forward_1})$")]),
+        "mjj_vbs_boost":    HistConf([Axis(coll="vbsjets_boost", field="mass", bins=50, start=300, stop=4000, label=r"$M_{jj}^{forward_{boost}}$ [GeV]")]),
+        "deta_vbs_boost":   HistConf([Axis(coll="vbsjets_boost", field="delta_eta", bins=36, start=0, stop=9.0, label=r"$|\Delta\eta_{jj}^{forward_{boost}}|$")]),
+        "dR_vbs_boost":     HistConf([Axis(coll="events", field="vbs_boost_dR", bins=40, start=0.0, stop=7.0, label=r"$\Delta R(jj)^{forward_{boost}}$")]),
        
         "jet_id":   HistConf([Axis(coll="JetGood", field="jetId", bins=10, start=0, stop=10, label="Jet id")]),
         "jet_rel_iso":  HistConf([Axis(coll="LeptonGood", field="jetRelIso", bins=50, start=0, stop=2, label="Jet iso in lep")]),
@@ -378,20 +396,20 @@ cfg = Configurator(
         "phi_tag1":   HistConf([Axis(coll="events", field="jet1_phi", bins=48, start=-4., stop=4., label=r"$\phi(j_1)$")]),
         "phi_tag2":   HistConf([Axis(coll="events", field="jet2_phi", bins=48, start=-4., stop=4., label=r"$\phi(j_2)$")]),
         # lead lepton
-        "eta_w_lep":   HistConf([Axis(coll="events", field="w_lep_eta", bins=32, start=-4.0, stop=4.0, label=r"$\eta^{W\,lep}$ ")]),
-        "pt_w_lep":   HistConf([Axis(coll="events", field="w_lep_pt", bins=40, start=0.0, stop=300.0, label=r"$p_T^{W\,lep}$ [GeV]")]),
-        "phi_w_lep":   HistConf([Axis(coll="events", field="w_lep_phi", bins=32, start=-4.0, stop=4.0, label=r"$\phi^{W\,lep}$ ")]),
+        "eta_w_lep":   HistConf([Axis(coll="events", field="w_lep_eta", bins=32, start=-4.0, stop=4.0, label=r"$\eta^{lep_1}$ ")]),
+        "pt_w_lep":   HistConf([Axis(coll="events", field="w_lep_pt", bins=40, start=0.0, stop=300.0, label=r"$p_T^{lep_1}$ [GeV]")]),
+        "phi_w_lep":   HistConf([Axis(coll="events", field="w_lep_phi", bins=32, start=-4.0, stop=4.0, label=r"$\phi^{lep_1}$ ")]),
         "m_ll":   HistConf([Axis(coll="ll", field="m_ll", bins=50, start=0, stop=200.0, label=r"$m_{ll}$ [GeV]")]),
         # lead lepton dR
         "lead_wlep_wjet1_dR": HistConf([Axis(coll="events", field="lead_wlep_wjet1_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_1)^{W}$")]),
         "lead_wlep_wjet2_dR": HistConf([Axis(coll="events", field="lead_wlep_wjet2_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_2)^{W}$")]),
         "lead_wlep_wfatjet1_dR": HistConf([Axis(coll="events", field="lead_wlep_wfatjet1_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lJ_1)^{W}$")]),
         "lead_wlep_w_resolved_dR": HistConf([Axis(coll="events", field="lead_wlep_w_resolved_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lW_{resolved})$")]),
-        "lead_wlep_vbsjet1_dR": HistConf([Axis(coll="events", field="lead_wlep_vbsjet1_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_1)^{vbs}$")]),
-        "lead_wlep_vbsjet2_dR": HistConf([Axis(coll="events", field="lead_wlep_vbsjet2_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_2)^{vbs}$")]),
+        "lead_wlep_vbsjet1_dR": HistConf([Axis(coll="events", field="lead_wlep_vbsjet1_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_1)^{forward}$")]),
+        "lead_wlep_vbsjet2_dR": HistConf([Axis(coll="events", field="lead_wlep_vbsjet2_dR", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_2)^{forward}$")]),
        
-        "lead_wlep_vbsjet1_dR_boost": HistConf([Axis(coll="events", field="lead_wlep_vbsjet1_dR_boost", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_1)^{vbs,boost}$")]),
-        "lead_wlep_vbsjet2_dR_boost": HistConf([Axis(coll="events", field="lead_wlep_vbsjet2_dR_boost", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_2)^{vbs,boost}$")]),
+        "lead_wlep_vbsjet1_dR_boost": HistConf([Axis(coll="events", field="lead_wlep_vbsjet1_dR_boost", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_1)^{forward,boost}$")]),
+        "lead_wlep_vbsjet2_dR_boost": HistConf([Axis(coll="events", field="lead_wlep_vbsjet2_dR_boost", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(lj_2)^{forward,boost}$")]),
        
         # lead lepton dEta
         "lead_wlep_wfatjet1_deta":   HistConf([Axis(coll="events", field="lead_wlep_wfatjet1_deta", bins=24, start=0.0, stop=9.0, label=r"$|\Delta\eta_{lJ}^{W}|$")]),
@@ -420,6 +438,13 @@ cfg = Configurator(
         "fj_Z_vs_QCD":  HistConf([Axis(coll="candidate_boost", field="particleNet_ZvsQCD", bins=32, start=0, stop=1.1,   label=r"particleNet_ZvsQCD$")]),
         "fj_pn_mass":  HistConf([Axis(coll="candidate_boost", field="particleNet_mass", bins=15, start=40, stop=115,   label=r"particleNet_mass$")]),
 
+
+        "fj_W_vs_QCD_deeptag":  HistConf([Axis(coll="candidate_boost", field="deepTag_WvsQCD", bins=32, start=0, stop=1.1,   label=r"deepTag_WvsQCD$")]),
+        "fj_Z_vs_QCD_deeptag":  HistConf([Axis(coll="candidate_boost", field="deepTag_ZvsQCD", bins=32, start=0, stop=1.1,   label=r"deepTag_ZvsQCD$")]),
+        
+        "fj_W_vs_QCD_deeptagMD":  HistConf([Axis(coll="candidate_boost", field="deepTagMD_WvsQCD", bins=32, start=0, stop=1.1,   label=r"deepTagMD_WvsQCD$")]),
+        "fj_Z_vs_QCD_deeptagMD":  HistConf([Axis(coll="candidate_boost", field="deepTagMD_ZvsQCD", bins=32, start=0, stop=1.1,   label=r"deepTagMD_ZvsQCD$")]),
+        
         #"ak8_ak4_separation":       HistConf([Axis(coll="events", field="separation", bins=40, start=0.0, stop=4.0, label=r"$\Delta R(AK8 to AK4)$")]),
     
         "z_lep":   HistConf([Axis(coll="events", field="z_lep", bins=40, start=-1.0, stop=1.0, label=r"$Zepp. lepton$")]),
@@ -435,17 +460,17 @@ cfg = Configurator(
         "qgl_vbs2_boost":  HistConf([Axis(coll="events", field="qgl_vbs2_boost", bins=40, start=0, stop=1.0, label=r"$QGL VBS jet2 (boosted)$")]),
        
         "qgl_wjet1_resolved":  HistConf([Axis(coll="events", field="qgl_wjet1_resolved", bins=40, start=0, stop=1.0, label=r"$QGL had. W jet 1 $")]),
-        "qgl_wjet1_resolved":  HistConf([Axis(coll="events", field="qgl_wjet2_resolved", bins=40, start=0, stop=1.0, label=r"$QGL had. W jet 2 $")]),
+        "qgl_wjet2_resolved":  HistConf([Axis(coll="events", field="qgl_wjet2_resolved", bins=40, start=0, stop=1.0, label=r"$QGL had. W jet 2 $")]),
         #"qgl_fatjet":  HistConf([Axis(coll="events", field="qgl_fatjet", bins=40, start=0, stop=1.0, label=r"$QGL AK8 W jet $")]),
 
         
         # VBS jet kinematics
-        "pt_vbsjet1":    HistConf([Axis(coll="events", field="vbsjet1_pt", bins=60, start=0, stop=300, label=r"$p_T(j_1)^{VBS}$ [GeV]")]),
-        "pt_vbsjet2":    HistConf([Axis(coll="events", field="vbsjet2_pt", bins=60, start=0, stop=300, label=r"$p_T(j_2)^{VBS}$ [GeV]")]),
-        "eta_vbsjet1":   HistConf([Axis(coll="events", field="vbsjet1_eta", bins=48, start=-4.8, stop=4.8, label=r"$\eta(j_1)^{VBS}$")]),
-        "eta_vbsjet2":   HistConf([Axis(coll="events", field="vbsjet2_eta", bins=48, start=-4.8, stop=4.8, label=r"$\eta(j_2)^{VBS}$")]),
-        "phi_vbsjet1":   HistConf([Axis(coll="events", field="vbsjet1_phi", bins=48, start=-4., stop=4., label=r"$\phi(j_1)^{VBS}$")]),
-        "phi_vbsjet2":   HistConf([Axis(coll="events", field="vbsjet2_phi", bins=48, start=-4., stop=4., label=r"$\phi(j_2)^{VBS}$")]),
+        "pt_vbsjet1":    HistConf([Axis(coll="events", field="vbsjet1_pt", bins=60, start=0, stop=300, label=r"$p_T(j_1)^{forward}$ [GeV]")]),
+        "pt_vbsjet2":    HistConf([Axis(coll="events", field="vbsjet2_pt", bins=60, start=0, stop=300, label=r"$p_T(j_2)^{forward}$ [GeV]")]),
+        "eta_vbsjet1":   HistConf([Axis(coll="events", field="vbsjet1_eta", bins=48, start=-4.8, stop=4.8, label=r"$\eta(j_1)^{forward}$")]),
+        "eta_vbsjet2":   HistConf([Axis(coll="events", field="vbsjet2_eta", bins=48, start=-4.8, stop=4.8, label=r"$\eta(j_2)^{forward}$")]),
+        "phi_vbsjet1":   HistConf([Axis(coll="events", field="vbsjet1_phi", bins=48, start=-4., stop=4., label=r"$\phi(j_1)^{forward}$")]),
+        "phi_vbsjet2":   HistConf([Axis(coll="events", field="vbsjet2_phi", bins=48, start=-4., stop=4., label=r"$\phi(j_2)^{forward}$")]),
         
         # STUPID B JETS CAUSING PROBLEMS
         
@@ -468,5 +493,16 @@ cfg = Configurator(
 
         "HT_check":     HistConf([Axis(coll="LHE", field="HT", label="gen HT", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
         "HT_sum":       HistConf([Axis(coll="events", field="ht_sum", bins=35, start=0, stop=3500, label="reco HT")]),
+    },
+    #THIS IS WHERE YOU ADD COLUMN VARIABLES TO SAVE FOR BDT THINGS
+    columns = {
+        "common": {
+           "bycategory": {
+                "whad_withbveto_e": [ColOut("events",["nJetGood","mt_w_leptonic", "w_had_dR","z_lep","centrality_resolved","vbs_dR","jet1_pt","qgl_vbs1_resolved","qgl_vbs2_resolved","wleptonic_eta","w_lep_eta","lead_wlep_vbsjet1_dR","lead_wlep_vbsjet2_dR"]), ColOut("PuppiMET", ["pt"]), ColOut("vbsjets", ["mass", "delta_eta"]), ColOut("w_had_jets", ["pt"])],
+                "whad_withbveto_mu": [ColOut("events",["nJetGood","mt_w_leptonic", "w_had_dR","z_lep","centrality_resolved","vbs_dR","jet1_pt","qgl_vbs1_resolved","qgl_vbs2_resolved","wleptonic_eta","w_lep_eta","lead_wlep_vbsjet1_dR","lead_wlep_vbsjet2_dR"]), ColOut("PuppiMET", ["pt"]), ColOut("vbsjets", ["mass", "delta_eta"]), ColOut("w_had_jets", ["pt"])],
+                # "boosted_jet_in_window_e": [ColOut("events",["nJetGood","nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted","vbs_dR","jet1_pt","qgl_vbs1_resolved","qgl_vbs2_resolved","wleptonic_eta","w_lep_eta","lead_wlep_vbsjet1_dR"]), ColOut("PuppiMET", ["pt"]), ColOut("vbsjets", ["mass", "delta_eta"]), ColOut("candidate_boost", ["particleNet_WvsQCD","particleNet_ZvsQCD","tau21"])],
+                # "boosted_jet_in_window_mu": [ColOut("events",["nJetGood","nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted","vbs_dR","jet1_pt","qgl_vbs1_resolved","qgl_vbs2_resolved","wleptonic_eta","w_lep_eta","lead_wlep_vbsjet1_dR"]), ColOut("PuppiMET", ["pt"]), ColOut("vbsjets", ["mass", "delta_eta"]), ColOut("candidate_boost", ["particleNet_WvsQCD","particleNet_ZvsQCD","tau21"])],
+           }
+        }
     },
 )
