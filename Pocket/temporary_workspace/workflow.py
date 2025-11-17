@@ -23,7 +23,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
     def process(self, events):
         # --- Fix buggy genWeight here ---
         dataset = events.metadata["dataset"]
-        if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in dataset:
+        # if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in dataset:
+        if hasattr(events, "genWeight"):
             events["genWeight"] = np.sign(events.genWeight)
        
         # IMPORTANT PATCH DUE TO BUGGY GEN WEIGHT IN UL GENWEIGHT nanoaodv9!
@@ -152,6 +153,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         # far_enough_from_ak8 = (separation > 0.8)
         ev["JetGood"] = ev.JetGood[mask_jet_cleaning]
+        mask_jetpuid = ~( (np.abs(ev.JetGood.eta) > 2.65) & (np.abs(ev.JetGood.eta) < 3.139) & (ev.JetGood.puId < 7)  & (ev.JetGood.pt < 50.0))
+        ev["JetGood"] = ev.JetGood[mask_jetpuid]
         ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
         # far_enough_from_ak8 = (ev.JetGood.delta_r(ev.candidate_boost) > 0.8)
         # far_enough_from_ak8 = ak.fill_none(far_enough_from_ak8, True)
@@ -199,7 +202,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         # deta and dR btw tagging jets
         ev["vbsjets", "delta_eta"] = np.abs(v1.eta - v2.eta)
         ev["vbs_dR"] = ak.fill_none(v1.delta_r(v2), np.nan)
-
+        ev["vbsjets", "delta_phi"] = np.abs(v1.phi - v2.phi)
 
         ##### NOW REPEAT VBS ID BUT NEED SOME BOOST CATEGORIZATION #####
 
@@ -346,6 +349,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["w_had_jet1_phi"] = ak.fill_none(wj1.phi, np.nan)
         ev["w_had_jet2_phi"] = ak.fill_none(wj2.phi, np.nan)
         ev["w_had_dR"] = ak.fill_none(wj1.delta_r(wj2), np.nan)
+        ev["w_had_delta_eta"] = np.abs(wj1.eta - wj2.eta)
+        ev["w_had_delta_phi"] = np.abs(wj1.phi - wj2.phi)
 
         # ------------- W Leptonic -------------
         #lead_lep = ak.firsts(ev.LeptonGood)
@@ -387,7 +392,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["lead_wlep_w_resolved_deta"] = np.abs(lead_lep.eta - whad.eta)
 
 
-        deltaR = lead_lep.metric_table(ev["BJet_csv"])
+        deltaR = lead_lep.metric_table(ev["BJetGood"])
 
         # Flatten last two axes to get all lep-bjet pairs per event (usually just n_bjets per event)
         deltaR_per_event = ak.flatten(deltaR, axis=2)
@@ -417,7 +422,10 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["lead_wlep_vbsjet2_dR"] = ak.fill_none(lead_lep.delta_r(v2), np.nan)
         ev["lead_wlep_vbsjet1_deta"] = np.abs(lead_lep.eta - v1.eta)
         ev["lead_wlep_vbsjet2_deta"] = np.abs(lead_lep.eta - v2.eta)
+        ev["lead_wlep_vbsjet1_dphi"] = np.abs(lead_lep.phi - v1.phi)
+        ev["lead_wlep_vbsjet2_dphi"] = np.abs(lead_lep.phi - v2.phi)
         
+
         ev["lead_wlep_vbsjet1_dR_boost"] = ak.fill_none(lead_lep.delta_r(v1b), np.nan)
         ev["lead_wlep_vbsjet2_dR_boost"] = ak.fill_none(lead_lep.delta_r(v2b), np.nan)
         ev["lead_wlep_vbsjet1_deta_boost"] = np.abs(lead_lep.eta - v1b.eta)
@@ -556,8 +564,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['lead_wlep_neutrino_dR'] = np.sqrt(ev.lead_wlep_neutrino_deta**2 + ev.lead_wlep_MET_dphi**2)
         ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
 
-        ev['centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
-        ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1b,v2b),np.nan)
+        ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
+        ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1,v2),np.nan)
 
         ev['qgl_vbs1_resolved'] = ak.fill_none(v1.qgl,np.nan)
         ev['qgl_vbs2_resolved'] = ak.fill_none(v2.qgl,np.nan)
@@ -565,11 +573,20 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['qgl_vbs1_boost'] = ak.fill_none(v1b.qgl,np.nan)
         ev['qgl_vbs2_boost'] = ak.fill_none(v2b.qgl,np.nan)
 
-        ev['qgl_wjet1_resolved'] = ak.fill_none(ev.w_had_jets.jet1.qgl,np.nan)
-        ev['qgl_wjet2_resolved'] = ak.fill_none(ev.w_had_jets.jet2.qgl,np.nan)
+        ev["w_had_jets",'qgl_wjet1_resolved'] = ak.fill_none(ev.w_had_jets.jet1.qgl,np.nan)
+        ev["w_had_jets",'qgl_wjet2_resolved'] = ak.fill_none(ev.w_had_jets.jet2.qgl,np.nan)
 
 
         ev["ht_sum"] = ak.sum(ev.Jet.pt, axis=1)
+
+        dress_lep = ak.firsts(ev.GenDressedLepton)
+        gen_met = ev.GenMET
+        
+        ev["gen_w_pt_dressed"] = (dress_lep + gen_met).pt
+        w_pt_dressed = ak.firsts(ev.gen_w_pt_dressed, axis=-1)
+        # First, get W pT by PDG
+        w_pt_direct = ak.firsts(ev.GenPart[abs(ev.GenPart.pdgId) == 24].pt, axis=-1)
+        ev["gen_w_pt_by_pdg"] = ak.fill_none(w_pt_direct, w_pt_dressed)
 
         # features = {
         #     # "mjj_vbs": ak.to_numpy(ak.flatten(ev.vbsjets.mass, axis=None)),
