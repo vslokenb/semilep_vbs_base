@@ -1,4 +1,4 @@
-### Optimus Prime in lingerie
+### Optimus Prime 
 import re
 import sys
 import types
