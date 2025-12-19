@@ -1,5 +1,6 @@
 ### Optimus Prime 
 import re
+from itertools import product
 import sys
 import types
 import pandas as pd
@@ -32,32 +33,33 @@ from torch.nn import (
     ModuleList,
     ReLU,
     Sequential,
+    Sigmoid,
 )
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 import torch_geometric.transforms as T
 
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn import GINEConv, GPSConv, global_add_pool, HeteroConv, TransformerConv
+from torch_geometric.nn import GINEConv, GPSConv, global_add_pool, HeteroConv, TransformerConv, GlobalAttention
 from torch_geometric.nn.attention import PerformerAttention
 
 import mplhep as hep
 hep.style.use("CMS")
 
 
-def load_category_from_coffea(coffea_file, category_name):
+def load_category_from_coffea(coffea_file, category_name, out_prefix):
     #Load and combine all processes for a given category from a .coffea file
     ####### DEBUGGING?
 
-    if 'coffea.processor.accumulator' not in sys.modules:
-        sys.modules['coffea.processor.accumulator'] = types.ModuleType('accumulator')
+    # if 'coffea.processor.accumulator' not in sys.modules:
+    #     sys.modules['coffea.processor.accumulator'] = types.ModuleType('accumulator')
     
-    # You can optionally map classes if needed:
-    try:
-        from coffea.processor import processor
-        sys.modules['coffea.processor.accumulator'].ProcessorAccumulator = getattr(processor, 'ProcessorAccumulator', None)
-    except ImportError:
-        pass  # if ProcessorAccumulator no longer exists, keep as None
+    # # You can optionally map classes if needed:
+    # try:
+    #     from coffea.processor import processor
+    #     sys.modules['coffea.processor.accumulator'].ProcessorAccumulator = getattr(processor, 'ProcessorAccumulator', None)
+    # except ImportError:
+    #     pass  # if ProcessorAccumulator no longer exists, keep as None
     
 
     ####### DEBUGGING?
@@ -133,126 +135,285 @@ def load_category_from_coffea(coffea_file, category_name):
         raise ValueError(f"No data found for category '{category_name}' in {coffea_file}")
 
     df_all = pd.concat(all_dfs, ignore_index=True)
-    return df_all,gen_weight_normalization
+    df_all["label"] = df_all["process"].apply(lambda x: 1 if "EWK" in str(x) else 0) 
 
-def get_graphical(df, norm_table):
-    data_list = []
-
-    df["label"] = df["process"].apply(lambda x: 1 if "EWK" in str(x) else 0) 
-
-    labels = df["label"].to_numpy()
-    # 3. Event weights
-    if "weight" in df.columns:
+    labels = df_all["label"].to_numpy()
+    # # 3. Event weights
+    if "weight" in df_all.columns:
         #print(df["year_tag"], " year and scaled correction ", norm_table)
-        df["weight"] = df.apply( lambda row: row["weight"] / norm_table.get(row["year_tag"], 1.0), axis=1 )
-        weights = df["weight"].to_numpy()
+        df_all["weight"] = df_all.apply( lambda row: row["weight"] / gen_weight_normalization.get(row["year_tag"], 1.0), axis=1 )
+        weights = df_all["weight"].to_numpy()
     else:
         weights = None
 
-    
-    exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process",  'weight_variation_PileupWeightUp', 'weight_variation_PileupWeightDown', 'weight_variation_sf_mu_idUp', 'weight_variation_sf_mu_idDown', 'weight_variation_sf_mu_isoUp', 'weight_variation_sf_mu_isoDown', 'weight_variation_sf_ele_idUp', 'weight_variation_sf_ele_idDown', 'weight_variation_sf_ele_recoUp', 'weight_variation_sf_ele_recoDown', 'weight_variation_sf_L1prefiringUp', 'weight_variation_sf_L1prefiringDown', 'weight_variation_sf_mu_triggerUp', 'weight_variation_sf_mu_triggerDown', 'weight_variation_sf_jet_puIdUp', 'weight_variation_sf_jet_puIdDown', 'weight_variation_sf_partonshower_isrUp', 'weight_variation_sf_partonshower_isrDown', 'weight_variation_sf_partonshower_fsrUp', 'weight_variation_sf_partonshower_fsrDown']
 
+    return df_all,gen_weight_normalization
+
+
+
+def load_category_dataframe(parquet_path):
+    df = pd.read_parquet(parquet_path)
+    return df
+
+def get_graphical(df):
+    data_list = []
+
+    node_feature_dims = {
+        "jet1": 3,
+        "jet2": 3,
+        "jet3": 3,
+        "jet4": 3,
+        "jet5": 3,
+        "jet6": 3,
+        "lepton1": 3,
+        "PuppiMET": 2,
+    }
+
+    labels = df["label"].to_numpy()
+
+    # Event weights
+    weights = df["weight"].to_numpy() if "weight" in df.columns else None
+
+    exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process"] + \
+                   [c for c in df.columns if c.startswith("weight_variation")]
 
     feature_cols = (
         df.drop(columns=[c for c in exclude_cols if c in df.columns])
         .select_dtypes(include=["number"])
         .columns.tolist()
     )
-    # print("Features:", feature_cols)
-    # print(df[feature_cols].dtypes)
 
-    EDGE_PREFIXES = ("mass", "dR", "dphi", "deta")
-    feature_cols = [
-        col for col in feature_cols
-        if not any(col.startswith(p + "_") for p in EDGE_PREFIXES)
-    ]
-
-    global_cols = [c for c in feature_cols if c.startswith("events")]
+    # Separate global vs node features
+    global_cols = [c for c in feature_cols if c.startswith("events") or c.startswith("w")]
     feature_cols = [c for c in feature_cols if c not in global_cols]
 
-    feature_groups = {}
-    
-    for col in feature_cols:
-        match = re.match(r"([^_]+)_", col)
-        prefix = match.group(1) if match else "global"
-        feature_groups.setdefault(prefix, []).append(col)
+    type_prefixes = ["lepton", "jet", "PuppiMET"]
+    enumerated_groups = {}
+    for t in type_prefixes:
+        obj_cols = [c for c in feature_cols if c.startswith(t)]
+        for col in obj_cols:
+            m = re.match(rf"{t}(\d*)_(.*)", col)
+            if m:
+                idx = m.group(1) or ""
+                obj_idx = f"{t}{idx}"
+                enumerated_groups.setdefault(obj_idx, []).append(col)
 
-    # print("\nFeature groups:")
-    # for k, v in feature_groups.items():
-    #     print(f"  {k}: {v}")
-
-    row_num=0
-    data_list = []
     for _, row in df.iterrows():
-
         data = HeteroData()
-        # --------------------------------------------------------------
-        # Create node types with their own feature vectors
-        # One node per feature group
-        # --------------------------------------------------------------
-        for node_type, cols in feature_groups.items():
+
+        # ----- Nodes -----
+        for node_type, cols in enumerated_groups.items():
             vals = row[cols].values.astype(float)
-            if np.all(vals == -999):
-                continue
             vals[vals == -999] = 0.0
-            # shape => (1, num_features_for_this_group)
-            data[node_type].x = torch.tensor([vals], dtype=torch.float)
+            data[node_type].x = torch.tensor([vals], dtype=torch.float)  # shape [num_nodes, features]
+            data[node_type].num_nodes = data[node_type].x.size(0)
 
-        # --------------------------------------------------------------
-        # Build fully connected edges between all node types
-        # With exactly 1 node in each type, the index is always [[0],[0]]
-        # --------------------------------------------------------------
-        node_types = list(feature_groups.keys())
+        node_types = list(enumerated_groups.keys())
 
+        # ----- Edges -----
         EDGE_QUANTITIES = auto_generate_mappings(df, node_types)
+        EDGE_TYPES = ["mass", "dR", "dphi", "deta"]
 
-        EDGE_TYPES = ["mass", "dR", "dphi","deta"]
-
-        for src in node_types:
-            if src not in data.node_types:
+        for src, dst in product(node_types, repeat=2):
+            if src not in data.node_types or dst not in data.node_types:
                 continue
-            for dst in node_types:
-                if dst not in data.node_types:
+
+            n_src = data[src].num_nodes
+            n_dst = data[dst].num_nodes
+
+            if n_src == 0 or n_dst == 0:
+                continue
+
+            for etype in EDGE_TYPES:
+                col = EDGE_QUANTITIES.get((src, etype, dst))
+                if col is None:
                     continue
-                for etype in EDGE_TYPES:
 
-                    # get correct event-based column
-                    col = EDGE_QUANTITIES.get((src, etype, dst))
-                    if col is None:
-                        continue  # skip if not available
+                # Create fully connected edges between src and dst
+                src_idx, dst_idx = torch.meshgrid(
+                    torch.arange(n_src), torch.arange(n_dst), indexing='ij'
+                )
+                edge_index = torch.vstack([src_idx.flatten(), dst_idx.flatten()])
 
-                    # 1-edge graph (0 → 0)
-                    edge_index = torch.tensor([[0], [0]], dtype=torch.long)
+                # Edge attributes
+                val = float(row[col])
+                edge_attr = torch.full((edge_index.size(1), 1), val, dtype=torch.float)
 
-                    # lookup precomputed scalar
-                    val = float(row[col])
-                    edge_attr = torch.tensor([[val]], dtype=torch.float)
+                data[src, etype, dst].edge_index = edge_index
+                data[src, etype, dst].edge_attr = edge_attr
 
-                    data[src, etype, dst].edge_index = edge_index
-                    data[src, etype, dst].edge_attr  = edge_attr
+        # ----- Global features -----
         if global_cols:
             global_vals = row[global_cols].values.astype(float)
             data.u = torch.tensor([global_vals], dtype=torch.float)
 
-        # --------------------------------------------------------------
-        # Attach labels and metadata
-        # --------------------------------------------------------------
+        # ----- Labels and weights -----
         data.y = torch.tensor([int(row["label"])], dtype=torch.long)
         data.weight = torch.tensor([float(row["weight"])], dtype=torch.float)
         data.process = row["process"]
 
-        data.node_types = node_types 
+        data.node_types = node_types
 
+        # Apply PyG transforms
         data = T.ToUndirected()(data)
         data = T.AddSelfLoops()(data)
-        # data = T.AddRandomWalkPE(walk_length=20, attr_name='pe')(data)
+
         data_list.append(data)
-        # if row_num > 3:
-        #     continue
-        # row_num+=1
-        
-    
+
     return data_list
+
+# def get_graphical(df):
+#     data_list = []
+
+#     # df["label"] = df["process"].apply(lambda x: 1 if "EWK" in str(x) else 0) 
+#     node_feature_dims = {
+#         "jet1": 3,
+#         "jet2": 3,
+#         "jet3": 3,
+#         "jet4": 3,
+#         "jet5": 3,
+#         "jet6": 3,
+#         "lepton1": 3,
+#         "PuppiMET": 2,
+#     }
+#     labels = df["label"].to_numpy()
+#     # 3. Event weights
+#     if "weight" in df.columns:
+#         #print(df["year_tag"], " year and scaled correction ", norm_table)
+#         # df["weight"] = df.apply( lambda row: row["weight"] / norm_table.get(row["year_tag"], 1.0), axis=1 )
+#         weights = df["weight"].to_numpy()
+#     else:
+#         weights = None
+
+    
+#     exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process",  'weight_variation_PileupWeightUp', 'weight_variation_PileupWeightDown', 'weight_variation_sf_mu_idUp', 'weight_variation_sf_mu_idDown', 'weight_variation_sf_mu_isoUp', 'weight_variation_sf_mu_isoDown', 'weight_variation_sf_ele_idUp', 'weight_variation_sf_ele_idDown', 'weight_variation_sf_ele_recoUp', 'weight_variation_sf_ele_recoDown', 'weight_variation_sf_L1prefiringUp', 'weight_variation_sf_L1prefiringDown', 'weight_variation_sf_mu_triggerUp', 'weight_variation_sf_mu_triggerDown', 'weight_variation_sf_jet_puIdUp', 'weight_variation_sf_jet_puIdDown', 'weight_variation_sf_partonshower_isrUp', 'weight_variation_sf_partonshower_isrDown', 'weight_variation_sf_partonshower_fsrUp', 'weight_variation_sf_partonshower_fsrDown']#, 'PuppiMET_pt','PuppiMET_phi', 'w_had_jets_centrality_resolved','w_had_jets_N']
+
+
+#     feature_cols = (
+#         df.drop(columns=[c for c in exclude_cols if c in df.columns])
+#         .select_dtypes(include=["number"])
+#         .columns.tolist()
+#     )
+#     # print("Features:", feature_cols)
+#     # print(df[feature_cols].dtypes)
+
+#     EDGE_PREFIXES = ("mass", "dR", "dphi", "deta")
+#     feature_cols = [
+#         col for col in feature_cols
+#         if not any(col.startswith(p + "_") for p in EDGE_PREFIXES)
+#     ]
+
+#     global_cols = [c for c in feature_cols if c.startswith("events") or c.startswith("w")]
+#     feature_cols = [c for c in feature_cols if c not in global_cols]
+
+#     type_prefixes = ["lepton", "jet", "PuppiMET"]
+#     feature_groups = {t: [] for t in type_prefixes}
+
+#     # feature_groups = {}
+    
+#     for col in feature_cols:
+#         for t in type_prefixes:
+#             if col.startswith(t):
+#                 feature_groups[t].append(col)
+#                 break
+
+#     enumerated_groups = {}
+#     for obj in type_prefixes:
+#         # find all columns starting with obj
+#         obj_cols = [c for c in feature_cols if c.startswith(obj)]
+#         # group by object index
+#         obj_dict = {}
+#         for col in obj_cols:
+#             m = re.match(rf"{obj}(\d*)_(.*)", col)
+#             if m:
+#                 idx = m.group(1) or ""  # default to blank if no index
+#                 obj_idx = f"{obj}{idx}"
+#                 obj_dict.setdefault(obj_idx, []).append(col)
+#         enumerated_groups.update(obj_dict)
+
+
+#     print("\nFeature groups:")
+#     for k, v in feature_groups.items():
+#         print(f"  {k}: {v}")
+
+#     row_num=0
+#     data_list = []
+#     for _, row in df.iterrows():
+
+#         data = HeteroData()
+#         # --------------------------------------------------------------
+#         # Create node types with their own feature vectors
+#         # One node per feature group
+#         # --------------------------------------------------------------
+#         for node_type, cols in enumerated_groups.items():
+#             vals = row[cols].values.astype(float)
+#             # data[node_type].num_nodes = 0
+#             if np.all(vals == -999):
+#                 vals = np.zeros(node_feature_dims[node_type], dtype=float)
+#             vals[vals == -999] = 0.0
+#             # shape => (1, num_features_for_this_group)
+            
+#             data[node_type].x = torch.tensor([vals], dtype=torch.float)
+#             data[node_type].num_nodes = data[node_type].x.size(0)
+#         # --------------------------------------------------------------
+#         # Build fully connected edges between all node types
+#         # With exactly 1 node in each type, the index is always [[0],[0]]
+#         # --------------------------------------------------------------
+#         node_types = list(enumerated_groups.keys())
+
+#         EDGE_QUANTITIES = auto_generate_mappings(df, node_types)
+
+#         EDGE_TYPES = ["mass", "dR", "dphi","deta"]
+
+#         for src, dst in product(node_types, repeat=2):
+#             if src not in data.node_types or dst not in data.node_types:
+#                 # skip edges if either node type doesn't exist
+#                 continue
+#             for etype in EDGE_TYPES:
+#                     # get correct event-based column
+#                     col = EDGE_QUANTITIES.get((src, etype, dst))
+#                     if col is None:
+#                         # data[src, etype, dst].edge_index = torch.zeros((2, 0), dtype=torch.long)
+#                         # data[src, etype, dst].edge_attr = torch.zeros((0, 1), dtype=torch.float)
+#                         continue
+
+#                     # 1-edge graph (0 → 0)
+#                     edge_index = torch.tensor([[0], [0]], dtype=torch.long)
+
+#                     # lookup precomputed scalar
+#                     val = float(row[col])
+#                     edge_attr = torch.tensor([[val]], dtype=torch.float)
+
+#                     data[src, etype, dst].edge_index = edge_index
+#                     data[src, etype, dst].edge_attr  = edge_attr
+                
+#         if global_cols:
+#             global_vals = row[global_cols].values.astype(float)
+#             data.u = torch.tensor([global_vals], dtype=torch.float)
+
+#         # --------------------------------------------------------------
+#         # Attach labels and metadata
+#         # --------------------------------------------------------------
+#         data.y = torch.tensor([int(row["label"])], dtype=torch.long)
+#         data.weight = torch.tensor([float(row["weight"])], dtype=torch.float)
+#         data.process = row["process"]
+
+#         data.node_types = node_types 
+
+#         data = T.ToUndirected()(data)
+#         data = T.AddSelfLoops()(data)
+#         # data = T.AddRandomWalkPE(walk_length=20, attr_name='pe')(data)
+#         data_list.append(data)
+#         # if row_num > 3:
+#         #     continue
+#         # row_num+=1
+
+#     node_set = set()
+#     for data in data_list:
+#         node_set.update(data.node_types)
+#     print(node_set)   
+    
+#     return data_list
 
 def visualize_graph(graph, index):
     """
@@ -333,26 +494,26 @@ def auto_generate_mappings(df, node_types, edge_types=("mass", "dR", "dphi", "de
 
     return EDGE_QUANTITIES
 
-class RedrawProjection:
-    def __init__(self, model: torch.nn.Module,
-                redraw_interval: Optional[int] = None):
-        self.model = model
-        self.redraw_interval = redraw_interval
-        self.num_last_redraw = 0
+# class RedrawProjection:
+#     def __init__(self, model: torch.nn.Module,
+#                 redraw_interval: Optional[int] = None):
+#         self.model = model
+#         self.redraw_interval = redraw_interval
+#         self.num_last_redraw = 0
 
-    def redraw_projections(self):
-        if not self.model.training or self.redraw_interval is None:
-            return
-        if self.num_last_redraw >= self.redraw_interval:
-            fast_attentions = [
-                module for module in self.model.modules()
-                if isinstance(module, PerformerAttention)
-            ]
-            for fast_attention in fast_attentions:
-                fast_attention.redraw_projection_matrix()
-            self.num_last_redraw = 0
-            return
-        self.num_last_redraw += 1
+#     def redraw_projections(self):
+#         if not self.model.training or self.redraw_interval is None:
+#             return
+#         if self.num_last_redraw >= self.redraw_interval:
+#             fast_attentions = [
+#                 module for module in self.model.modules()
+#                 if isinstance(module, PerformerAttention)
+#             ]
+#             for fast_attention in fast_attentions:
+#                 fast_attention.redraw_projection_matrix()
+#             self.num_last_redraw = 0
+#             return
+#         self.num_last_redraw += 1
 
 
 class HeteroGraph(torch.nn.Module):
@@ -360,7 +521,7 @@ class HeteroGraph(torch.nn.Module):
         super().__init__()
 
         self.channels = channels 
-        input_dim = channels * len(node_types) + channels
+        # input_dim = channels * len(node_types) + channels
 
 
         node_feature_dims = {
@@ -372,7 +533,7 @@ class HeteroGraph(torch.nn.Module):
             "jet6": 3,
             "lepton1": 3,
             "PuppiMET": 2,
-            "w": 2,
+            # "w": 2,
         }
 
         self.edge_type_to_key = {
@@ -388,16 +549,20 @@ class HeteroGraph(torch.nn.Module):
             for nt in node_types
         })
 
-        # per-edge-type embeddings
+        self.edge_emb = torch.nn.ModuleDict({
+            "__".join(etype): Sequential(
+                Linear(1, channels),
+                ReLU(),
+                Linear(channels, channels)
+            )
+            for etype in edge_types
+        })
 
-        # print("DEBUG: edge_types entries and their types:")
-        # for et in edge_types:
-        #     print("  ", et, " type:", type(et))
+        self.u_mlp = Sequential(
+            Linear(u_dim, channels),
+            ReLU(),
+        )
 
-        # self.edge_emb = torch.nn.ModuleDict({
-        #     "__".join(et): Linear(1, channels)#edge_feature_dims[et[1]]
-        #     for et in edge_types
-        # })
 
         self.convs = torch.nn.ModuleList()
         for layer_idx in range(num_layers):
@@ -408,10 +573,10 @@ class HeteroGraph(torch.nn.Module):
                         out_channels=channels,
                         heads=3,
                         dropout=0.1,
-                        edge_dim=1,
+                        edge_dim=channels,
                     )
                     for (src, rel, dst) in edge_types
-                }, aggr='sum')
+                }, aggr='mean')
             else:
                 conv = HeteroConv({
                     (src, rel, dst): TransformerConv(
@@ -419,19 +584,59 @@ class HeteroGraph(torch.nn.Module):
                         out_channels=channels,
                         heads=3,
                         dropout=0.1,
-                        edge_dim=1,
+                        edge_dim=channels,
                     )
                     for (src, rel, dst) in edge_types
-                }, aggr='sum')
+                }, aggr='mean')
 
-            self.u_mlp = Sequential( Linear(u_dim, channels), ReLU(),)
+            # self.u_mlp = Sequential( Linear(u_dim, channels), ReLU(),)
 
             self.convs.append(conv)
         
         self.mlp = None
         self.node_types = node_types
+        self.res_proj = torch.nn.ModuleDict({
+            nt: Linear(channels, channels * 3)  # heads = 3
+            for nt in node_types
+        })
 
-        self.redraw_projection = RedrawProjection( self.convs,redraw_interval=1000 if attn_type == 'performer' else None        )
+        self.edge_res_scale = torch.nn.Parameter(torch.tensor(1.0))
+
+
+        pooled_nodes_dim = len(node_types) * channels * 3
+        input_dim = pooled_nodes_dim + channels
+        # print("input dim: ", input_dim)
+        # self.mlp = None
+        self.mlp = Sequential(
+                Linear(input_dim, channels // 2),
+                ReLU(),
+                Linear(channels // 2, channels // 4),
+                ReLU(),
+                Linear(channels // 4, 1),
+                Sigmoid()
+            )
+
+        # print(
+        #     "[INIT] mlp input dim =", self.mlp[0].in_features,
+        #     "| pooled_nodes_dim =", pooled_nodes_dim,
+        #     "| u_dim =", channels,
+        #     "| node_types =", len(node_types),
+        #     "| heads = 3"
+        # )
+
+        # self.pool = torch.nn.ModuleDict({
+        #     nt: GlobalAttention(
+        #         gate_nn=Sequential(
+        #             Linear(channels * 3, channels),
+        #             ReLU(),
+        #             Linear(channels, 1)
+        #         )
+        #     )
+        #     for nt in node_types
+        # })
+
+        
+        # self.redraw_projection = RedrawProjection( self.convs,redraw_interval=1000 if attn_type == 'performer' else None        )
     
     def forward(self, data: HeteroData):
 
@@ -459,15 +664,44 @@ class HeteroGraph(torch.nn.Module):
             if 'edge_attr' not in data[etype]:
                 continue
             key = "__".join(etype)
-            edge_attr_dict[etype] = data[etype].edge_attr  #self.edge_emb[key](data[etype].edge_attr)
+            edge_attr_dict[etype] = self.edge_emb[key](data[etype].edge_attr)
         # layers
-        for conv in self.convs:
-            h = conv(h, edge_index_dict=edge_index_dict, edge_attr_dict=edge_attr_dict)
+        h0 = h.copy()
+        # for conv in self.convs:
+        #     h_new = conv(h, edge_index_dict=edge_index_dict, edge_attr_dict=edge_attr_dict)
+
+        #     for nt in h_new:
+        #         if nt in h0:
+        #             h_new[nt] = h_new[nt] + self.edge_res_scale * self.res_proj[nt](h0[nt])
+
+        #     h = h_new
+        for layer_idx, conv in enumerate(self.convs):
+            h_new = conv(
+                h,
+                edge_index_dict=edge_index_dict,
+                edge_attr_dict=edge_attr_dict
+            )
+            h_out = {}
+            for nt in h:
+                if nt in h_new:
+                    if layer_idx == 0:
+                        h_out[nt] = h_new[nt] + self.res_proj[nt](h[nt])
+                    else:
+                        h_out[nt] = h_new[nt] + h[nt]
+                else:
+                    if layer_idx == 0:
+                        # no incoming edges for this node type
+                        h_out[nt] = self.res_proj[nt](h[nt])
+                    else:
+                        h_out[nt] = h[nt]
+            h = h_out
+
+
         num_graphs = data.num_graphs 
         pooled = []
 
         for nt in self.node_types:  
-            if nt in h:
+            if nt in data.node_types:
                 h_nt = h[nt]                      # [num_nodes, C]
                 batch = data[nt].batch            # [num_nodes]
 
@@ -475,14 +709,14 @@ class HeteroGraph(torch.nn.Module):
                 pooled_nt = global_add_pool(
                     h_nt, batch, size=num_graphs
                 )
-
-                # 2) reduce over features - [num_graphs, 1]
-                pooled_nt = pooled_nt.sum(dim=1, keepdim=True)
+                # pooled_nt = self.pool[nt](h_nt, batch)
+                # # 2) reduce over features - [num_graphs, 1]
+                # pooled_nt = pooled_nt.sum(dim=1, keepdim=True)
 
             else:
                 # Node type missing entirely - zero scalar per graph
                 pooled_nt = torch.zeros(
-                    num_graphs, 1, device=out_device
+                    num_graphs, self.channels * 3, device=out_device
                 )
 
             pooled.append(pooled_nt)
@@ -499,20 +733,31 @@ class HeteroGraph(torch.nn.Module):
         u = data['u']          # shape [batch, u_dim]
         u_emb = self.u_mlp(u)  # map to channel size
 
+        # print(
+        #     "[FWD] pooled_nodes:", pooled_nodes.shape,
+        #     "| u_emb:", u_emb.shape
+        # )
         out = torch.cat([pooled_nodes, u_emb], dim=-1)
 
-        if not hasattr(self, "mlp") or self.mlp is None:
-            C = self.channels
-            input_dim = out.size(1) 
-            self.mlp = Sequential(
-                Linear(input_dim, C // 2),
-                ReLU(),
-                Linear(C // 2, C // 4),
-                ReLU(),
-                Linear(C // 4, 1)
-            ).to(out.device)
+        # print(
+        #     "[FWD] out:", out.shape,
+        #     "| mlp expects:", self.mlp[0].in_features
+        # )
 
+        # if not hasattr(self, "mlp") or self.mlp is None:
+        #     C = self.channels
+        #     input_dim = pooled_nodes.size(1) + u_emb.size(1)#out.size(1) 
+        #     self.mlp = Sequential(
+        #         Linear(input_dim, C // 2),
+        #         ReLU(),
+        #         Linear(C // 2, C // 4),
+        #         ReLU(),
+        #         Linear(C // 4, 1),
+        #         Sigmoid()
+        #     ).to(out.device)
+        # # logits = self.mlp(out)
 
+        # return logits.squeeze(-1)
         return self.mlp(out)
 
 
@@ -527,7 +772,7 @@ def neural_net_initialization(full_data):
     node_types, edge_types, num_node_categories, num_edge_categories, u_dim = collect_graph_metadata(full_data)
 
     # 6. Hyperparameters
-    channels = 32
+    channels = 16
     num_layers = 2
     attn_type = 'multihead'
     attn_kwargs = {'dropout': 0.5}
@@ -541,7 +786,7 @@ def neural_net_initialization(full_data):
         num_edge_categories=num_edge_categories,
         u_dim=u_dim).to(device)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-3)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=20, min_lr=0.00001)
     return model, optimizer, scheduler, device
 
@@ -552,6 +797,7 @@ def plot_training_curves(train_losses, val_errors):
     plt.plot(epochs, train_losses, label="Training")
     plt.plot(epochs, val_errors, label="Validation")
     plt.xlabel("Epoch")
+    plt.yscale('log')
     plt.ylabel("Loss")
     plt.title("Training Curve")
     plt.legend()
@@ -574,31 +820,44 @@ def plot_auc_curves(train_aucs, val_aucs):
     plt.savefig("transform_auc_vs_epoch.png")
 
 
-def plot_roc_curve(labels, probs, weights=None,name='validation'):
-    if weights is not None:
-        fpr, tpr, _ = roc_curve(
-            labels.numpy(),
-            probs.numpy(),
-            sample_weight=weights.numpy()
-        )
-    else:
-        fpr, tpr, _ = roc_curve(
-            labels.numpy(),
-            probs.numpy()
-        )
-
-    roc_auc = auc(fpr, tpr)
-
+def plot_roc_curves(datasets, title="ROC Curve Transformer", filename="roc_comparison.png"):
+    """
+    Plot multiple ROC curves on the same figure.
+    
+    datasets: list of dicts, each with keys:
+        - 'labels': tensor or numpy array of true labels
+        - 'probs' : tensor or numpy array of predicted probabilities
+        - 'weights': optional tensor or numpy array
+        - 'name'  : string label for the curve
+    """
     plt.figure(figsize=(6,6))
-    plt.plot(fpr, tpr, label=f"AUC = {roc_auc:.3f}")
+    
+    for data in datasets:
+        labels = data['labels']
+        probs  = data['probs']
+        weights = data.get('weights', None)
+        name = data.get('name', 'ROC')
+
+        # Convert to numpy if needed
+        if hasattr(labels, 'numpy'):
+            labels = labels.numpy()
+        if hasattr(probs, 'numpy'):
+            probs = probs.numpy()
+        if weights is not None and hasattr(weights, 'numpy'):
+            weights = weights.numpy()
+
+        fpr, tpr, _ = roc_curve(labels, probs, sample_weight=weights)
+        roc_auc = auc(fpr, tpr)
+        plt.plot(fpr, tpr, label=f"{name} (AUC = {roc_auc:.3f})")
+
     plt.plot([0,1], [0,1], linestyle="--", color="gray")
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
-    plt.title(f"ROC Curve ({name})")
+    plt.title(title)
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"transform_roc_curve_{name}.png")
+    plt.savefig(filename)
 
 
 def plot_score_distributions(labels, probs, weights=None):
@@ -619,6 +878,7 @@ def plot_score_distributions(labels, probs, weights=None):
     plt.xlabel("Model output (sigmoid)")
     plt.ylabel("Events")
     plt.title("Classifier Output Distribution")
+    plt.yscale('log')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
@@ -637,6 +897,7 @@ def collect_graph_metadata(dataset):
         for nt in g.node_types:
             node_types.add(nt)
             # Track max feature size per node type
+            # print("node type before error", nt)
             x_size = g[nt].x.size(1)
             if nt not in num_node_categories or x_size > num_node_categories[nt]:
                 num_node_categories[nt] = x_size
@@ -659,7 +920,7 @@ def collect_graph_metadata(dataset):
 
 
 
-def balance_signal_background_weights_graphs(data_list,    balance_to="background"):
+def balance_signal_background_weights_graphs(data_list,    balance_to="signal"):
     """
     Rescale signal or background weights so that
     sum(signal_weights) == sum(background_weights).
@@ -708,6 +969,24 @@ def balance_signal_background_weights_graphs(data_list,    balance_to="backgroun
 
     return data_list
 
+def plot_raw_logit_output(first_batch_logits, last_batch_logits,epoch):
+   
+    plt.figure(figsize=(12,5))
+
+    plt.subplot(1,2,1)
+    plt.hist(first_batch_logits.numpy(), bins=30, color='skyblue')
+    plt.title("Logits - First Batch")
+    plt.xlabel("Logit value")
+    plt.ylabel("Count")
+
+    plt.subplot(1,2,2)
+    plt.hist(last_batch_logits.numpy(), bins=30, color='salmon')
+    plt.title("Logits - Last Batch")
+    plt.xlabel("Logit value")
+    plt.ylabel("Count")
+
+    plt.tight_layout()
+    plt.savefig(f"transform_logits_{epoch}.png")
 
 def main():
 
@@ -719,13 +998,17 @@ def main():
 
     args = parser.parse_args()
 
-    df, norm = load_category_from_coffea(args.coffea_file, args.category)
-    data_list=get_graphical(df, norm)
-    data_list = balance_signal_background_weights_graphs( data_list,    balance_to="background")
+    # df_init, norm = load_category_from_coffea(args.coffea_file, args.category)
+
+    # df_init.to_parquet(args.out, index=False)
+
+    df = load_category_dataframe(args.out)
+    data_list=get_graphical(df)
+    data_list = balance_signal_background_weights_graphs( data_list,    balance_to="signal")
   
     from torch_geometric.loader import DataLoader
-    train_val_list, test_list = train_test_split(data_list, test_size=0.1, random_state=42)
-    train_list, val_list = train_test_split(train_val_list, test_size=0.5, random_state=42 )
+    train_val_list, test_list = train_test_split(data_list, test_size=0.2, random_state=42)
+    train_list, val_list = train_test_split(train_val_list, test_size=0.25, random_state=42 )
     # 0.25 x 0.8 = 0.2, so final split is 60% train / 20% val / 20% test
     # current: 0.5 * 0.9 = 0.45, so split is 45, 45, 10 (need stats for debugging)
 
@@ -738,7 +1021,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     model, optimizer, scheduler, device = neural_net_initialization(data_list)
-    criterion = torch.nn.BCEWithLogitsLoss(reduction="none")
+    criterion = torch.nn.BCELoss(reduction="none")
 
     @torch.enable_grad()
     def train(model, optimizer, train_loader, device):
@@ -751,15 +1034,16 @@ def main():
         all_labels = []
         all_weights = []
 
-        for data in train_loader:
+        for data_idx, data in enumerate(train_loader):
             data = data.to(device)
 
             optimizer.zero_grad()
-            model.redraw_projection.redraw_projections()
+            # model.redraw_projection.redraw_projections()
 
             out = model(data).squeeze()      # logits
             y   = data.y.float()
 
+            # out = torch.sigmoid(out)
             loss_per_event = criterion(out, y)
 
             if hasattr(data, 'weight'):
@@ -770,28 +1054,34 @@ def main():
                 total_loss   += (loss_per_event * w).sum().item()
                 total_weight += w.sum().item()
 
-                all_weights.append(w.detach().cpu())
+                all_weights.append(w.detach())
             else:
                 loss = loss_per_event.mean()
 
                 total_loss   += loss_per_event.sum().item()
                 total_weight += loss_per_event.numel()
 
-                all_weights.append(torch.ones_like(y).cpu())
+                all_weights.append(torch.ones_like(y))
 
             loss.backward()
             optimizer.step()
 
-            all_logits.append(out.detach().cpu())
-            all_labels.append(y.detach().cpu())
+            if data_idx == 0:
+                first_batch_logits = out.detach()
+            last_batch_logits = out.detach()
+            all_logits.append(out.detach())
+            all_labels.append(y.detach())
 
-        all_logits  = torch.cat(all_logits)
-        all_labels  = torch.cat(all_labels)
-        all_weights = torch.cat(all_weights)
+        all_logits = torch.cat(all_logits).cpu()
+        all_labels = torch.cat(all_labels).cpu()
+        all_weights = torch.cat(all_weights).cpu()
+        first_batch_logits = first_batch_logits.cpu()
+        last_batch_logits = last_batch_logits.cpu()
+
 
         avg_loss = total_loss / total_weight
 
-        return avg_loss, all_logits, all_labels, all_weights
+        return avg_loss, all_logits, all_labels, all_weights, first_batch_logits, last_batch_logits
 
 
 
@@ -813,7 +1103,7 @@ def main():
 
             out = model(data).squeeze()     # logits
             y   = data.y.float()
-
+            # out = torch.sigmoid(out)
             loss_per_event = criterion(out, y)
 
             if hasattr(data, 'weight'):
@@ -822,19 +1112,19 @@ def main():
                 total_loss   += (loss_per_event * w).sum().item()
                 total_weight += w.sum().item()
 
-                all_weights.append(w.detach().cpu())
+                all_weights.append(w.detach())
             else:
                 total_loss   += loss_per_event.sum().item()
                 total_weight += loss_per_event.numel()
 
-                all_weights.append(torch.ones_like(y).cpu())
+                all_weights.append(torch.ones_like(y))
 
-            all_logits.append(out.detach().cpu())
-            all_labels.append(y.detach().cpu())
+            all_logits.append(out.detach())
+            all_labels.append(y.detach())
 
-        all_logits  = torch.cat(all_logits)
-        all_labels  = torch.cat(all_labels)
-        all_weights = torch.cat(all_weights)
+        all_logits  = torch.cat(all_logits).cpu()
+        all_labels  = torch.cat(all_labels).cpu()
+        all_weights = torch.cat(all_weights).cpu()
 
         avg_loss = total_loss / total_weight
 
@@ -842,7 +1132,7 @@ def main():
 
 
 
-    num_epochs = 50
+    num_epochs = 25
     train_losses = []
     val_errors   = []
     val_aucs     = []
@@ -855,30 +1145,34 @@ def main():
 
     for epoch in range(1, num_epochs + 1):
         # -------- TRAIN --------
-        train_loss, train_logits, train_labels, train_weights = train(
+        train_loss, train_logits, train_labels, train_weights,first_batch_logits, last_batch_logits = train(
             model, optimizer, train_loader, device
         )
-        
-        print("Logits range: ", train_logits.min().item(), train_logits.max().item())
-        train_probs = torch.sigmoid(train_logits)
-        print("probs range: ", train_probs.min().item(), train_probs.max().item())
-        train_auc = roc_auc_score(
-            train_labels.numpy(),
-            train_probs.numpy(),
-            sample_weight=train_weights.numpy()
-        )
+        if hasattr(model, 'edge_res_scale'):
+            print(f"Epoch {epoch}: edge_res_scale = {model.edge_res_scale.item():.3f}")
 
+        print("Logits range: ", train_logits.min().item(), train_logits.max().item())
+        train_probs = (train_logits)
+        print("probs range: ", train_probs.min().item(), train_probs.max().item())
+        # train_auc = roc_auc_score(
+        #     train_labels.numpy(),
+        #     train_probs.numpy(),
+        #     sample_weight=train_weights.numpy()
+        # )
+
+        if epoch == 1 or epoch == num_epochs:
+            plot_raw_logit_output(first_batch_logits, last_batch_logits, epoch)
         # -------- VALIDATION --------
         val_error, val_logits, val_labels, val_weights = test(
             model, val_loader, device
         )
 
-        val_probs = torch.sigmoid(val_logits)
-        val_auc = roc_auc_score(
-            val_labels.numpy(),
-            val_probs.numpy(),
-            sample_weight=val_weights.numpy()
-        )
+        val_probs = (val_logits)
+        # val_auc = roc_auc_score(
+        #     val_labels.numpy(),
+        #     val_probs.numpy(),
+        #     sample_weight=val_weights.numpy()
+        # )
 
         # -------- SCHEDULER --------
         scheduler.step(val_error)
@@ -886,15 +1180,15 @@ def main():
         # -------- LOGGING --------
         train_losses.append(train_loss)
         val_errors.append(val_error)
-        train_aucs.append(train_auc)
-        val_aucs.append(val_auc)
+        # train_aucs.append(train_auc)
+        # val_aucs.append(val_auc)
 
         print(
             f"Epoch {epoch:03d} | "
             f"Train Loss: {train_loss:.4f} | "
-            f"Train AUC: {train_auc:.4f} | "
+            # f"Train AUC: {train_auc:.4f} | "
             f"Val Error: {val_error:.4f} | "
-            f"Val AUC: {val_auc:.4f}"
+            # f"Val AUC: {val_auc:.4f}"
         )
 
         # -------- EARLY STOPPING --------
@@ -922,12 +1216,12 @@ def main():
 
     ######## plots?
     # Validation probabilities
-    val_probs = torch.sigmoid(val_logits)
+    val_probs = (val_logits)
 
     # Plots
     plot_training_curves(train_losses, val_errors)
     plot_auc_curves(train_aucs, val_aucs)
-    plot_roc_curve(val_labels, val_probs, val_weights, "validation")
+    # plot_roc_curve(val_labels, val_probs, val_weights, "validation")
     plot_score_distributions(val_labels, val_probs, val_weights)
 
     
@@ -936,14 +1230,20 @@ def main():
         model, test_loader, device
     )
 
-    test_probs = torch.sigmoid(test_logits)
+    test_probs = (test_logits)
 
     test_auc = roc_auc_score(
         test_labels.numpy(),
         test_probs.numpy(),
         sample_weight=test_weights.numpy()
     )
-    plot_roc_curve(test_labels, test_probs, test_weights,"Evaluation")
+    # plot_roc_curve(test_labels, test_probs, test_weights,"Test")
+    plot_roc_curves([
+    {"labels": val_labels, "probs": val_probs, "weights": val_weights, "name": "Validation"},
+    {"labels": test_labels, "probs": test_probs, "weights": test_weights, "name": "Test"}], 
+    title="Validation vs Test ROC", 
+    filename="roc_val_test.png")
+
     print("\n===== FINAL TEST RESULTS =====")
     print(f"Test Error: {test_error:.4f}")
     print(f"Test AUC:   {test_auc:.4f}")
