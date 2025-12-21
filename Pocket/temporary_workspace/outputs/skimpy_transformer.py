@@ -156,105 +156,216 @@ def load_category_dataframe(parquet_path):
     return df
 
 def get_graphical(df):
-    data_list = []
-
-    node_feature_dims = {
-        "jet1": 3,
-        "jet2": 3,
-        "jet3": 3,
-        "jet4": 3,
-        "jet5": 3,
-        "jet6": 3,
-        "lepton1": 3,
-        "PuppiMET": 2,
-    }
-
-    labels = df["label"].to_numpy()
+    data_list = [] # GOAL IS 1 GRAPH PER EVENT
 
     # Event weights
-    weights = df["weight"].to_numpy() if "weight" in df.columns else None
+    weights = df["weight"].to_numpy() if "weight" in df.columns else None # MAKE SURE WE PROPAGATE WEIGHTS INTO DA SYSTEM
 
     exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process"] + \
-                   [c for c in df.columns if c.startswith("weight_variation")]
+                   [c for c in df.columns if c.startswith("weight_variation")] # EXCLUDE COLUMNS THAT DON'T CONTAIN FEATURES
 
-    feature_cols = (
+    feature_cols = ( # DROP THE ABOVE COLUMNS FROM GRAPH
         df.drop(columns=[c for c in exclude_cols if c in df.columns])
         .select_dtypes(include=["number"])
         .columns.tolist()
     )
 
     # Separate global vs node features
-    global_cols = [c for c in feature_cols if c.startswith("events") or c.startswith("w")]
-    feature_cols = [c for c in feature_cols if c not in global_cols]
+    global_cols = [c for c in feature_cols if c.startswith("events") or c.startswith("w")] # set global feature list
+    feature_cols = [c for c in feature_cols if c not in global_cols] # set rest of features excluding the above
 
-    type_prefixes = ["lepton", "jet", "PuppiMET"]
-    enumerated_groups = {}
-    for t in type_prefixes:
-        obj_cols = [c for c in feature_cols if c.startswith(t)]
-        for col in obj_cols:
-            m = re.match(rf"{t}(\d*)_(.*)", col)
-            if m:
-                idx = m.group(1) or ""
-                obj_idx = f"{t}{idx}"
-                enumerated_groups.setdefault(obj_idx, []).append(col)
+    # type_prefixes = ["lepton", "jet", "PuppiMET"] # 3 types of nodes supposdely
+    OBJ_RE = re.compile(r"(jet|lepton|PuppiMET)(\d*)_(.+)")
+    objects = {}
+    for col in feature_cols:
+        m = OBJ_RE.match(col)
+        if not m:
+            continue
 
-    for _, row in df.iterrows():
+        obj_type, idx, feat = m.groups()
+        idx = idx or "1"  
+
+        objects.setdefault(obj_type, {})
+        objects[obj_type].setdefault(idx, {})
+        objects[obj_type][idx][feat] = col
+
+    # -----------------------------
+    # Build one graph per event
+    # -----------------------------
+    for evt_idx, row in df.iterrows():
         data = HeteroData()
 
-        # ----- Nodes -----
-        for node_type, cols in enumerated_groups.items():
+        # ---------- JETS (many nodes, one type) ----------
+        jet_features = []
+        jet_index_map = {}  # jet1 → 0, jet2 → 1, ...
+
+        for idx, feats in sorted(objects.get("jet", {}).items()):
+            cols = list(feats.values())
+            vals = row[cols].values.astype(float)
+
+            if (vals == -999).any():
+                continue
+
+            jet_index_map[f"jet{idx}"] = len(jet_features)
+            jet_features.append(vals)
+
+        if jet_features:
+            data["jet"].x = torch.tensor(jet_features, dtype=torch.float)
+            data["jet"].num_nodes = data["jet"].x.size(0)
+        # ---------- LEPTONS (one or more nodes) ----------
+        lep_features = []
+        lep_index_map = {}  # lepton1 -> 0, lepton2 -> 1, etc.
+
+        for idx, feats in sorted(objects.get("lepton", {}).items()):
+            cols = list(feats.values())
             vals = row[cols].values.astype(float)
             vals[vals == -999] = 0.0
-            data[node_type].x = torch.tensor([vals], dtype=torch.float)  # shape [num_nodes, features]
-            data[node_type].num_nodes = data[node_type].x.size(0)
+            lep_index_map[f"lepton{idx}"] = len(lep_features)
+            lep_features.append(vals)
 
-        node_types = list(enumerated_groups.keys())
+        if lep_features:
+            data["lepton"].x = torch.tensor(lep_features, dtype=torch.float)
+            data["lepton"].num_nodes = data["lepton"].x.size(0)
 
-        # ----- Edges -----
-        EDGE_QUANTITIES = auto_generate_mappings(df, node_types)
-        EDGE_TYPES = ["mass", "dR", "dphi", "deta"]
+        # ---------- MET (single node) ----------
+        met_feats = objects.get("PuppiMET", {}).get("1")
+        if met_feats:
+            cols = list(met_feats.values())
+            vals = row[cols].values.astype(float)
 
-        for src, dst in product(node_types, repeat=2):
-            if src not in data.node_types or dst not in data.node_types:
+            data["PuppiMET"].x = torch.tensor([vals], dtype=torch.float)
+            data["PuppiMET"].num_nodes = 1
+
+        # ---------- DEBUG: node sanity ----------
+        print(f"\n[EVENT {evt_idx}] NODE SUMMARY")
+        for nt in data.node_types:
+            x = data[nt].x
+            if x is None or x.numel() == 0:
+                # No node features → fill with zeros
+                data[nt].x = torch.zeros((data[nt].num_nodes, self.channels), device=x.device)
                 continue
 
-            n_src = data[src].num_nodes
-            n_dst = data[dst].num_nodes
+            x_new=x.clone()
+            try:
+                x_new[:, 2] = torch.log(x[:, 2].clamp(min=1e-3))
+            except:
+                x_new[:, 0] = torch.log(x[:, 0].clamp(min=1e-3))
+            data[nt].x = x_new
+            print(f"Node type: {nt}, shape: {x.shape}")
+            print(f"First 5 nodes:\n{x[:5, :]}")
+            print(f"{nt} nodes: mean={x.mean():.3f}, std={x.std():.3f}, " f"min={x.min():.1f}, max={x.max():.1f}" )
+        # -----------------------------
+        # Build edges from existing columns
+        # -----------------------------
 
-            if n_src == 0 or n_dst == 0:
+        edges = {etype: [] for etype in ["mass","dR","dphi","deta"]}
+        edge_attrs = {etype: [] for etype in ["mass","dR","dphi","deta"]}
+
+
+        EDGE_RE = re.compile(r"(mass|dR|dphi|deta)_(\w+)_(\w+)")
+        edge_dict = {}
+        for col in df.columns:
+            m = EDGE_RE.match(col)
+            if not m:
                 continue
 
-            for etype in EDGE_TYPES:
-                col = EDGE_QUANTITIES.get((src, etype, dst))
-                if col is None:
-                    continue
+            etype, src, dst = m.groups()
+            val = float(row[col])
 
-                # Create fully connected edges between src and dst
-                src_idx, dst_idx = torch.meshgrid(
-                    torch.arange(n_src), torch.arange(n_dst), indexing='ij'
-                )
-                edge_index = torch.vstack([src_idx.flatten(), dst_idx.flatten()])
+            if val == -999:
+                continue
 
-                # Edge attributes
-                val = float(row[col])
-                edge_attr = torch.full((edge_index.size(1), 1), val, dtype=torch.float)
+            def resolve(obj): # this function makes sure the jet index is appropriately handled
+                if obj.startswith("jet"):
+                    return "jet", jet_index_map.get(obj)
+                if obj.startswith("lepton"):
+                    return "lepton", 0
+                if obj.startswith("PuppiMET"):
+                    return "PuppiMET", 0
+                return None, None
 
-                data[src, etype, dst].edge_index = edge_index
-                data[src, etype, dst].edge_attr = edge_attr
+            src_type, src_idx = resolve(src)
+            dst_type, dst_idx = resolve(dst)
 
-        # ----- Global features -----
+            if src_idx is None or dst_idx is None:
+                continue
+            key = (src_type, etype, dst_type)
+            if key not in edge_dict:
+                edge_dict[key] = {'edge_index': [], 'edge_attr': []}
+
+            # Append the edge and its feature
+            edge_dict[key]['edge_index'].append([src_idx, dst_idx])
+            edge_dict[key]['edge_attr'].append([val])
+
+        # for etype in edges:
+        #     if not edges[etype]:
+        #         continue
+        for key, d in edge_dict.items():
+            edge_index = torch.tensor(d['edge_index'], dtype=torch.long).t().contiguous()
+            # edge_attr = torch.tensor(d['edge_attr'], dtype=torch.float)
+            if len(d['edge_attr']) == 0:
+                edge_attr = torch.zeros((edge_index.shape[1], 1), dtype=torch.float)
+            else:
+                edge_attr = torch.tensor(d['edge_attr'], dtype=torch.float)
+            # if edge_index.shape[1] != edge_attr.shape[0]:
+            #     min_len = min(edge_index.shape[1], edge_attr.shape[0])
+            #     edge_index = edge_index[:, :min_len]
+            #     edge_attr = edge_attr[:min_len]
+            #     print(f"[WARN] Truncated edges for {key} to {min_len} to match edge_attr")
+
+            # edge_attr = torch.full((len(edges), node_channels), val, dtype=torch.float)
+            assert edge_index.shape[1] == edge_attr.shape[0], f"{key} mismatch!"
+            # print(key, len(d['edge_index']), len(d['edge_attr']))
+
+            data[key].edge_index = edge_index
+            data[key].edge_attr = edge_attr
+
+        # ---------- DEBUG: edge sanity ----------
+        for (src_type, etype, dst_type), edge_data in data.items():
+            ei = edge_data.edge_index
+            ea = edge_data.edge_attr
+            x = data[src_type].x
+            y = data[dst_type].x
+
+            # Assert edge_index vs edge_attr lengths
+            assert ei.shape[1] == ea.shape[0], f"{src_type}-{etype}-{dst_type} mismatch"
+
+            # Assert node indices are valid
+            assert ei.max() < x.shape[0], f"{src_type}-{etype}-{dst_type} src index out of bounds"
+            assert ei.min() >= 0, f"{src_type}-{etype}-{dst_type} src index negative"
+            assert ei.max(1)[1] < y.shape[0], f"{src_type}-{etype}-{dst_type} dst index out of bounds"
+
+            # Optionally: check feature dimension of edge_attr
+            assert ea.shape[1] == 1, f"{src_type}-{etype}-{dst_type} edge_attr dim mismatch"
+
+        # -----------------------------
+        # Global features
+        # -----------------------------
         if global_cols:
-            global_vals = row[global_cols].values.astype(float)
-            data.u = torch.tensor([global_vals], dtype=torch.float)
+            data.u = torch.tensor([row[global_cols].values.astype(float)], dtype=torch.float)
 
-        # ----- Labels and weights -----
+        for etype in data.edge_types:
+            ea = data[etype].edge_attr
+            if ea is None or ea.numel() == 0:
+                # No edge features → fill with zeros
+                num_edges = data[etype].edge_index.shape[1]
+                data[etype].edge_attr = torch.zeros((num_edges, self.channels), device=data[etype].edge_index.device)
+                continue
+
+            ea_new = ea.clone()
+            # assume mass is the first column for edges where it exists
+            if ea_new.shape[1] > 0:
+                ea_new[:, 0] = torch.log(ea[:, 0].clamp(min=1e-3))
+            data[etype].edge_attr = ea_new
+
+            # print(f"{etype} edges: min mass={ea_new[:,0].min():.3f}, max mass={ea_new[:,0].max():.3f}")
+        # Labels & metadata
+        # -----------------------------
         data.y = torch.tensor([int(row["label"])], dtype=torch.long)
         data.weight = torch.tensor([float(row["weight"])], dtype=torch.float)
         data.process = row["process"]
 
-        data.node_types = node_types
-
-        # Apply PyG transforms
+        # PyG transforms
         data = T.ToUndirected()(data)
         data = T.AddSelfLoops()(data)
 
@@ -525,13 +636,8 @@ class HeteroGraph(torch.nn.Module):
 
 
         node_feature_dims = {
-            "jet1": 3,
-            "jet2": 3,
-            "jet3": 3,
-            "jet4": 3,
-            "jet5": 3,
-            "jet6": 3,
-            "lepton1": 3,
+            "jet": 3,
+            "lepton": 3,
             "PuppiMET": 2,
             # "w": 2,
         }
@@ -554,6 +660,15 @@ class HeteroGraph(torch.nn.Module):
                 Linear(1, channels),
                 ReLU(),
                 Linear(channels, channels)
+            )
+            for etype in edge_types
+        })
+
+        self.edge_emb_rd2 = torch.nn.ModuleDict({
+            "__".join(etype): Sequential(
+                Linear(channels, channels),
+                ReLU(),
+                Linear(channels, channels*3)
             )
             for etype in edge_types
         })
@@ -584,7 +699,7 @@ class HeteroGraph(torch.nn.Module):
                         out_channels=channels,
                         heads=3,
                         dropout=0.1,
-                        edge_dim=channels,
+                        edge_dim=channels*3,
                     )
                     for (src, rel, dst) in edge_types
                 }, aggr='mean')
@@ -659,12 +774,36 @@ class HeteroGraph(torch.nn.Module):
             etype: data[etype].edge_index
             for etype in data.edge_types
         }
-        edge_attr_dict={}
-        for etype in data.edge_types:    # etype = (src, rel, dst)
-            if 'edge_attr' not in data[etype]:
-                continue
-            key = "__".join(etype)
-            edge_attr_dict[etype] = self.edge_emb[key](data[etype].edge_attr)
+        
+        # for nt in h:
+        #     print(nt, "h shape:", h[nt].shape)
+        # for key in edge_attr_dict:
+        #     print(key, "edge_attr shape:", edge_attr_dict[key].shape)
+
+        for etype in data.edge_types:
+            ei = data[etype].edge_index
+            ea = data[etype].edge_attr
+            num_edges = ei.shape[1]
+            if ea is None or ea.shape[0] == 0:
+                # No edge features at all → fill with zeros
+                data[etype].edge_attr = torch.zeros(
+                    (num_edges, self.channels),
+                    device=ei.device
+                )
+
+            elif ea.shape[0] < num_edges:
+                # Missing some edge features → pad with zeros
+                pad = torch.zeros(
+                    (num_edges - ea.shape[0], ea.shape[1]),
+                    device=ea.device
+                )
+                data[etype].edge_attr = torch.cat([ea, pad], dim=0)
+
+            elif ea.shape[0] > num_edges:
+                # Extra edge features (rare but possible)
+                data[etype].edge_attr = ea[:num_edges]
+
+        
         # layers
         h0 = h.copy()
         # for conv in self.convs:
@@ -675,7 +814,26 @@ class HeteroGraph(torch.nn.Module):
         #             h_new[nt] = h_new[nt] + self.edge_res_scale * self.res_proj[nt](h0[nt])
 
         #     h = h_new
+
+        edge_attr_dict_prev={}
         for layer_idx, conv in enumerate(self.convs):
+            edge_attr_dict={}
+            
+            for etype in data.edge_types:    # etype = (src, rel, dst)
+                if 'edge_attr' not in data[etype]:
+                    continue
+                key = "__".join(etype)
+                
+                if layer_idx == 0:
+                    ea = data[etype].edge_attr
+                    edge_attr_dict[etype] = self.edge_emb[key](ea)
+                else:
+                    ea = edge_attr_dict_prev[etype]
+                    edge_attr_dict[etype] = self.edge_emb_rd2[key](ea)
+            edge_attr_dict_prev = edge_attr_dict.copy()
+
+                # edge_attr_dict[etype] = self.edge_emb[key](data[etype].edge_attr)
+
             h_new = conv(
                 h,
                 edge_index_dict=edge_index_dict,
@@ -772,7 +930,7 @@ def neural_net_initialization(full_data):
     node_types, edge_types, num_node_categories, num_edge_categories, u_dim = collect_graph_metadata(full_data)
 
     # 6. Hyperparameters
-    channels = 16
+    channels = 32
     num_layers = 2
     attn_type = 'multihead'
     attn_kwargs = {'dropout': 0.5}
@@ -786,7 +944,7 @@ def neural_net_initialization(full_data):
         num_edge_categories=num_edge_categories,
         u_dim=u_dim).to(device)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-3)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=20, min_lr=0.00001)
     return model, optimizer, scheduler, device
 
@@ -797,7 +955,7 @@ def plot_training_curves(train_losses, val_errors):
     plt.plot(epochs, train_losses, label="Training")
     plt.plot(epochs, val_errors, label="Validation")
     plt.xlabel("Epoch")
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.ylabel("Loss")
     plt.title("Training Curve")
     plt.legend()
@@ -953,6 +1111,13 @@ def balance_signal_background_weights_graphs(data_list,    balance_to="signal"):
         scale = sum_sig / sum_bkg
         weights[bkg_mask] *= scale
         print(f"Scaled background weights by {scale:.3f} to match signal total.")
+    
+    elif balance_to == "unity":
+        scale1 = 1 / sum_bkg
+        scale2 = 1 / sum_bkg
+        weights[bkg_mask] *= scale1
+        weights[sig_mask] *= scale2
+        print(f"Scaled sig and bkg weights by {scale1:.3f} and {scale2:.3f} to match unity.")
 
     else:
         raise ValueError("balance_to must be either 'signal' or 'background'.")
@@ -1004,7 +1169,7 @@ def main():
 
     df = load_category_dataframe(args.out)
     data_list=get_graphical(df)
-    data_list = balance_signal_background_weights_graphs( data_list,    balance_to="signal")
+    data_list = balance_signal_background_weights_graphs( data_list,    balance_to="unity")
   
     from torch_geometric.loader import DataLoader
     train_val_list, test_list = train_test_split(data_list, test_size=0.2, random_state=42)
@@ -1132,13 +1297,13 @@ def main():
 
 
 
-    num_epochs = 25
+    num_epochs = 300
     train_losses = []
     val_errors   = []
     val_aucs     = []
     train_aucs   = []
 
-    patience = 5  # how many epochs to wait for improvement
+    patience = 15  # how many epochs to wait for improvement
     best_val_error = float('inf')
     epochs_no_improve = 0
     best_model_path = "best_model.pt"  # path to save the best model
