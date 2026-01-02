@@ -247,13 +247,13 @@ def get_graphical(df):
 
             x_new=x.clone()
             try:
-                x_new[:, 2] = torch.log(x[:, 2].clamp(min=1e-3))
+                x_new[:, 2] = torch.log(x[:, 2].clamp(min=1e-3)) #set pt to log scale
             except:
-                x_new[:, 0] = torch.log(x[:, 0].clamp(min=1e-3))
+                x_new[:, 0] = torch.log(x[:, 0].clamp(min=1e-3))#set pt to log scale (MET)
             data[nt].x = x_new
-            print(f"Node type: {nt}, shape: {x.shape}")
-            print(f"First 5 nodes:\n{x[:5, :]}")
-            print(f"{nt} nodes: mean={x.mean():.3f}, std={x.std():.3f}, " f"min={x.min():.1f}, max={x.max():.1f}" )
+            print(f"Node type: {nt}, shape: {x_new.shape}")
+            print(f"First 5 nodes:\n{x_new[:5, :]}")
+            print(f"{nt} nodes: mean={x_new.mean():.3f}, std={x_new.std():.3f}, " f"min={x_new.min():.1f}, max={x_new.max():.1f}" )
         # -----------------------------
         # Build edges from existing columns
         # -----------------------------
@@ -355,7 +355,7 @@ def get_graphical(df):
             ea_new = ea.clone()
             # assume mass is the first column for edges where it exists
             if ea_new.shape[1] > 0:
-                ea_new[:, 0] = torch.log(ea[:, 0].clamp(min=1e-3))
+                ea_new[:, 0] = torch.log(ea[:, 0].clamp(min=1e-3))#set di-object mass to log scale
             data[etype].edge_attr = ea_new
 
             # print(f"{etype} edges: min mass={ea_new[:,0].min():.3f}, max mass={ea_new[:,0].max():.3f}")
@@ -668,7 +668,7 @@ class HeteroGraph(torch.nn.Module):
             "__".join(etype): Sequential(
                 Linear(channels, channels),
                 ReLU(),
-                Linear(channels, channels*3)
+                Linear(channels, channels*4)
             )
             for etype in edge_types
         })
@@ -686,7 +686,7 @@ class HeteroGraph(torch.nn.Module):
                     (src, rel, dst): TransformerConv(
                         in_channels=channels,  # match node_emb output
                         out_channels=channels,
-                        heads=3,
+                        heads=4,
                         dropout=0.1,
                         edge_dim=channels,
                     )
@@ -695,11 +695,11 @@ class HeteroGraph(torch.nn.Module):
             else:
                 conv = HeteroConv({
                     (src, rel, dst): TransformerConv(
-                        in_channels=channels*3,  # previous out_channels * heads
+                        in_channels=channels*4,  # previous out_channels * heads
                         out_channels=channels,
-                        heads=3,
+                        heads=4,
                         dropout=0.1,
-                        edge_dim=channels*3,
+                        edge_dim=channels*4,
                     )
                     for (src, rel, dst) in edge_types
                 }, aggr='mean')
@@ -711,14 +711,14 @@ class HeteroGraph(torch.nn.Module):
         self.mlp = None
         self.node_types = node_types
         self.res_proj = torch.nn.ModuleDict({
-            nt: Linear(channels, channels * 3)  # heads = 3
+            nt: Linear(channels, channels * 4)  # heads = 3
             for nt in node_types
         })
 
         self.edge_res_scale = torch.nn.Parameter(torch.tensor(1.0))
 
 
-        pooled_nodes_dim = len(node_types) * channels * 3
+        pooled_nodes_dim = len(node_types) * channels * 4
         input_dim = pooled_nodes_dim + channels
         # print("input dim: ", input_dim)
         # self.mlp = None
@@ -874,7 +874,7 @@ class HeteroGraph(torch.nn.Module):
             else:
                 # Node type missing entirely - zero scalar per graph
                 pooled_nt = torch.zeros(
-                    num_graphs, self.channels * 3, device=out_device
+                    num_graphs, self.channels * 4, device=out_device
                 )
 
             pooled.append(pooled_nt)
@@ -944,7 +944,7 @@ def neural_net_initialization(full_data):
         num_edge_categories=num_edge_categories,
         u_dim=u_dim).to(device)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-3)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=20, min_lr=0.00001)
     return model, optimizer, scheduler, device
 
@@ -1036,7 +1036,7 @@ def plot_score_distributions(labels, probs, weights=None):
     plt.xlabel("Model output (sigmoid)")
     plt.ylabel("Events")
     plt.title("Classifier Output Distribution")
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
@@ -1070,7 +1070,7 @@ def collect_graph_metadata(dataset):
                 if et not in num_edge_categories:
                     num_edge_categories[et] = 0
 
-        # Global feature 'u'
+        # Global feature u
         if u_dim is None:
             u_dim = g['u'].size(1)
 
@@ -1114,7 +1114,7 @@ def balance_signal_background_weights_graphs(data_list,    balance_to="signal"):
     
     elif balance_to == "unity":
         scale1 = 1 / sum_bkg
-        scale2 = 1 / sum_bkg
+        scale2 = 1 / sum_sig
         weights[bkg_mask] *= scale1
         weights[sig_mask] *= scale2
         print(f"Scaled sig and bkg weights by {scale1:.3f} and {scale2:.3f} to match unity.")
@@ -1175,7 +1175,7 @@ def main():
     train_val_list, test_list = train_test_split(data_list, test_size=0.2, random_state=42)
     train_list, val_list = train_test_split(train_val_list, test_size=0.25, random_state=42 )
     # 0.25 x 0.8 = 0.2, so final split is 60% train / 20% val / 20% test
-    # current: 0.5 * 0.9 = 0.45, so split is 45, 45, 10 (need stats for debugging)
+    #  0.5 * 0.9 = 0.45, so split is 45, 45, 10 (need stats for debugging)
 
     train_loader = DataLoader(train_list, batch_size=32, shuffle=True)
     val_loader   = DataLoader(val_list, batch_size=64, shuffle=False)
@@ -1297,13 +1297,13 @@ def main():
 
 
 
-    num_epochs = 300
+    num_epochs = 500
     train_losses = []
     val_errors   = []
     val_aucs     = []
     train_aucs   = []
 
-    patience = 15  # how many epochs to wait for improvement
+    patience = 25  # how many epochs to wait for improvement
     best_val_error = float('inf')
     epochs_no_improve = 0
     best_model_path = "best_model.pt"  # path to save the best model
