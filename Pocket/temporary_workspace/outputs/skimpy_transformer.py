@@ -34,6 +34,7 @@ from torch.nn import (
     ReLU,
     Sequential,
     Sigmoid,
+    LayerNorm,
 )
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
@@ -161,8 +162,10 @@ def get_graphical(df):
     # Event weights
     weights = df["weight"].to_numpy() if "weight" in df.columns else None # MAKE SURE WE PROPAGATE WEIGHTS INTO DA SYSTEM
 
-    exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process"] + \
-                   [c for c in df.columns if c.startswith("weight_variation")] # EXCLUDE COLUMNS THAT DON'T CONTAIN FEATURES
+    exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process", "w_had_jets_mass"] + \
+                   [c for c in df.columns if c.startswith("weight_variation")] + \
+                   [c for c in df.columns if c.startswith("vbsjets")]
+                   # EXCLUDE COLUMNS THAT DON'T CONTAIN FEATURES
 
     feature_cols = ( # DROP THE ABOVE COLUMNS FROM GRAPH
         df.drop(columns=[c for c in exclude_cols if c in df.columns])
@@ -237,7 +240,7 @@ def get_graphical(df):
             data["PuppiMET"].num_nodes = 1
 
         # ---------- DEBUG: node sanity ----------
-        print(f"\n[EVENT {evt_idx}] NODE SUMMARY")
+        # print(f"\n[EVENT {evt_idx}] NODE SUMMARY")
         for nt in data.node_types:
             x = data[nt].x
             if x is None or x.numel() == 0:
@@ -251,9 +254,9 @@ def get_graphical(df):
             except:
                 x_new[:, 0] = torch.log(x[:, 0].clamp(min=1e-3))#set pt to log scale (MET)
             data[nt].x = x_new
-            print(f"Node type: {nt}, shape: {x_new.shape}")
-            print(f"First 5 nodes:\n{x_new[:5, :]}")
-            print(f"{nt} nodes: mean={x_new.mean():.3f}, std={x_new.std():.3f}, " f"min={x_new.min():.1f}, max={x_new.max():.1f}" )
+            # print(f"Node type: {nt}, shape: {x_new.shape}")
+            # print(f"First 5 nodes:\n{x_new[:5, :]}")
+            # print(f"{nt} nodes: mean={x_new.mean():.3f}, std={x_new.std():.3f}, " f"min={x_new.min():.1f}, max={x_new.max():.1f}" )
         # -----------------------------
         # Build edges from existing columns
         # -----------------------------
@@ -364,6 +367,7 @@ def get_graphical(df):
         data.y = torch.tensor([int(row["label"])], dtype=torch.long)
         data.weight = torch.tensor([float(row["weight"])], dtype=torch.float)
         data.process = row["process"]
+        data.idx = evt_idx
 
         # PyG transforms
         data = T.ToUndirected()(data)
@@ -664,46 +668,63 @@ class HeteroGraph(torch.nn.Module):
             for etype in edge_types
         })
 
-        self.edge_emb_rd2 = torch.nn.ModuleDict({
-            "__".join(etype): Sequential(
-                Linear(channels, channels),
-                ReLU(),
-                Linear(channels, channels*4)
-            )
-            for etype in edge_types
-        })
+        self.edge_emb_rd2 = torch.nn.ModuleList([
+            torch.nn.ModuleDict({
+                "__".join(etype): Sequential(
+                    Linear(channels * (3 ** i), channels * (3 ** (i + 1))),
+                    ReLU(),
+                )
+                for etype in edge_types
+            })
+            for i in range(num_layers - 1)
+        ])
 
         self.u_mlp = Sequential(
             Linear(u_dim, channels),
+            LayerNorm(channels),
             ReLU(),
         )
 
 
         self.convs = torch.nn.ModuleList()
+        self.norms = torch.nn.ModuleList([
+            LayerNorm(channels * 3)
+            for _ in range(num_layers)
+            ])
         for layer_idx in range(num_layers):
             if layer_idx == 0:
                 conv = HeteroConv({
                     (src, rel, dst): TransformerConv(
                         in_channels=channels,  # match node_emb output
                         out_channels=channels,
-                        heads=4,
+                        heads=3,
                         dropout=0.1,
                         edge_dim=channels,
                     )
                     for (src, rel, dst) in edge_types
                 }, aggr='mean')
-            else:
+            else: # layer_idx % 2 == 1:
                 conv = HeteroConv({
                     (src, rel, dst): TransformerConv(
-                        in_channels=channels*4,  # previous out_channels * heads
+                        in_channels=channels*3,  # previous out_channels * heads
                         out_channels=channels,
-                        heads=4,
+                        heads=3,
                         dropout=0.1,
-                        edge_dim=channels*4,
+                        edge_dim=channels*(3**layer_idx),
                     )
                     for (src, rel, dst) in edge_types
                 }, aggr='mean')
-
+            # elif layer_idx % 2 == 0:
+            #     conv = HeteroConv({
+            #         (src, rel, dst): TransformerConv(
+            #             in_channels=channels,  # previous out_channels * heads
+            #             out_channels=channels,
+            #             heads=3,
+            #             dropout=0.1,
+            #             edge_dim=channels,
+            #         )
+            #         for (src, rel, dst) in edge_types
+            #     }, aggr='mean')
             # self.u_mlp = Sequential( Linear(u_dim, channels), ReLU(),)
 
             self.convs.append(conv)
@@ -711,14 +732,14 @@ class HeteroGraph(torch.nn.Module):
         self.mlp = None
         self.node_types = node_types
         self.res_proj = torch.nn.ModuleDict({
-            nt: Linear(channels, channels * 4)  # heads = 3
+            nt: Linear(channels, channels *3)  # heads = 3
             for nt in node_types
         })
 
         self.edge_res_scale = torch.nn.Parameter(torch.tensor(1.0))
 
 
-        pooled_nodes_dim = len(node_types) * channels * 4
+        pooled_nodes_dim = len(node_types) * channels *3
         input_dim = pooled_nodes_dim + channels
         # print("input dim: ", input_dim)
         # self.mlp = None
@@ -731,28 +752,6 @@ class HeteroGraph(torch.nn.Module):
                 Sigmoid()
             )
 
-        # print(
-        #     "[INIT] mlp input dim =", self.mlp[0].in_features,
-        #     "| pooled_nodes_dim =", pooled_nodes_dim,
-        #     "| u_dim =", channels,
-        #     "| node_types =", len(node_types),
-        #     "| heads = 3"
-        # )
-
-        # self.pool = torch.nn.ModuleDict({
-        #     nt: GlobalAttention(
-        #         gate_nn=Sequential(
-        #             Linear(channels * 3, channels),
-        #             ReLU(),
-        #             Linear(channels, 1)
-        #         )
-        #     )
-        #     for nt in node_types
-        # })
-
-        
-        # self.redraw_projection = RedrawProjection( self.convs,redraw_interval=1000 if attn_type == 'performer' else None        )
-    
     def forward(self, data: HeteroData):
 
         # ----- Node inputs -----
@@ -774,11 +773,6 @@ class HeteroGraph(torch.nn.Module):
             etype: data[etype].edge_index
             for etype in data.edge_types
         }
-        
-        # for nt in h:
-        #     print(nt, "h shape:", h[nt].shape)
-        # for key in edge_attr_dict:
-        #     print(key, "edge_attr shape:", edge_attr_dict[key].shape)
 
         for etype in data.edge_types:
             ei = data[etype].edge_index
@@ -806,14 +800,6 @@ class HeteroGraph(torch.nn.Module):
         
         # layers
         h0 = h.copy()
-        # for conv in self.convs:
-        #     h_new = conv(h, edge_index_dict=edge_index_dict, edge_attr_dict=edge_attr_dict)
-
-        #     for nt in h_new:
-        #         if nt in h0:
-        #             h_new[nt] = h_new[nt] + self.edge_res_scale * self.res_proj[nt](h0[nt])
-
-        #     h = h_new
 
         edge_attr_dict_prev={}
         for layer_idx, conv in enumerate(self.convs):
@@ -829,7 +815,7 @@ class HeteroGraph(torch.nn.Module):
                     edge_attr_dict[etype] = self.edge_emb[key](ea)
                 else:
                     ea = edge_attr_dict_prev[etype]
-                    edge_attr_dict[etype] = self.edge_emb_rd2[key](ea)
+                    edge_attr_dict[etype] = self.edge_emb_rd2[layer_idx - 1][key](ea)
             edge_attr_dict_prev = edge_attr_dict.copy()
 
                 # edge_attr_dict[etype] = self.edge_emb[key](data[etype].edge_attr)
@@ -843,18 +829,17 @@ class HeteroGraph(torch.nn.Module):
             for nt in h:
                 if nt in h_new:
                     if layer_idx == 0:
-                        h_out[nt] = h_new[nt] + self.res_proj[nt](h[nt])
+                        h_res = h_new[nt] + self.res_proj[nt](h[nt])
                     else:
-                        h_out[nt] = h_new[nt] + h[nt]
+                        h_res = h_new[nt] + h[nt]
                 else:
                     if layer_idx == 0:
-                        # no incoming edges for this node type
-                        h_out[nt] = self.res_proj[nt](h[nt])
+                        h_res = self.res_proj[nt](h[nt])
                     else:
-                        h_out[nt] = h[nt]
+                        h_res = h[nt]
+                # shared LayerNorm
+                h_out[nt] = self.norms[layer_idx](h_res)
             h = h_out
-
-
         num_graphs = data.num_graphs 
         pooled = []
 
@@ -874,16 +859,10 @@ class HeteroGraph(torch.nn.Module):
             else:
                 # Node type missing entirely - zero scalar per graph
                 pooled_nt = torch.zeros(
-                    num_graphs, self.channels * 4, device=out_device
+                    num_graphs, self.channels *3, device=out_device
                 )
 
             pooled.append(pooled_nt)
-
-
-
-        # Now safe to concatenate
-        # for i, t in enumerate(pooled):
-        #     print(i, t.shape)
 
         pooled_nodes = torch.cat(pooled, dim=-1)
 
@@ -891,31 +870,8 @@ class HeteroGraph(torch.nn.Module):
         u = data['u']          # shape [batch, u_dim]
         u_emb = self.u_mlp(u)  # map to channel size
 
-        # print(
-        #     "[FWD] pooled_nodes:", pooled_nodes.shape,
-        #     "| u_emb:", u_emb.shape
-        # )
         out = torch.cat([pooled_nodes, u_emb], dim=-1)
 
-        # print(
-        #     "[FWD] out:", out.shape,
-        #     "| mlp expects:", self.mlp[0].in_features
-        # )
-
-        # if not hasattr(self, "mlp") or self.mlp is None:
-        #     C = self.channels
-        #     input_dim = pooled_nodes.size(1) + u_emb.size(1)#out.size(1) 
-        #     self.mlp = Sequential(
-        #         Linear(input_dim, C // 2),
-        #         ReLU(),
-        #         Linear(C // 2, C // 4),
-        #         ReLU(),
-        #         Linear(C // 4, 1),
-        #         Sigmoid()
-        #     ).to(out.device)
-        # # logits = self.mlp(out)
-
-        # return logits.squeeze(-1)
         return self.mlp(out)
 
 
@@ -931,9 +887,9 @@ def neural_net_initialization(full_data):
 
     # 6. Hyperparameters
     channels = 32
-    num_layers = 2
+    num_layers = 3
     attn_type = 'multihead'
-    attn_kwargs = {'dropout': 0.5}
+    attn_kwargs = {'dropout': 0.1}
 
     model = HeteroGraph(
         node_types=node_types,
@@ -945,7 +901,7 @@ def neural_net_initialization(full_data):
         u_dim=u_dim).to(device)
     
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-3)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=20, min_lr=0.00001)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=15, min_lr=1e-5)
     return model, optimizer, scheduler, device
 
 def plot_training_curves(train_losses, val_errors):
@@ -1153,6 +1109,99 @@ def plot_raw_logit_output(first_batch_logits, last_batch_logits,epoch):
     plt.tight_layout()
     plt.savefig(f"transform_logits_{epoch}.png")
 
+
+def get_kin_range(df, kin, cfg):
+    if kin not in cfg:
+        return None  
+
+    spec = cfg[kin]
+
+    if "range" in spec:
+        return spec["range"]
+
+    if "pct" in spec:
+        lo, hi = spec["pct"]
+        return np.percentile(df[kin].values, [lo, hi])
+
+    raise ValueError(f"Invalid axis spec for {kin}")
+
+
+def plot_kinematic_vs_score_2d(df, scores, kinematics, bins=(20,20), max_events=None):
+    if max_events is not None:
+        df = df.iloc[:max_events]
+        scores = scores[:max_events]
+
+    labels = df['label'].values
+    if 'weight' in df.columns:
+        event_weights = df['weight'].values
+    else:
+        event_weights = np.ones(len(df))
+    KIN_AXES = {
+        "jet1_pt":     dict(range=(0, 500)),
+        "jet2_pt":     dict(range=(0, 500)),
+        "mass_jet1_jet2": dict(range=(0, 1500)),
+        "mass_jet3_jet4": dict(range=(0, 200)),
+    }
+
+    for kin in kinematics:
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
+
+        x_range = get_kin_range(df, kin, KIN_AXES)
+        if x_range is None:
+            x_range = (df[kin].min(), df[kin].max())
+        x_bins = bins[0]
+
+        for ax, lbl, title in zip(axes, [0, 1], ["Background", "Signal"]):
+            mask = labels == lbl
+            x = df[kin].values[mask]
+            w = event_weights[mask]
+            y = scores[mask]
+            if isinstance(y, torch.Tensor):
+                y = y.cpu().numpy()   
+            # --- 2D histogram (normalized) ---
+            h = ax.hist2d(
+                x,
+                y,
+                bins=bins,
+                range=[x_range, (0, 1.0)],
+                cmap='viridis',
+                weights=w,
+                density=True    # ← normalize Z
+            )
+            fig.colorbar(h[3], ax=ax, label='Density')
+
+            # --- Profile: mean score per x-bin ---
+            x_edges = np.linspace(x_range[0], x_range[1], x_bins + 1)
+            x_centers = 0.5 * (x_edges[:-1] + x_edges[1:])
+
+            mean_scores = np.full(x_bins, np.nan)
+            for i in range(x_bins):
+                in_bin = (x >= x_edges[i]) & (x < x_edges[i+1])
+                if np.any(in_bin):
+                    mean_scores[i] = np.average(y[in_bin], weights=w[in_bin])
+
+            ax.plot(
+                x_centers,
+                mean_scores,
+                color='red',
+                marker='o',
+                markersize=4,
+                linewidth=2,
+                #label=r'$\langle \mathrm{score} \rangle$'
+            )
+
+            ax.set_xlabel(kin)
+            ax.set_ylabel("Probability")
+            ax.set_title(title)
+            ax.set_ylim(0, 1.0)
+            ax.legend()
+
+        plt.tight_layout()
+        plt.savefig(f"score_comp_{kin}.png")
+        plt.close()
+
+
+
 def main():
 
     parser = argparse.ArgumentParser(description="Convert specific category from .coffea to pandas DataFrame")
@@ -1169,7 +1218,7 @@ def main():
 
     df = load_category_dataframe(args.out)
     data_list=get_graphical(df)
-    data_list = balance_signal_background_weights_graphs( data_list,    balance_to="unity")
+    # data_list = balance_signal_background_weights_graphs( data_list,    balance_to="unity")
   
     from torch_geometric.loader import DataLoader
     train_val_list, test_list = train_test_split(data_list, test_size=0.2, random_state=42)
@@ -1177,9 +1226,9 @@ def main():
     # 0.25 x 0.8 = 0.2, so final split is 60% train / 20% val / 20% test
     #  0.5 * 0.9 = 0.45, so split is 45, 45, 10 (need stats for debugging)
 
-    train_loader = DataLoader(train_list, batch_size=32, shuffle=True)
-    val_loader   = DataLoader(val_list, batch_size=64, shuffle=False)
-    test_loader  = DataLoader(test_list, batch_size=64, shuffle=False)
+    train_loader = DataLoader(balance_signal_background_weights_graphs( train_list, balance_to="unity"), batch_size=32, shuffle=True)
+    val_loader   = DataLoader(balance_signal_background_weights_graphs( val_list, balance_to="unity"), batch_size=64, shuffle=False)
+    test_loader  = DataLoader(balance_signal_background_weights_graphs( test_list, balance_to="unity"), batch_size=64, shuffle=False)
 
     print(f"Train size: {len(train_list)}, Val size: {len(val_list)}, Test size: {len(test_list)}")
 
@@ -1390,6 +1439,16 @@ def main():
     plot_score_distributions(val_labels, val_probs, val_weights)
 
     
+
+    # with torch.no_grad():
+    # for batch in val_loader:  # could be train_loader, test_loader too
+    #     batch = batch.to(device)
+    #     out = model(batch)
+    #     probs = torch.softmax(out, dim=1)
+    #     for i, data in enumerate(batch.to_data_list()):
+    #         df_val.loc[data.idx, 'score'] = probs[i, 1].item()
+    
+    # plot_kinematic_vs_score_2d(df_val, val_probs, )
     # ===== FINAL TEST EVALUATION =====
     test_error, test_logits, test_labels, test_weights = test(
         model, test_loader, device
@@ -1404,17 +1463,19 @@ def main():
     )
     # plot_roc_curve(test_labels, test_probs, test_weights,"Test")
     plot_roc_curves([
-    {"labels": val_labels, "probs": val_probs, "weights": val_weights, "name": "Validation"},
-    {"labels": test_labels, "probs": test_probs, "weights": test_weights, "name": "Test"}], 
-    title="Validation vs Test ROC", 
-    filename="roc_val_test.png")
+    {"labels": test_labels, "probs": test_probs, "weights": test_weights, "name": "Test"},
+    {"labels": train_labels, "probs": train_probs, "weights": train_weights, "name": "Train"}], 
+    title="Train vs Test ROC", 
+    filename="roc_test_vs_train_test.png")
 
     print("\n===== FINAL TEST RESULTS =====")
     print(f"Test Error: {test_error:.4f}")
     print(f"Test AUC:   {test_auc:.4f}")
 
-
-
+    df_test = df.loc[[data.idx for data in test_list]]
+    # df_test['score'] = test_probs.numpy() 
+    print(df_test.head())
+    plot_kinematic_vs_score_2d(df_test, test_probs, ["mass_jet1_jet2", "mass_jet3_jet4", "jet1_pt","jet2_pt", "events_mt_w_leptonic", "vbsjets_mass", "w_had_jets_mass", "vbsjets_delta_eta"])
 if __name__ == "__main__":
     main()
 
