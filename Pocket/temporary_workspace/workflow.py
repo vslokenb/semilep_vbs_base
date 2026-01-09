@@ -162,7 +162,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         ev["JetGood30"] = ev.JetGood[(ev.JetGood.pt > 30)]
         ev["MuonGood30"] = ev.MuonGood[(ev.MuonGood.pt > 30)]
-        ev["ElectronGood35"] = ev.ElectronGood[(ev.ElectronGood.pt > 35)]
+        ev["ElectronGood38"] = ev.ElectronGood[(ev.ElectronGood.pt > 38)]
         
         # b-tagging 
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.15)
@@ -563,6 +563,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['lead_wlep_neutrino_deta']  = np.abs(lead_lep.eta - ev.neutrino_eta)
         ev['lead_wlep_neutrino_dR'] = np.sqrt(ev.lead_wlep_neutrino_deta**2 + ev.lead_wlep_MET_dphi**2)
         ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
+        ev['wleptonic_pt'] = ak.fill_none((ev.PuppiMET + lead_lep).pt, np.nan)
 
         ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
         ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1,v2),np.nan)
@@ -579,14 +580,14 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         ev["ht_sum"] = ak.sum(ev.Jet.pt, axis=1)
 
-        dress_lep = ak.firsts(ev.GenDressedLepton)
-        gen_met = ev.GenMET
+        # dress_lep = ak.firsts(ev.GenDressedLepton)
+        # gen_met = ev.GenMET
         
-        ev["gen_w_pt_dressed"] = (dress_lep + gen_met).pt
-        w_pt_dressed = ak.firsts(ev.gen_w_pt_dressed, axis=-1)
-        # First, get W pT by PDG
-        w_pt_direct = ak.firsts(ev.GenPart[abs(ev.GenPart.pdgId) == 24].pt, axis=-1)
-        ev["gen_w_pt_by_pdg"] = ak.fill_none(w_pt_direct, w_pt_dressed)
+        # ev["gen_w_pt_dressed"] = (dress_lep + gen_met).pt
+        # w_pt_dressed = ak.firsts(ev.gen_w_pt_dressed, axis=-1)
+        # # First, get W pT by PDG
+        # w_pt_direct = ak.firsts(ev.GenPart[abs(ev.GenPart.pdgId) == 24].pt, axis=-1)
+        # ev["gen_w_pt_by_pdg"] = ak.fill_none(w_pt_direct, w_pt_dressed)
 
         # features = {
         #     # "mjj_vbs": ak.to_numpy(ak.flatten(ev.vbsjets.mass, axis=None)),
@@ -621,12 +622,51 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #ev['qgl_fatjet'] = ak.fill_none(wfj.qgl,np.nan)
         
 
+        jets_sorted = ev.JetGood[ak.argsort(ev.JetGood.pt, ascending=False)]
+        fj_sorted = ev.candidate_boost[ak.argsort(ev.candidate_boost.pt, ascending=False)]
+        lepton_sorted = ev.LeptonGood[ak.argsort(ev.LeptonGood.pt, ascending=False)]
+
+        for i in range(np.max(ak.num(jets_sorted, axis=1))):  # max number of jets in any event
+            ev[f'jet{i+1}'] = ak.firsts(jets_sorted[:, i:i+1])
+        for i in range(np.max(ak.num(fj_sorted, axis=1))):  # max number of candidate fatjets in any event
+            ev[f'fatjet{i+1}'] = ak.firsts(fj_sorted[:, i:i+1])
+        for i in range(np.max(ak.num(lepton_sorted, axis=1))):  # max number of good leptons in any event
+            ev[f'lepton{i+1}'] = ak.firsts(lepton_sorted[:, i:i+1])
+        
+        # object_names = [name for name in ev.fields if name.startswith(("jet", "fatjet", "lepton"))]
+        names=['jet1','jet2','jet3','jet4','jet5','jet6', 'lepton1', 'PuppiMET']
+        objects=[ev.jet1, ev.jet2, ev.jet3, ev.jet4, ev.jet5, ev.jet6, ev.lepton1, ev.PuppiMET]
+        ev["deta"] = {}
+        ev["dphi"] ={}
+        ev["dR"] ={}
+        ev["mass"] ={} 
+        for i in range(len(names)):
+            a = objects[i]
+            for j in range(i+1, len(names)):
+                b = objects[j]
+                dphi = delta_phi(a.phi, b.phi)
+                try:
+                    deta = np.abs(a.eta - b.eta)
+                    dR   = np.sqrt(dphi**2 + deta**2)
+                    mass = (a+b).mass
+                except:
+                    deta = 0
+                    dR   = 0
+                    mass = 0
+                
+                
+                # Store them
+                ev["deta", f"{names[i]}_{names[j]}"] = deta
+                ev["dphi", f"{names[i]}_{names[j]}"] = dphi
+                ev["dR",   f"{names[i]}_{names[j]}"] = dR
+                ev["mass", f"{names[i]}_{names[j]}"] = mass
+
     def count_objects(self, variation):
         ev = self.events
         ev["nMuonGood"]     = ak.num(ev.MuonGood)
         ev["nElectronGood"] = ak.num(ev.ElectronGood)
         ev["nMuonGood30"]     = ak.num(ev.MuonGood)
-        ev["nElectronGood35"] = ak.num(ev.ElectronGood)
+        ev["nElectronGood38"] = ak.num(ev.ElectronGood)
         ev["nLeptonGood"]   = ev.nMuonGood + ev.nElectronGood
         ev["nJetGood"]      = ak.num(ev.JetGood)
         ev["nJetGood30"]      = ak.num(ev.JetGood30)

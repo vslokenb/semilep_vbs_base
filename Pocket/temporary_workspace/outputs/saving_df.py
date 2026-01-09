@@ -74,7 +74,7 @@ def load_category_from_coffea(coffea_file, category_name):
                 continue
             if category_name not in year_dict:
                 continue  # Skip missing categories
-            category_dict = year_dict[category_name]
+            category_dict = year_dict[category_name]['nominal']
             #print(category_dict)
             print(f"Processing {process_name} ({subkey}) for category {category_name}")
 
