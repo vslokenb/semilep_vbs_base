@@ -233,19 +233,19 @@ cfg = Configurator(
             # "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
             # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
 
-            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
-            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
+            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
             
 
-            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
             "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
             "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
             "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8",
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -271,15 +271,15 @@ cfg = Configurator(
             
            
             # ###### SIGNAL #########
-            "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
-            "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
+            # "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
 
 
             # # ##### DATA #######
@@ -325,12 +325,12 @@ cfg = Configurator(
             #         "inclusive": ["wjet_reweight"],},
             #     "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
             #         "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
+                # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                #     "inclusive": ["wjet_reweight"],},
+                # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                #     "inclusive": ["wjet_reweight"],},
+                # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                #     "inclusive": ["wjet_reweight"],},
                 # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
                 #     "inclusive": ["wjet_reweight"],},
                 # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
@@ -545,8 +545,8 @@ cfg = Configurator(
     columns = {
         "common": {
            "bycategory": {
-                "whad_withbveto_e": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("PuppiMET", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt"]), ColOut("jet2",["eta","phi","pt"]),ColOut("jet3",["eta","phi","pt"]), ColOut("jet4",["eta","phi","pt"]), ColOut("jet5",["eta","phi","pt"]), ColOut("jet6",["eta","phi","pt"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"])],
-                "whad_withbveto_mu": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("PuppiMET", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved", "mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt"]), ColOut("jet2",["eta","phi","pt"]),ColOut("jet3",["eta","phi","pt"]), ColOut("jet4",["eta","phi","pt"]), ColOut("jet5",["eta","phi","pt"]), ColOut("jet6",["eta","phi","pt"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"])],
+                "whad_withbveto_e": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("PuppiMET", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]), ColOut("jet2",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]),ColOut("jet3",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]), ColOut("jet4",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]), ColOut("jet5",["eta","phi","pt", "qgl","chEmEF", "chHEF","neEmEF", "neHEF","nConstituents"]), ColOut("jet6",["eta","phi","pt", "qgl","chEmEF", "chHEF","neEmEF", "neHEF", "nConstituents"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"])],
+                "whad_withbveto_mu": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("PuppiMET", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]), ColOut("jet2",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]),ColOut("jet3",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]), ColOut("jet4",["eta","phi","pt", "qgl","chEmEF", "chHEF", "neEmEF", "neHEF","nConstituents"]), ColOut("jet5",["eta","phi","pt", "qgl","chEmEF", "chHEF","neEmEF", "neHEF","nConstituents"]), ColOut("jet6",["eta","phi","pt", "qgl","chEmEF", "chHEF","neEmEF", "neHEF", "nConstituents"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_PuppiMET","jet2_PuppiMET","jet3_PuppiMET","jet4_PuppiMET","jet5_PuppiMET","jet6_PuppiMET","lepton1_PuppiMET"])],
                 "boosted_jet_in_window_e": [ColOut("events",["nJetGood", "nCentralJetsGood", "nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted","vbs_dR","jet1_pt","qgl_vbs1_resolved","qgl_vbs2_resolved","wleptonic_eta","w_lep_eta","lead_wlep_vbsjet1_dR"]), ColOut("PuppiMET", ["pt"]), ColOut("vbsjets", ["mass", "delta_eta", "delta_phi"]), ColOut("candidate_boost", ["particleNet_WvsQCD","particleNet_ZvsQCD","tau21"])],
                 "boosted_jet_in_window_mu": [ColOut("events",["nJetGood", "nCentralJetsGood", "nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted","vbs_dR","jet1_pt","qgl_vbs1_resolved","qgl_vbs2_resolved","wleptonic_eta","w_lep_eta","lead_wlep_vbsjet1_dR"]), ColOut("PuppiMET", ["pt"]), ColOut("vbsjets", ["mass", "delta_eta", "delta_phi"]), ColOut("candidate_boost", ["particleNet_WvsQCD","particleNet_ZvsQCD","tau21"])],
            }

@@ -644,8 +644,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             a = objects[i]
             for j in range(i+1, len(names)):
                 b = objects[j]
-                dphi = delta_phi(a.phi, b.phi)
                 try:
+                    dphi = delta_phi(a.phi, b.phi)
                     deta = np.abs(a.eta - b.eta)
                     dR   = np.sqrt(dphi**2 + deta**2)
                     mass = (a+b).mass
@@ -653,6 +653,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     deta = 0
                     dR   = 0
                     mass = 0
+                    dphi = 0
                 
                 
                 # Store them
