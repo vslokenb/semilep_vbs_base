@@ -11,6 +11,8 @@ import glob
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, accuracy_score, roc_curve
 import re
+import mplhep as hep
+hep.style.use("CMS")
 print(xgb.__version__)
 def load_category_from_coffea(coffea_file, category_name):
     #Load and combine all processes for a given category from a .coffea file
@@ -212,20 +214,18 @@ def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
     # print(f" Test Accuracy: {acc:.4f}")
 
     fpr, tpr, _ = roc_curve(ytrue, ypred)
-    # fpr_t, tpr_t, _ = roc_curve(ytrue_training, ypred_training)
     plt.figure(figsize=(6, 6))
-    plt.plot(fpr, tpr, label=f"Test AUC = {auc:.3f}")
-    # plt.plot(fpr_t, tpr_t, linestyle='--', label=f"Train AUC = {auc_t:.3f}")
-    plt.plot([0, 1], [0, 1], "k--")
+    plt.plot(fpr, tpr, label=f"Test AUC = {auc:.3f}", linewidth=2)
+    plt.plot([0, 1], [0, 1], "k--", linewidth=1)
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
-    plt.title("ROC Curve - " + tag)
+    plt.title("Test ROC - BDT")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"bdt/eval_2018_roc_curve_{channel}_"+tag+".png", dpi=300)
+    plt.savefig(f"bdt/eval_2018_roc_curve_{channel}_{tag}.png", dpi=300)
     plt.close()
-    print("Saved ROC curve as 'roc_curve.png'")
+    print(f"Saved ROC curve as 'eval_2018_roc_curve_{channel}_{tag}.png'")
 
 
     df_plot = df_train.copy()
@@ -343,7 +343,7 @@ def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
                 stacked=True,
                 color=stack_colors,
                 label=stack_labels,
-                edgecolor="black",
+                edgecolor="none",
             )
         if "data_vals" in locals():
             plt.errorbar(
@@ -376,7 +376,7 @@ def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
     #     plt.errorbar(bin_centers, values_t, yerr = hist_data[group]["stat_unc"], label=group, linewidth=1.8)
     plt.xlabel("BDT Discriminator Output")
     plt.ylabel("Yield")
-    plt.title(f"BDT Discriminator per Process ({channel}) - " + tag)
+    plt.title(f"BDT - {channel}")
     plt.legend(fontsize=8)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
