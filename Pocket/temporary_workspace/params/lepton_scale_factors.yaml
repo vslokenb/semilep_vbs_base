@@ -1,0 +1,295 @@
+
+lepton_scale_factors:
+  ####################################################################################################
+  electron_sf:
+    # in PocketCoffea by convention the cleaned collection are called *Good
+    collection: ElectronGood
+    
+    id: 
+    # mapping of the electron id working point of NanoAOD 
+    # to the name of the corresponding scale factors
+    # in the correction set provided by EGM 
+      mvaIso_WP80: wp80iso
+      mvaIso_WP90: wp90iso
+      mvaNoIso_WP80: wp80noiso
+      mvaNoIso_WP90: wp90noiso
+      mvaFall17V2Iso_WP80: wp80iso
+      mvaFall17V2Iso_WP90: wp90iso
+      mvaFall17V2noIso_WP80: wp80noiso
+      mvaFall17V2noIso_WP90: wp90noiso
+
+    JSONfiles: 
+      '2016_PreVFP':
+        files:
+          reco: ${cvmfs:Run2-2016preVFP-UL-NanoAODv9,EGM,electron.json.gz}
+          id:   ${cvmfs:Run2-2016preVFP-UL-NanoAODv9,EGM,electron.json.gz}
+        name: UL-Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20: RecoAbove20
+  
+      '2016_PostVFP':
+        files: 
+          reco: ${cvmfs:Run2-2016postVFP-UL-NanoAODv9,EGM,electron.json.gz}
+          id:   ${cvmfs:Run2-2016postVFP-UL-NanoAODv9,EGM,electron.json.gz}
+        name: UL-Electron-ID-SF    
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20: RecoAbove20
+
+      '2017':
+        files:
+          reco: ${cvmfs:Run2-2017-UL-NanoAODv9,EGM,electron.json.gz}
+          id:   ${cvmfs:Run2-2017-UL-NanoAODv9,EGM,electron.json.gz}
+        name: UL-Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20: RecoAbove20
+
+      '2018':
+        files: 
+          reco: ${cvmfs:Run2-2018-UL-NanoAODv9,EGM,electron.json.gz}
+          id:   ${cvmfs:Run2-2018-UL-NanoAODv9,EGM,electron.json.gz}
+        name: UL-Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20: RecoAbove20
+
+      '2022_preEE':
+        files: 
+          reco: ${cvmfs:Run3-22CDSep23-Summer22-NanoAODv12,EGM,electron.json.gz}
+          id:   ${cvmfs:Run3-22CDSep23-Summer22-NanoAODv12,EGM,electron.json.gz}
+        name: Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+
+      '2022_postEE':
+        files:
+          reco: ${cvmfs:Run3-22EFGSep23-Summer22EE-NanoAODv12,EGM,electron.json.gz}
+          id:   ${cvmfs:Run3-22EFGSep23-Summer22EE-NanoAODv12,EGM,electron.json.gz}
+        name: Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+
+      '2023_preBPix':
+        files:
+          reco: ${cvmfs:Run3-23CSep23-Summer23-NanoAODv12,EGM,electron.json.gz}
+          id:   ${cvmfs:Run3-23CSep23-Summer23-NanoAODv12,EGM,electron.json.gz}
+        name: Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+
+      '2023_postBPix':
+        files:
+          reco: ${cvmfs:Run3-23DSep23-Summer23BPix-NanoAODv12,EGM,electron.json.gz}
+          id:   ${cvmfs:Run3-23DSep23-Summer23BPix-NanoAODv12,EGM,electron.json.gz}
+        name: Electron-ID-SF
+        reco:
+          pt_lt_20: RecoBelow20
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+
+      "2024":
+        files:
+          reco: ${cvmfs:Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15,EGM,electron_v1.json.gz,2025-08-15}
+          id:   ${cvmfs:Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15,EGM,electronID_v1.json.gz,2025-08-15}
+        name: Electron-ID-SF
+        reco:
+          #pt_lt_20: #"RecoBelow20" bin is still missing for the moment.
+          pt_gt_20_lt_75: Reco20to75
+          pt_gt_75: RecoAbove75
+
+    era_mapping:
+      # this is needed because the correction set provided by EGM
+      # have a fixed set of era labels, different from ours
+      "2016_PreVFP": 
+        id: "2016preVFP"
+        reco: "2016preVFP"
+      "2016_PostVFP": 
+        id: "2016postVFP"
+        reco: "2016postVFP"
+        trigger: "2016postVFP"
+      "2017": 
+        id: "2017"
+        reco: "2017"
+        trigger: "2017"
+      "2018": 
+        id: "2018"
+        reco: "2018"
+        trigger: "2018"
+      "2022_preEE": 
+        id: "2022Re-recoBCD"
+        reco: "2022Re-recoBCD"
+        trigger: "2022Re-recoBCD"
+      "2022_postEE": 
+        id: "2022Re-recoE+PromptFG"
+        reco: "2022Re-recoE+PromptFG"
+        trigger: "2022Re-recoE+PromptFG"
+      "2023_preBPix": 
+        id: "2023PromptC"
+        reco: "2023PromptC"
+        trigger: "2023PromptC"
+      "2023_postBPix": 
+        id: "2023PromptD"
+        reco: "2023PromptD"
+        trigger: "2023PromptD"
+      "2024": 
+        id: "2024"
+        reco: "2024Prompt"
+        #trigger: "2024Prompt"
+
+
+    # The scale and smearing configuration is expected to have this structure
+    scale_and_smearing:      
+      apply: 
+        '2016_PreVFP': False
+        '2016_PostVFP': False
+        '2017': False
+        '2018': False
+        '2022_preEE': True
+        '2022_postEE': True
+        '2023_preBPix': True
+        '2023_postBPix': True
+        '2024': True
+      
+      correctionlib_config:
+        '2022_preEE':
+          file: ${cvmfs:Run3-22CDSep23-Summer22-NanoAODv12,EGM,electronSS_EtDependent.json.gz}
+          correction_name:
+            scale: "Scale"
+            smear: "SmearAndSyst"
+          et_dependent: true
+        '2022_postEE':
+          file: ${cvmfs:Run3-22EFGSep23-Summer22EE-NanoAODv12,EGM,electronSS_EtDependent.json.gz}
+          correction_name:
+            scale: "Scale"
+            smear: "SmearAndSyst"
+          et_dependent: true
+        '2023_preBPix':
+          file: ${cvmfs:Run3-23CSep23-Summer23-NanoAODv12,EGM,electronSS_EtDependent.json.gz}
+          correction_name:
+            scale: "Scale"
+            smear: "SmearAndSyst"
+          et_dependent: true
+        '2023_postBPix':
+          file: ${cvmfs:Run3-23DSep23-Summer23BPix-NanoAODv12,EGM,electronSS_EtDependent.json.gz}
+          correction_name:
+            scale: "Scale"
+            smear: "SmearAndSyst"
+          et_dependent: true
+        '2024':
+          file: ${cvmfs:Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15,EGM,electronSS_EtDependent.json.gz}
+          correction_name:
+            scale: "Scale"
+            smear: "SmearAndSyst"
+          et_dependent: true
+    
+    # The trigger SF configuration is expected to have this structure
+    # needs to be provided by the user.
+    trigger_sf:
+      2016_PreVFP:
+        name: Electron-HLT-SF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL16preVFB.json
+      2016_PostVFP:
+        name: Electron-HLT-SF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL16postVFB.json
+      '2017':
+        name: Electron-HLT-SF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL17.json
+      '2018':
+        name: Electron-HLT-SF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL18.json
+      2022_preEE:
+        2022_preEE:
+        name: Electron-HLT-SF
+        file: ${cvmfs:Run3-22CDSep23-Summer22-NanoAODv12,EGM,electronHlt.json.gz}
+        path: HLT_SF_Ele30_MVAiso80ID
+      2022_postEE:
+        name: Electron-HLT-SF
+        file: ${cvmfs:Run3-22EFGSep23-Summer22EE-NanoAODv12,EGM,electronHlt.json.gz}
+        path: HLT_SF_Ele30_MVAiso80ID
+      2023_preBPix:
+        name: Electron-HLT-SF
+        file: ${cvmfs:Run3-23CSep23-Summer23-NanoAODv12,EGM,electronHlt.json.gz}
+        path: HLT_SF_Ele30_MVAiso80ID
+      2023_postBPix:
+        name: Electron-HLT-SF
+        file: ${cvmfs:Run3-23DSep23-Summer23BPix-NanoAODv12,EGM,electronHlt.json.gz}
+        path: HLT_SF_Ele30_MVAiso80ID
+
+  ##################################################################################################  
+  muon_sf:
+     # in PocketCoffea by convention the cleaned collection are called *Good
+    collection: MuonGood
+    
+    sf_name:
+      '2016_PreVFP':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LooseRelIso_DEN_TightIDandIPCut
+          trigger: NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight
+
+      '2016_PostVFP':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LooseRelIso_DEN_TightIDandIPCut
+          trigger: NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight
+
+      '2017':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LooseRelIso_DEN_TightIDandIPCut
+          trigger: NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight
+
+      '2018':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LooseRelIso_DEN_TightIDandIPCut
+          trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+
+      '2022_preEE':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+
+      '2022_postEE':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+
+      '2023_preBPix':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+          
+      '2023_postBPix':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+      
+      '2024':
+          id: NUM_TightID_DEN_TrackerMuons
+          iso: NUM_LoosePFIso_DEN_TightID
+          trigger: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight
+
+    JSONfiles:
+      '2016_PreVFP':
+          file: ${cvmfs:Run2-2016preVFP-UL-NanoAODv9,MUO,muon_Z.json.gz}
+      '2016_PostVFP':
+          file: ${cvmfs:Run2-2016postVFP-UL-NanoAODv9,MUO,muon_Z.json.gz}
+      '2017':
+          file: ${cvmfs:Run2-2017-UL-NanoAODv9,MUO,muon_Z.json.gz}
+      '2018':
+          file: ${cvmfs:Run2-2018-UL-NanoAODv9,MUO,muon_Z.json.gz}
+      '2022_preEE':
+          file: ${cvmfs:Run3-22CDSep23-Summer22-NanoAODv12,MUO,muon_Z.json.gz}
+      '2022_postEE':
+          file: ${cvmfs:Run3-22EFGSep23-Summer22EE-NanoAODv12,MUO,muon_Z.json.gz}
+      '2023_preBPix':
+          file: ${cvmfs:Run3-23CSep23-Summer23-NanoAODv12,MUO,muon_Z.json.gz}
+      '2023_postBPix':
+          file: ${cvmfs:Run3-23DSep23-Summer23BPix-NanoAODv12,MUO,muon_Z.json.gz}
+      '2024':
+          file: ${cvmfs:Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15,MUO,muon_Z.json.gz}    

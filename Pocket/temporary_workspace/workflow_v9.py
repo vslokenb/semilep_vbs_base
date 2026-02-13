@@ -78,7 +78,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     "pt": 10.0,
                     "eta": 2.5,
                     #"iso": 0.06,
-                    "id": "mvaNoIso_WPL", #"mvaFall17V2noIso_WPL",
+                    "id": "mvaFall17V2noIso_WPL",
                 },
                 "Muon": {
                     "pt": 10.0,
@@ -146,8 +146,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["candidate_boost180"] = ev.FatJetGood[(_tau21(ev.FatJetGood) < 0.45) & (ev.FatJetGood.msoftdrop < 250)]
         ev["candidate_boost"] =ev.candidate_boost180[ev.candidate_boost180.pt > 200]
 
-        b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
-        ev["BJet_upart"] = ev.JetGood[b_mask]
+        # b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
+        # ev["BJet_upart"] = ev.JetGood[b_mask]
 
         dR_jets_jet = ev.JetGood.metric_table(ev.candidate_boost)
         mask_jet_cleaning = ak.prod(dR_jets_jet > 0.8, axis=2) == 1
@@ -157,57 +157,14 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         # far_enough_from_ak8 = (separation > 0.8)
         ev["JetGood"] = ev.JetGood[mask_jet_cleaning]
-        # mask_jetpuid = ~( (np.abs(ev.JetGood.eta) > 2.65) & (np.abs(ev.JetGood.eta) < 3.139)  & (ev.JetGood.pt < 50.0)) # & (ev.JetGood.puId < 7)
+        mask_jetpuid = ~( (np.abs(ev.JetGood.eta) > 2.65) & (np.abs(ev.JetGood.eta) < 3.139)  & (ev.JetGood.pt < 50.0))  & (ev.JetGood.puId < 7)
         # ev["JetGood"] = ev.JetGood[mask_jetpuid]
-        
-        
-        
-        
+        ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
         # far_enough_from_ak8 = (ev.JetGood.delta_r(ev.candidate_boost) > 0.8)
         # far_enough_from_ak8 = ak.fill_none(far_enough_from_ak8, True)
         # ev["JetGood"] = ev.JetGood[far_enough_from_ak8]
 
-        ########################################
-        ## REDEFINING JET ID FOR DEBUG ########
-        ########################################
-        separation_lepton_debug = ev.Jet.metric_table(ev.LeptonGood)
-        mask_dr_lepton = ak.prod(separation_lepton_debug > 0.4, axis=2) == 1
-
-
-        Jet_passJetIdTight = (
-            # |eta| ≤ 2.4
-            ((abs(ev.Jet.eta) <= 2.4) &
-            (ev.Jet.neHEF < 0.90) &
-            (ev.Jet.neEmEF < 0.90) &
-            ((ev.Jet.chMultiplicity + ev.Jet.neMultiplicity) > 1) &
-            (ev.Jet.chHEF > 0.00) &
-            (ev.Jet.chMultiplicity > 0))
-            |
-            # 2.4 < |eta| ≤ 2.7
-            ((abs(ev.Jet.eta) > 2.4) & (abs(ev.Jet.eta) <= 2.7) &
-            (ev.Jet.neHEF < 0.98) &
-            (ev.Jet.neEmEF < 0.99))
-            |
-            # 2.7 < |eta| ≤ 3.0
-            ((abs(ev.Jet.eta) > 2.7) & (abs(ev.Jet.eta) <= 3.0) &
-            (ev.Jet.neMultiplicity >= 1))
-            |
-            # |eta| > 3.0
-            ((abs(ev.Jet.eta) > 3.0) &
-            (ev.Jet.neMultiplicity > 2) &
-            (ev.Jet.neEmEF < 0.9))
-        )
-
-
-        ev["JetGood30"] = ev.JetGood[(ev.JetGood.pt > 30)] # TESTING OUT HIGH ETA REGIONS
-        ev["JetGood_new"] = ev.Jet[(ev.Jet.pt > 30) & mask_dr_lepton & (abs(ev.Jet.eta) < 4.7) & Jet_passJetIdTight] # TESTING OUT HIGH ETA REGIONS
-        dR_jets_jet_v1 = ev.JetGood_new.metric_table(ev.candidate_boost)
-        mask_jet_cleaning_v1 = ak.prod(dR_jets_jet_v1 > 0.8, axis=2) == 1
-        ev["JetGood_new"] = ev.JetGood_new[mask_jet_cleaning_v1]
-
-        ev["JetGood"] = ev.JetGood_new
-        ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
-
+        ev["JetGood30"] = ev.JetGood[(ev.JetGood.pt > 30)]
         ev["MuonGood30"] = ev.MuonGood[(ev.MuonGood.pt > 30)]
         ev["ElectronGood38"] = ev.ElectronGood[(ev.ElectronGood.pt > 38)]
         
@@ -215,10 +172,10 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.15)
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.1355) #& (ev.JetGood.pt > 20) NANO V9
         # b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
-        # b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.1355) #TEST EVAL FOR AK8 BTAG
+        b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.1355) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
-        # ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
-        #ev["BJet_csv"] = ev.JetGood[b_mask]
+        ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
+        # ev["BJet_csv"] = ev.JetGood[b_mask]
         ev["BJetGood"] = btagging(
             ev.JetGood[np.abs(ev.JetGood.eta) < 2.5],
             self.params.btagging.working_point[self._year],
@@ -228,7 +185,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["JetGood_tagger_check"]= ev.JetGood[(np.abs(ev.JetGood.eta) < 2.5)]
 
         #blah = ev.JetGood_tagger_check[ak.argsort(ev.JetGood_tagger_check.btagDeepB, ascending=False)]
-        ev['leading_bscore'] = ak.max(ev.JetGood_tagger_check.btagUParTAK4B, axis=1)
+        ev['leading_bscore'] = ak.max(ev.JetGood_tagger_check.btagDeepFlavB, axis=1)
+        
         #ev['nCleanJet_30'] = ak.num(ev.JetGood.pt >= 30)
         # ------------- VBS tagging jets -------------
         has4j = ak.num(ev.JetGood) >= 4
@@ -619,14 +577,14 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
         ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1,v2),np.nan)
 
-        ev['qgl_vbs1_resolved'] = ak.fill_none(v1.btagUParTAK4QvG,np.nan) # UParT AK4 Q vs G
-        ev['qgl_vbs2_resolved'] = ak.fill_none(v2.btagUParTAK4QvG,np.nan)
+        ev['qgl_vbs1_resolved'] = ak.fill_none(v1.qgl,np.nan) # UParT AK4 Q vs G
+        ev['qgl_vbs2_resolved'] = ak.fill_none(v2.qgl,np.nan)
 
-        ev['qgl_vbs1_boost'] = ak.fill_none(v1b.btagUParTAK4QvG,np.nan)
-        ev['qgl_vbs2_boost'] = ak.fill_none(v2b.btagUParTAK4QvG,np.nan)
+        ev['qgl_vbs1_boost'] = ak.fill_none(v1b.qgl,np.nan)
+        ev['qgl_vbs2_boost'] = ak.fill_none(v2b.qgl,np.nan)
 
-        ev["w_had_jets",'qgl_wjet1_resolved'] = ak.fill_none(ev.w_had_jets.jet1.btagUParTAK4QvG,np.nan)
-        ev["w_had_jets",'qgl_wjet2_resolved'] = ak.fill_none(ev.w_had_jets.jet2.btagUParTAK4QvG,np.nan)
+        ev["w_had_jets",'qgl_wjet1_resolved'] = ak.fill_none(ev.w_had_jets.jet1.qgl,np.nan)
+        ev["w_had_jets",'qgl_wjet2_resolved'] = ak.fill_none(ev.w_had_jets.jet2.qgl,np.nan)
 
 
         ev["ht_sum"] = ak.sum(ev.Jet.pt, axis=1)
@@ -670,7 +628,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         # self._accumulator["mva_df"].append(df)
 
 
-        #ev['qgl_fatjet'] = ak.fill_none(wfj.btagUParTAK4QvG,np.nan)
+        # ev['qgl_fatjet'] = ak.fill_none(wfj.btagUParTAK4QvG,np.nan)
         
 
         jets_sorted = ev.JetGood[ak.argsort(ev.JetGood.pt, ascending=False)]
@@ -724,8 +682,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nJetGood"]      = ak.num(ev.JetGood)
         ev["nJetGood30"]      = ak.num(ev.JetGood30)
         ev["nBJetGood"]     = ak.num(ev.BJetGood)
-        ev["nBJet_upart"]     = ak.num(ev.BJet_upart)
-        ev["nJetGood_new"]     = ak.num(ev.JetGood_new)
+        # ev["nBJet_upart"]     = ak.num(ev.BJet_upart)
+        ev["nBJet_ak8"]     = ak.num(ev.BJet_ak8)
         ev["nCentralJetsGood"] = ak.num(ev.CentralJetsGood)
         ev["nFatJetGood"] = ak.num(ev.FatJetGood)
         ev["nFatJetCentral"] = ak.num(ev.FatJetCentral) if hasattr(ev, "FatJetCentral") else 0

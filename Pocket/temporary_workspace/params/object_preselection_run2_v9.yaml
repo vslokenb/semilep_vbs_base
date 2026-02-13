@@ -13,11 +13,15 @@ object_preselection:
     jetId: 2
     btag:
       wp: L
+    puId:
+      wp: L
+      value: 4
+      maxpt: 50.0
   Electron:
     pt: 38
     eta: 2.5
     iso: 0.06
-    id: mvaIso_WP90
+    id: mvaFall17V2Iso_WP90
   FatJet:
     dr_lepton: 0.8
     pt: 200
