@@ -360,10 +360,16 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         # ------------- W Leptonic -------------
         #lead_lep = ak.firsts(ev.LeptonGood)
-        ev["mt_w_leptonic"] = np.sqrt( #CHANGED mT DEFINITION TO USE PUPPIMET
-            2.0 * lead_lep.pt * ev.PuppiMET.pt * (1.0 - np.cos(lead_lep.delta_phi(ev.PuppiMET)))
+        ev["mt_w_leptonic"] = np.sqrt( #CHANGED mT DEFINITION TO USE DeepMETResolutionTune
+            2.0 * lead_lep.pt * ev.DeepMETResolutionTune.pt * (1.0 - np.cos(lead_lep.delta_phi(ev.DeepMETResolutionTune)))
         )
-        w_lep = ev.PuppiMET + lead_lep
+        met = vector.awk(
+            pt=ev.DeepMETResolutionTune.pt,
+            phi=ev.DeepMETResolutionTune.phi,
+            eta=0,
+            mass=0
+        )
+        w_lep = met + lead_lep
         whad = ev.w_had_jets.jet1 + ev.w_had_jets.jet2
         # print("w leptonic pT: ", w_lep.pt)
 
@@ -411,11 +417,11 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["lep_bjet_dR"] = deltaR_per_event
         #ev["lead_wlep_badjet_dR"] = ak.fill_none(lead_lep.delta_r(badjet), np.nan)
        
-        #ev["lead_wlep_MET_dR"] = ak.fill_none(lead_lep.delta_r(ev.PuppiMET), np.nan)
-        #ev["lead_wlep_MET_deta"] = np.abs(lead_lep.eta - ev.PuppiMET.eta)
+        #ev["lead_wlep_MET_dR"] = ak.fill_none(lead_lep.delta_r(ev.DeepMETResolutionTune), np.nan)
+        #ev["lead_wlep_MET_deta"] = np.abs(lead_lep.eta - ev.DeepMETResolutionTune.eta)
 
         #dPhi between lead lepton and MET
-        ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.PuppiMET.phi)
+        ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.DeepMETResolutionTune.phi)
         ev["lead_wlep_wfatjet1_dphi"] = delta_phi(lead_lep.phi, wfj.phi)
         ev["lead_wlep_wjet1_dphi"] = delta_phi(lead_lep.phi, wj1.phi)
         ev["lead_wlep_wjet2_dphi"] = delta_phi(lead_lep.phi, wj2.phi)
@@ -567,12 +573,12 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             C = np.minimum(eta_plus, eta_minus)
             return C
         
-        ev['neutrino_pz'] = ak.fill_none(solve_neutrino_pz(lead_lep, ev.PuppiMET),np.nan)
-        ev['neutrino_eta'] = ak.fill_none(np.arcsinh(ev.neutrino_pz / ev.PuppiMET.pt),np.nan)
+        ev['neutrino_pz'] = ak.fill_none(solve_neutrino_pz(lead_lep, ev.DeepMETResolutionTune),np.nan)
+        ev['neutrino_eta'] = ak.fill_none(np.arcsinh(ev.neutrino_pz / ev.DeepMETResolutionTune.pt),np.nan)
         ev['lead_wlep_neutrino_deta']  = np.abs(lead_lep.eta - ev.neutrino_eta)
         ev['lead_wlep_neutrino_dR'] = np.sqrt(ev.lead_wlep_neutrino_deta**2 + ev.lead_wlep_MET_dphi**2)
         ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
-        ev['wleptonic_pt'] = ak.fill_none((ev.PuppiMET + lead_lep).pt, np.nan)
+        ev['wleptonic_pt'] = ak.fill_none((ev.DeepMETResolutionTune + lead_lep).pt, np.nan)
 
         ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
         ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1,v2),np.nan)
@@ -638,14 +644,15 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         n_jets = max(6, int(np.max(ak.num(jets_sorted, axis=1))))
         for i in range(n_jets):
             ev[f'jet{i+1}'] = ak.firsts(jets_sorted[:, i:i+1])
-        for i in range(np.max(ak.num(fj_sorted, axis=1))):  # max number of candidate fatjets in any event
+        n_fatjets = max(1, int(np.max(ak.num(fj_sorted, axis=1))))
+        for i in range(n_fatjets):
             ev[f'fatjet{i+1}'] = ak.firsts(fj_sorted[:, i:i+1])
         for i in range(np.max(ak.num(lepton_sorted, axis=1))):  # max number of good leptons in any event
             ev[f'lepton{i+1}'] = ak.firsts(lepton_sorted[:, i:i+1])
         
         # object_names = [name for name in ev.fields if name.startswith(("jet", "fatjet", "lepton"))]
-        names=['jet1','jet2','jet3','jet4','jet5','jet6', 'lepton1', 'PuppiMET']
-        objects=[ev.jet1, ev.jet2, ev.jet3, ev.jet4, ev.jet5, ev.jet6, ev.lepton1, ev.PuppiMET]
+        names=['jet1','jet2','jet3','jet4','jet5','jet6', 'lepton1', 'DeepMETResolutionTune','fatjet1']
+        objects=[ev.jet1, ev.jet2, ev.jet3, ev.jet4, ev.jet5, ev.jet6, ev.lepton1, ev.DeepMETResolutionTune, ev.fatjet1]
         ev["deta"] = {}
         ev["dphi"] ={}
         ev["dR"] ={}
@@ -658,7 +665,13 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     dphi = delta_phi(a.phi, b.phi)
                     deta = np.abs(a.eta - b.eta)
                     dR   = np.sqrt(dphi**2 + deta**2)
-                    mass = (a+b).mass
+                    try:
+                        if names[i] == "fatjet1" or names[j] == "fatjet1":
+                            mass = (a + b).msoftdrop
+                        else:
+                            mass = (a + b).mass
+                    except:
+                        mass = 0
                 except:
                     deta = 0
                     dR   = 0
