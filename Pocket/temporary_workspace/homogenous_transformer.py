@@ -184,7 +184,7 @@ def get_hographical(df):
     # -----------------------------
     # Parse object structure
     # -----------------------------
-    OBJ_RE = re.compile(r"(jet|lepton|PuppiMET)(\d*)_(.+)")
+    OBJ_RE = re.compile(r"(jet|lepton|DeepMETResolutionTune)(\d*)_(.+)")
     objects = {}
 
     for col in feature_cols:
@@ -197,7 +197,7 @@ def get_hographical(df):
         objects[obj_type].setdefault(idx, {})
         objects[obj_type][idx][feat] = col
 
-    NODE_TYPES = {"jet": 0, "lepton": 1, "PuppiMET": 2}
+    NODE_TYPES = {"jet": 0, "lepton": 1, "DeepMETResolutionTune": 2}
     EDGE_TYPES = {"mass": 0, "dR": 1, "dphi": 2, "deta": 3}
 
     # -----------------------------
@@ -237,7 +237,7 @@ def get_hographical(df):
             node_types.append(NODE_TYPES["lepton"])
 
         # ---------- MET ----------
-        met_feats = objects.get("PuppiMET", {}).get("1")
+        met_feats = objects.get("DeepMETResolutionTune", {}).get("1")
         if met_feats:
             cols = list(met_feats.values())
             vals = row[cols].values.astype(float)
@@ -245,9 +245,9 @@ def get_hographical(df):
             if vals.shape[0] < 9:
                 vals = np.pad(vals, (0, 9 - vals.shape[0]), constant_values=0.0)
             
-            node_name_to_idx["PuppiMET"] = len(node_features)
+            node_name_to_idx["DeepMETResolutionTune"] = len(node_features)
             node_features.append(vals)
-            node_types.append(NODE_TYPES["PuppiMET"])
+            node_types.append(NODE_TYPES["DeepMETResolutionTune"])
 
         # ---------- Node tensors ----------
         x = torch.tensor(node_features, dtype=torch.float)
@@ -382,7 +382,7 @@ def get_graphical(df):
     feature_cols = [c for c in feature_cols if c not in global_cols] # set rest of features excluding the above
 
     # type_prefixes = ["lepton", "jet", "PuppiMET"] # 3 types of nodes supposdely
-    OBJ_RE = re.compile(r"(jet|lepton|PuppiMET)(\d*)_(.+)")
+    OBJ_RE = re.compile(r"(jet|lepton|DeepMETResolutionTune)(\d*)_(.+)")
     objects = {}
     for col in feature_cols:
         m = OBJ_RE.match(col)
@@ -435,13 +435,13 @@ def get_graphical(df):
             data["lepton"].num_nodes = data["lepton"].x.size(0)
 
         # ---------- MET (single node) ----------
-        met_feats = objects.get("PuppiMET", {}).get("1")
+        met_feats = objects.get("DeepMETResolutionTune", {}).get("1")
         if met_feats:
             cols = list(met_feats.values())
             vals = row[cols].values.astype(float)
 
-            data["PuppiMET"].x = torch.tensor([vals], dtype=torch.float)
-            data["PuppiMET"].num_nodes = 1
+            data["DeepMETResolutionTune"].x = torch.tensor([vals], dtype=torch.float)
+            data["DeepMETResolutionTune"].num_nodes = 1
 
         # ---------- DEBUG: node sanity ----------
         # print(f"\n[EVENT {evt_idx}] NODE SUMMARY")
@@ -487,8 +487,8 @@ def get_graphical(df):
                     return "jet", jet_index_map.get(obj)
                 if obj.startswith("lepton"):
                     return "lepton", 0
-                if obj.startswith("PuppiMET"):
-                    return "PuppiMET", 0
+                if obj.startswith("DeepMETResolutionTune"):
+                    return "DeepMETResolutionTune", 0
                 return None, None
 
             src_type, src_idx = resolve(src)
@@ -1014,7 +1014,7 @@ class HeteroGraph(torch.nn.Module):
         node_feature_dims = {
             "jet": 3,
             "lepton": 3,
-            "PuppiMET": 2,
+            "DeepMETResolutionTune": 2,
             # "w": 2,
         }
 
@@ -1295,7 +1295,7 @@ def plot_training_curves(train_losses, val_errors):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("transform_training_curve_2018.png")
+    plt.savefig("transform_training_curve_2016_prevfp.png")
     plt.close()
 
 def plot_auc_curves(train_aucs, val_aucs):
@@ -1360,7 +1360,7 @@ def plot_roc_curves(datasets, title="ROC Curve Transformer", filename="roc_compa
     plt.close()
 
 
-def plot_score_distributions(labels, probs, weights=None,outname="transform_score_distrib_2018.png"):
+def plot_score_distributions(labels, probs, weights=None,outname="transform_score_distrib_2016_prevfp_mu.png"):
     plt.figure(figsize=(7,5))
 
     sig = labels == 1
@@ -1376,18 +1376,18 @@ def plot_score_distributions(labels, probs, weights=None,outname="transform_scor
                  alpha=0.6, label="Signal")
 
     plt.xlabel("Transformer discriminator output",fontsize=14)
-    plt.ylabel("Yields",fontsize=14)
+    plt.ylabel("Frac. of events",fontsize=14)
     # plt.title("Classifier Output Distribution")
     # plt.yscale('log')
     hep.cms.label(
-        "Preliminary",
+        "Internal",
         data=False,             
         loc=0, 
         fontsize=16,   # reduce from the very large default
-        lumi=41.5,       
+        # lumi=41.5,       
         com=13                  
     )
-    plt.legend(fontsize=8)
+    plt.legend(fontsize=12)
     # plt.grid(True)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -1398,7 +1398,7 @@ def plot_score_distributions_stacked(
     scores,
     bins=40,
     max_events=None,
-    outname="transform_score_distrib_stacked_2018.png",
+    outname="transform_score_distrib_stacked_2016_prevfp_mu.png",
 ):
     """
     Plot stacked classifier output distribution grouped by process groups.
@@ -1508,11 +1508,11 @@ def plot_score_distributions_stacked(
     )
 
     plt.xlabel("Transformer discriminator output",fontsize=14)
-    plt.ylabel("Yields",fontsize=14)
+    plt.ylabel("Events",fontsize=14)
     # plt.title("Classifier Output Distribution")
     # plt.yscale('log')
     hep.cms.label(
-        "Preliminary",
+        "Internal",
         data=False,             
         loc=0, 
         fontsize=16,   # reduce from the very large default
@@ -1732,7 +1732,7 @@ def plot_kinematic_vs_score_2d(df, scores, kinematics, bins=(20,20), max_events=
             ax.legend()
 
         plt.tight_layout()
-        plt.savefig(f"score_comp_{kin}_2018.png")
+        plt.savefig(f"score_comp_{kin}_2017_mu.png")
         plt.close()
 
 process_groups = {
@@ -1937,7 +1937,7 @@ def plot_roc_per_background(df, scores, outdir="roc_groups"):
         plt.grid(True)
         plt.tight_layout()
 
-        outname = f"{outdir}/roc_vbs_vs_{bkg.replace('+','').replace('/','_')}_2018.png"
+        outname = f"{outdir}/roc_vbs_vs_{bkg.replace('+','').replace('/','_')}_2017_mu.png"
         plt.savefig(outname, dpi=300)
         plt.close()
 
@@ -2099,7 +2099,7 @@ def main():
     patience = 15  # how many epochs to wait for improvement
     best_val_error = float('inf')
     epochs_no_improve = 0
-    best_model_path = "best_model_2018.pt"  # path to save the best model
+    best_model_path = f"best_model_{args.category}_2016_prevfp.pt"  # path to save the best model
 
     for epoch in range(1, num_epochs + 1):
         # -------- TRAIN --------
@@ -2210,7 +2210,7 @@ def main():
     {"labels": test_labels, "probs": test_probs, "weights": test_weights, "name": "Test"},
     {"labels": train_labels, "probs": train_probs, "weights": train_weights, "name": "Train"}], 
     title="Train vs Test ROC", 
-    filename="roc_test_vs_train_test_2018.png")
+    filename=f"roc_test_vs_train_test_{args.category}_2016_prevfp.png")
 
     print("\n===== FINAL TEST RESULTS =====")
     print(f"Test Error: {test_error:.4f}")
