@@ -10,6 +10,7 @@ from pocket_coffea.lib.objects import lepton_selection, jet_selection, btagging,
 from types import SimpleNamespace
 import vector
 import math
+import xgboost as xgb
 
 vector.register_awkward()
 
@@ -26,7 +27,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         # if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in dataset:
         if hasattr(events, "genWeight"):
             events["genWeight"] = np.sign(events.genWeight)
-       
+
         # IMPORTANT PATCH DUE TO BUGGY GEN WEIGHT IN UL GENWEIGHT nanoaodv9!
         self.events = events
         return super().process(events)
@@ -63,12 +64,12 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["ElectronGood_0"] = lepton_selection(ev, "Electron", self.params)
         ele = ev.ElectronGood_0
         mask2 = (
-            (np.abs(ele.dxy) < 0.05) & (np.abs(ele.eta) < 1.479) & (np.abs(ele.dz) < 0.1) & (ele.cutBased >= 4) & (ele.lostHits <= 1)
+            (np.abs(ele.dxy) < 0.05) & (np.abs(ele.eta) < 1.479) & (np.abs(ele.dz) < 0.1) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
         ) | (
-            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.5) & (np.abs(ele.dz) < 0.2) & (ele.cutBased >= 4) & (ele.lostHits <= 1)
+            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.5) & (np.abs(ele.dz) < 0.2) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
         )
 
-        ev["ElectronGood"] = ele[mask2 & (ele.convVeto == 1)]
+        ev["ElectronGood"] = ele[mask2]
 
         #ev["ElectronGood"]      = ev.ElectronGood_0[(np.abs(ev.ElectronGood_0.dxy) < 0.05)]# & np.abs(ev.ElectronGood_0.dz) < 0.5]
        
@@ -80,11 +81,28 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     #"iso": 0.06,
                     "id": "mvaFall17V2noIso_WPL",
                 },
-                "Muon": {
+                "Muon": { 
                     "pt": 10.0,
                     "eta": 2.4,
-                    "id": "mediumId",
-                    "iso": 0.20,
+                    "id": "looseId",
+                    "iso": 0.40,
+                }
+            }
+        )
+
+        cleaning_criteria = SimpleNamespace(
+            object_preselection = {
+                "Electron": {
+                    "pt": 38.0,
+                    "eta": 2.5,
+                    #"iso": 0.06,
+                    "id": "mvaFall17V2noIso_WPL",
+                },
+                "Muon": { 
+                    "pt": 30.0,
+                    "eta": 2.4,
+                    "id": "looseId",
+                    "iso": 0.25,
                 }
             }
         )
@@ -104,9 +122,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         mask3 = (
             (np.abs(ev.ElectronLoose.dxy) < 0.05) & (np.abs(ev.ElectronLoose.eta) < 1.479) & (np.abs(ev.ElectronLoose.dz) < 0.1) 
         ) | (
-            (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.5) & (np.abs(ev.ElectronLoose.dz) < 0.2) & (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
+            (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.5) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
         )
-        ev["ElectronLoose"] = ev.ElectronLoose[mask3 & (ev.ElectronLoose.cutBased >= 3)]
+        ev["ElectronLoose"] = ev.ElectronLoose[mask3]
         leptons = ak.with_name(
             ak.concatenate([ev.MuonGood, ev.ElectronGood], axis=1),
             "PtEtaPhiMCandidate",
@@ -117,18 +135,47 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         )
         ev["LeptonLoose"] = loose_lep[ak.argsort(loose_lep.pt, ascending=False)]
 
+        ####### leptons for jet cleaning ##########
+
+        ev["MuonClean"]     = lepton_selection(ev, "Muon", cleaning_criteria)
+        mask4 = (
+            (np.abs(ev.MuonClean.dxy) < 0.02) & (np.abs(ev.MuonClean.eta) < 1.479) & (np.abs(ev.MuonClean.dz) < 0.1) & (np.abs(ev.MuonClean.pt) > 20)
+        ) | (
+            (np.abs(ev.MuonClean.dxy) < 0.02) & (np.abs(ev.MuonClean.eta) >= 1.479) & (np.abs(ev.MuonClean.eta) < 2.4) & (np.abs(ev.MuonClean.dz) < 0.1) & (np.abs(ev.MuonClean.pt) > 20)
+        ) | (
+            (np.abs(ev.MuonClean.pt) <= 20) & (np.abs(ev.MuonClean.dxy) < 0.01) & (np.abs(ev.MuonClean.dz) < 0.1)
+        )
+        ev["MuonClean"] = ev.MuonClean[mask4]
+        ev["ElectronClean"] = lepton_selection(ev, "Electron", cleaning_criteria)
+
+        mask3 = (
+            (np.abs(ev.ElectronClean.dxy) < 0.05) & (np.abs(ev.ElectronClean.eta) < 1.479) & (np.abs(ev.ElectronClean.dz) < 0.1) 
+        ) | (
+            (np.abs(ev.ElectronClean.dxy) < 0.1) & (np.abs(ev.ElectronClean.eta) >= 1.479) & (np.abs(ev.ElectronClean.eta) < 2.5) & (np.abs(ev.ElectronClean.dz) < 0.2) #& (ev.ElectronClean.sieie < 0.03) & (ev.ElectronClean.eInvMinusPInv < 0.014)
+        )
+        ev["ElectronClean"] = ev.ElectronClean[mask3]
+        leptons = ak.with_name(
+            ak.concatenate([ev.MuonGood, ev.ElectronGood], axis=1),
+            "PtEtaPhiMCandidate",
+        )
+        clean_lep = ak.with_name(
+            ak.concatenate([ev.MuonClean, ev.ElectronClean], axis=1),
+            "PtEtaPhiMCandidate",
+        )
+        ev["LeptonClean"] = clean_lep[ak.argsort(clean_lep.pt, ascending=False)]
+
         ev["LeptonGood"] = leptons[ak.argsort(leptons.pt, ascending=False)]
 
         lead_lep = ak.firsts(ev.LeptonGood)
         #lep_i = ak.fill_none(getattr(lead_lep, "jetIdx", None), -1)
         
         #print(ev.LeptonGood.fields)
-        ev["JetGood"], _ = jet_selection(ev, "Jet", self.params, "2017","LeptonLoose") #MAYBE THIS SHOULD BE LOOSE LEPTON
+        ev["JetGood"], _ = jet_selection(ev, "Jet", self.params, self._year,"LeptonClean") #MAYBE THIS SHOULD BE LOOSE LEPTON
         #ev["JetGood"] = ev.JetClean[ev.JetClean.pt > 30]
         #ev["JetGood"] = ev.Jet[(ev.Jet.jetId >= 6)&(ev.Jet.pt > 30)]
         #ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
 
-        ev["FatJetGood"], _ = jet_selection(ev,"FatJet", self.params, "2017", "LeptonGood")
+        ev["FatJetGood"], _ = jet_selection(ev,"FatJet", self.params, self._year, "LeptonGood")
         ev["FatJetGood", "idx"] = ak.local_index(ev.FatJetGood, axis=1)
         dR_fatjets_lep = ev.FatJetGood.metric_table(ev.LeptonGood)
         mask_lepjet_cleaning = ak.prod(dR_fatjets_lep > 0.8, axis=2) == 1
@@ -170,12 +217,12 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         
         # b-tagging 
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.15)
-        #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.1355) #& (ev.JetGood.pt > 20) NANO V9
+        b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.1522) #& (ev.JetGood.pt > 20) NANO V9
         # b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
-        b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.1355) #TEST EVAL FOR AK8 BTAG
+        b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.15) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
         ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
-        # ev["BJet_csv"] = ev.JetGood[b_mask]
+        ev["BJet_csv"] = ev.JetGood[b_mask]
         ev["BJetGood"] = btagging(
             ev.JetGood[np.abs(ev.JetGood.eta) < 2.5],
             self.params.btagging.working_point[self._year],
@@ -363,13 +410,15 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["mt_w_leptonic"] = np.sqrt( #CHANGED mT DEFINITION TO USE DeepMETResolutionTune
             2.0 * lead_lep.pt * ev.DeepMETResolutionTune.pt * (1.0 - np.cos(lead_lep.delta_phi(ev.DeepMETResolutionTune)))
         )
-        met = vector.awk(
-            pt=ev.DeepMETResolutionTune.pt,
-            phi=ev.DeepMETResolutionTune.phi,
-            eta=0,
-            mass=0
-        )
-        w_lep = met + lead_lep
+        # met = ak.zip({
+        #     "pt": ev.DeepMETResolutionTune.pt,
+        #     "eta": 0,
+        #     "phi": ev.DeepMETResolutionTune.phi,
+        #     "mass": 0,
+        #     }, with_name="PtEtaPhiMCandidate")
+
+        w_boson_lep_pt = np.sqrt((ev.DeepMETResolutionTune.pt * np.cos(ev.DeepMETResolutionTune.phi) + lead_lep.pt * np.cos(lead_lep.phi))**2 +  (ev.DeepMETResolutionTune.pt * np.sin(ev.DeepMETResolutionTune.phi) + lead_lep.pt * np.sin(lead_lep.phi))**2)
+        w_boson_lep_phi = np.arctan((ev.DeepMETResolutionTune.pt * np.sin(ev.DeepMETResolutionTune.phi) + lead_lep.pt * np.sin(lead_lep.phi) )/(ev.DeepMETResolutionTune.pt * np.cos(ev.DeepMETResolutionTune.phi) + lead_lep.pt * np.cos(lead_lep.phi)))
         whad = ev.w_had_jets.jet1 + ev.w_had_jets.jet2
         # print("w leptonic pT: ", w_lep.pt)
 
@@ -426,8 +475,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["lead_wlep_wjet1_dphi"] = delta_phi(lead_lep.phi, wj1.phi)
         ev["lead_wlep_wjet2_dphi"] = delta_phi(lead_lep.phi, wj2.phi)
         #dPhi between lep w and had w (boost,resolved)
-        ev["w_lep_w_resolved_dphi"] = delta_phi(w_lep.phi, whad.phi)
-        ev["w_lep_w_boost_dphi"] = delta_phi(w_lep.phi, wfj.phi)
+        ev["w_lep_w_resolved_dphi"] = delta_phi(w_boson_lep_phi, whad.phi)
+        ev["w_lep_w_boost_dphi"] = delta_phi(w_boson_lep_phi, wfj.phi)
 
         #dEta, dR between lead lepton and vbs jets
         ev["lead_wlep_vbsjet1_dR"] = ak.fill_none(lead_lep.delta_r(v1), np.nan)
@@ -577,8 +626,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['neutrino_eta'] = ak.fill_none(np.arcsinh(ev.neutrino_pz / ev.DeepMETResolutionTune.pt),np.nan)
         ev['lead_wlep_neutrino_deta']  = np.abs(lead_lep.eta - ev.neutrino_eta)
         ev['lead_wlep_neutrino_dR'] = np.sqrt(ev.lead_wlep_neutrino_deta**2 + ev.lead_wlep_MET_dphi**2)
-        ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
-        ev['wleptonic_pt'] = ak.fill_none((ev.DeepMETResolutionTune + lead_lep).pt, np.nan)
+        ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_boson_lep_pt)),np.nan)
+        ev['wleptonic_pt'] = ak.fill_none(w_boson_lep_pt, np.nan)
 
         ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
         ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1,v2),np.nan)
@@ -684,6 +733,37 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                 ev["dphi", f"{names[i]}_{names[j]}"] = dphi
                 ev["dR",   f"{names[i]}_{names[j]}"] = dR
                 ev["mass", f"{names[i]}_{names[j]}"] = mass
+        if hasattr(self.params, 'classifiers'):
+            for region in ["boosted_mu","boosted_e","resolved_mu","resolved_e"]:
+                arrays_to_stack = []
+                y_pred = []
+                for imodel,model_path in enumerate(self.params.classifiers[self._year][region]):
+                    model = xgb.XGBClassifier()
+                    model.load_model(model_path)
+                    if imodel == 0:
+                        features = model.get_booster().feature_names
+                        for name in features:
+                            if name.startswith("events_n"):
+                                field_name = name.replace("events_n", "")
+                                val = eval(f"ak.num(ev.{field_name})")
+                            elif name.startswith("events_"):
+                                field_name = name.replace("events_", "")
+                                val = ev[field_name]
+                            elif name.startswith("w_had_jets_"):
+                                field_name = name.replace("w_had_jets_", "")
+                                val = eval(f"ev.w_had_jets.{field_name}")
+                            elif "_" in name:
+                                path = name.replace("_", ".", 1)
+                                val = eval(f"ev.{path}")
+                            else:
+                                val = ev[name]
+                            if val.ndim > 1:
+                                val = ak.pad_none(val, 1, axis=1)[:, 0]
+                            val = ak.fill_none(val, np.nan)
+                            arrays_to_stack.append(ak.to_numpy(val))
+                        X_test = np.column_stack(arrays_to_stack)
+                    y_pred.append(model.get_booster().inplace_predict(X_test))
+                ev[f"bdt_{region}"] = np.mean(np.array(y_pred),axis=0)
 
     def count_objects(self, variation):
         ev = self.events
@@ -695,7 +775,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nJetGood"]      = ak.num(ev.JetGood)
         ev["nJetGood30"]      = ak.num(ev.JetGood30)
         ev["nBJetGood"]     = ak.num(ev.BJetGood)
-        # ev["nBJet_upart"]     = ak.num(ev.BJet_upart)
+        ev["nBJet_csv"]     = ak.num(ev.BJet_csv)
         ev["nBJet_ak8"]     = ak.num(ev.BJet_ak8)
         ev["nCentralJetsGood"] = ak.num(ev.CentralJetsGood)
         ev["nFatJetGood"] = ak.num(ev.FatJetGood)

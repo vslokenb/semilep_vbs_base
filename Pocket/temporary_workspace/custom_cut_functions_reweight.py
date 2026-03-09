@@ -28,47 +28,12 @@ met_skim_cut = Cut(name="met_skim", params={}, function=met_skim)
 # ---------- Preselection semileptonic VBS ----------
 def select_vbs_semileptonic(events, params, **kwargs):
     
-    #pu_pv_corrections = (events.PV.npvsGood < 55) | (events.PV.npvsGood > 60) 
-    one_lep = (events.nLeptonGood >=1)
-    
-    # two_j  = (events.nJetGood30    >= 2)
-    # met_cut = (events.PuppiMET.pt      >  params["met_pt"]) #USE PUPPIMET NOT PF MET
-
-    #good_bjet =events.JetGood[(np.abs(events.JetGood.eta) < 2.5) & (np.abs(events.JetGood.partonFlavour) == 5)]
-    
-    #dR_investigation = (events.Jet.jetId >= 6)
-    # wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
-    # wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < params["wjj_pt"])
-
-    cut_mt_w = (events.mt_w_leptonic < 185.0)
-
-    # veto b optional
-
-    #b_veto = (events.nBJet_csv == 0) if params.get("apply_b_veto", True) else True
-    #b_veto_gen = (ak.num(good_bjet) == 0)
-    # if params.get("require_lep_central", False):
-    lep = ak.firsts(events.LeptonGood)
-    #     j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
-    #     j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
-
-    #     j1_eta = ak.fill_none(getattr(j1, "eta", None), np.nan)
-    #     j2_eta = ak.fill_none(getattr(j2, "eta", None), np.nan)
-    #     lep_eta = ak.fill_none(getattr(lep, "eta", None), np.nan)
-
-    #     j1_pt_min = (j1.pt > 50)
-        #j2_pt_min = (j2.pt > 30)
-
-    #     eta_min = np.minimum(j1_eta, j2_eta)
-    #     eta_max = np.maximum(j1_eta, j2_eta)
-    #     #lep_central = 
-    #     lep_central = (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) & (lep.pt > 35.0) & j1_pt_min
-    # else:
-    #     lep_central = True
-    one_loosest_lep = (ak.num(events.Muon) == 1) #& (ak.num(events.Electron) == 0)
-
+    one_loosest_mu = (ak.num(events.Muon) >= 1) #& (ak.num(events.Electron) == 0)
+    one_loosest_ele = (ak.num(events.Electron) >= 1)
     # ht_mask = (events.LHE.HT <= 70.)
-    #w_pt_stitch = (events.gen_w_pt_by_pdg < 100)
-    mask = one_lep #& w_pt_stitch#& ht_mask#& met_cut & two_j & cut_mt_w & b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
+    
+    # w_pt_stitch = (events.gen_w_pt_by_pdg < 100)
+    mask = (one_loosest_mu | one_loosest_ele) #& ht_mask#& w_pt_stitch#& ht_mask#& met_cut & two_j & cut_mt_w & b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(

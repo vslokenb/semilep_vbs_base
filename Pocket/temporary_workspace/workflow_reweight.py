@@ -9,7 +9,7 @@ import vector
 import math
 
 vector.register_awkward()
-
+#### NEEDS TO HAVE LEPTON SELECTIONS FIXED BEFORE BEING USED AGAIN
 class VBSSemileptonicProcessor(BaseProcessorABC):
     """
         - Build LeptonGood and JetGood (lepton-clean)
@@ -346,7 +346,13 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["mt_w_leptonic"] = np.sqrt( #CHANGED mT DEFINITION TO USE PUPPIMET
             2.0 * lead_lep.pt * ev.PuppiMET.pt * (1.0 - np.cos(lead_lep.delta_phi(ev.PuppiMET)))
         )
-        w_lep = ev.PuppiMET + lead_lep
+        met = vector.awk(
+            pt=ev.DeepMETResolutionTune.pt,
+            phi=ev.DeepMETResolutionTune.phi,
+            eta=0,
+            mass=0
+        )
+        w_lep = met + lead_lep
         whad = ev.w_had_jets.jet1 + ev.w_had_jets.jet2
         # print("w leptonic pT: ", w_lep.pt)
 
@@ -562,19 +568,41 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
 
         ev["ht_sum"] = ak.sum(ev.Jet.pt, axis=1)
-
-        # ## STITCHING PROCEDURE
-        # dress_lep = ak.firsts(ev.GenDressedLepton)
-        # gen_met = ev.GenMET
         
-        # ev["gen_w_pt_dressed"] = (dress_lep + gen_met).pt
-        # w_pt_dressed = ak.firsts(ev.gen_w_pt_dressed, axis=-1)
-        # # First, get W pT by PDG
-        # w_pt_direct = ak.firsts(ev.GenPart[abs(ev.GenPart.pdgId) == 24].pt, axis=-1)
-        # ev["gen_w_pt_by_pdg"] = ak.fill_none(w_pt_direct, w_pt_dressed)
+        ev["st_gen"] = ak.sum(ev.GenJet[ev.GenJet.pt > 20].pt, axis=1)
 
-        ###### END STITCHING PROCEDURE
-        #ev["st_gen"] = ak.sum(ev.GenJet[ev.GenJet.pt > 15].pt, axis=1)
+        # neutrino_gen = ev.GenPart[(abs(ev.GenPart.pdgId) == 12) | (abs(ev.GenPart.pdgId) == 14) |  (abs(ev.GenPart.pdgId) == 16)]
+        # lepton_gen = ev.GenPart[(abs(ev.GenPart.pdgId) == 11) | (abs(ev.GenPart.pdgId) == 13) |  (abs(ev.GenPart.pdgId) == 15)]
+        # gen_ln = ak.concatenate([neutrino_gen, lepton_gen], axis=1)
+        # gen_pairs = ak.combinations(gen_ln, 2, fields=["p1", "p2"])
+        # pdg1 = gen_pairs.p1.pdgId
+        # pdg2 = gen_pairs.p2.pdgId
+        # is_neutrino_first = (abs(pdg1) % 2 == 0)
+        # same_gen = (abs(pdg1) - abs(pdg2) == 1)
+        # opposite_sign = (np.sign(pdg1) != np.sign(pdg2))
+        
+        # mother_idx1 = gen_pairs.p1.genPartIdxMother
+        # mother_idx2 = gen_pairs.p2.genPartIdxMother
+        # mother_pdg1 = ev.GenPart.pdgId[mother_idx1]
+        # mother_pdg2 = ev.GenPart.pdgId[mother_idx2]
+        # is_same_mother = (mother_idx1 == mother_idx2)
+        # is_w = (abs(mother_pdg1) == 24)
+
+        # gen_pairs_lv = gen_pairs[is_neutrino_first & same_gen & opposite_sign & is_same_mother & is_w]
+        # ev["gen_w_pt_ugly_sum"] = ak.fill_none((gen_pairs_lv.p1 + gen_pairs_lv.p2).pt ,np.nan) 
+        
+        dress_lep = ak.firsts(ev.GenDressedLepton)
+        gen_met = ev.GenMET
+        
+        ev["gen_w_pt_dressed"] = (dress_lep + gen_met).pt
+        w_pt_dressed = ak.firsts(ev.gen_w_pt_dressed, axis=-1)
+        # # # First, get W pT by PDG
+        w_pt_direct = ak.firsts(ev.GenPart[abs(ev.GenPart.pdgId) == 24].pt, axis=-1)
+
+        ev["gen_w_pt_by_pdg"] = ak.fill_none(w_pt_direct, w_pt_dressed)
+        # ev["gen_w_pt_by_pdg"] = ak.fill_none(ak.firsts(ev.GenPart[abs(ev.GenPart.pdgId) == 24].pt),ev.gen_w_pt_dressed)
+
+        
         #genJetIdx_nested = ev.Jet.genJetIdx
 
         # # Replace empty lists with [-1] (meaning: no match)

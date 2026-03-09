@@ -3,11 +3,14 @@ import os, cloudpickle
 from pocket_coffea.utils.configurator import Configurator
 from pocket_coffea.lib.cut_functions import get_HLTsel, get_nPVgood, goldenJson, eventFlags
 from pocket_coffea.parameters.cuts import passthrough
-from pocket_coffea.parameters.histograms import HistConf, Axis
+from pocket_coffea.parameters.histograms import *
 from pocket_coffea.lib.weights.common import common_weights
+from pocket_coffea.parameters import defaults
+from pocket_coffea.lib.columns_manager import ColOut
 from pocket_coffea.lib.weights.common.common import SF_L1prefiring
 from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
-from pocket_coffea.parameters import defaults
+
+
 import numpy as np
 import awkward as ak
 from pocket_coffea.lib.weights import WeightWrapper, WeightData, WeightDataMultiVariation, WeightLambda
@@ -16,9 +19,10 @@ from pocket_coffea.lib.scale_factors import sf_pileup_reweight
 safe_weights_classes = [w for w in common_weights if w.name not in ["signOf_genWeight"]]
 
 
-import workflow_pre, custom_cut_functions_pre
-from workflow_pre import VBSSemileptonicProcessor
-from custom_cut_functions_pre import (
+import workflow_reweight, custom_cut_functions_reweight, reweighting_st
+from workflow_reweight import VBSSemileptonicProcessor
+from reweighting_st import ratio_function
+from custom_cut_functions_reweight import (
    nLepton_skim_cut,
    # nJet_skim_cut,
     vbs_semileptonic_presel,
@@ -38,40 +42,9 @@ from custom_cut_functions_pre import (
 )
 
 
-# class PileupWeight(WeightWrapper):
-#     name = "PileupWeight"
-#     has_variations = True
-
-#     def __init__(self, parameters, metadata):
-#         super().__init__(parameters, metadata)
-#         self.year = metadata["year"]
-#         self._variations = parameters.pileupJSONfiles[self.year]["variations"]
-#         self.params = parameters
-
-#     def compute(self, events, size, shape_variation):
-#         if shape_variation == "nominal":
-#             sf, sfup, sfdown = sf_pileup_reweight(self.params, events, self.year)
-#             sf_data = {
-#                 "nominal": sf,
-#                 "up": sfup,
-#                 "down": sfdown
-#             }
-#             return WeightDataMultiVariation(
-#                 name=self.name,
-#                 nominal=sf_data["nominal"],
-#                 variations=self._variations["up"] + self._variations["down"],
-#                 up=[sf_data[var] for var in self._variations["up"]],
-#                 down=[sf_data[var] for var in self._variations["down"]]
-#             )
-#         else:
-#             return WeightData(
-#                 name=self.name,
-#                 nominal=np.ones(size),
-#             )
-
-
-cloudpickle.register_pickle_by_value(workflow_pre)
-cloudpickle.register_pickle_by_value(custom_cut_functions_pre)
+cloudpickle.register_pickle_by_value(workflow_reweight)
+cloudpickle.register_pickle_by_value(reweighting_st)
+cloudpickle.register_pickle_by_value(custom_cut_functions_reweight)
 
 localdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -86,7 +59,6 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/triggers.yaml",
     f"{localdir}/params/plotting.yaml",
     f"{localdir}/params/pileup.yaml",
-    f"{localdir}/params/lepton_scale_factors.yaml",
     update=True,
 )
 
@@ -97,12 +69,12 @@ PileupWeight = WeightLambda.wrap_func(
     has_variations=True  # no list of variations it means only up and down
     )
 
-# SF_L1prefiring = WeightLambda.wrap_func(
-#     name="sf_L1prefiring",
-#     function=lambda params, metadata, events, size, shape_variations:
-#         sf_L1prefiring(events),
-#     has_variations=True
-#     )
+wjet_reweight = WeightLambda.wrap_func(
+    name="wjet_reweight",
+    function=lambda params, metadata, events, size, shape_variations:
+       ratio_function(ak.sum(events.GenJet[events.GenJet.pt > 20].pt, axis=1)),
+    has_variations=False
+    )
 
 
 cfg = Configurator(
@@ -150,11 +122,11 @@ cfg = Configurator(
             f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
-            f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
 
             f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
@@ -238,16 +210,17 @@ cfg = Configurator(
             #########
             ## RUN 2 BKG
             #########
-            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # "WJetsToLNu_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # "WJetsToLNu_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # "WJetsToLNu_Pt-400To600_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # "WJetsToLNu_Pt-600ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            #"WJetsToLNu_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            #"WJetsToLNu_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            #"WJetsToLNu_Pt-400To600_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            #"WJetsToLNu_Pt-600ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+
+            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -280,13 +253,13 @@ cfg = Configurator(
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_fix2",
             # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_fix2",
             
-            #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             # "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
-            #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
+            #"DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -303,28 +276,28 @@ cfg = Configurator(
             # "DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8",
             # # "DYJetsToLL_M-4to50_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
-            #"ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
-            #"ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-            # # #"ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
+            #"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            #"TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
+            # "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+            # #"ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
             # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8", 
             # "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8", 
-            # # "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV", 
-            # # "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV", 
-            # # "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
-            # # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8", 
-            # # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8", 
-            # # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8", 
-            # # "WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8", 
-            # # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
-            # # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8", 
+            # "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV", 
+            # "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV", 
+            # "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", 
+            # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8", 
+            # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8", 
+            # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8", 
+            # "WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8", 
+            # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8", 
         
                         
             # #########
@@ -350,9 +323,9 @@ cfg = Configurator(
 
             #########
             ## SOME DATA
-            #########
-            # "SingleMuon", ## 2017B Single Muon dataset
-            "SingleElectron",
+            # #########
+            # "SingleMuon", ## 2017 Single Muon dataset
+            # "SingleElectron",## 2017 Single Electron dataset
             ],
             "year": ["2017"],
         },
@@ -377,12 +350,12 @@ cfg = Configurator(
     categories={
         "baseline": [passthrough],
         # # # "whad_peak_e": [whad_window_cut_e],  # |mjj^W - 80.4| < window
-        "z_check_e": [z_check_e],
-        "z_check_mu": [z_check_mu],
+        # "z_check_e": [z_check_e],
+        # "z_check_mu": [z_check_mu],
         "w_check_e":  [w_check_e],
         "w_check_mu":  [w_check_mu],
-        "z_check_e_2j": [z_check_e_2j],
-        "z_check_mu_2j": [z_check_mu_2j],
+        # "z_check_e_2j": [z_check_e_2j],
+        # "z_check_mu_2j": [z_check_mu_2j],
         "w_check_e_2j":  [w_check_e_2j],
         "w_check_mu_2j":  [w_check_mu_2j],
         # #"whad_peak_mu": [whad_window_cut_mu],  # |mjj^W - 80.4| < window
@@ -393,9 +366,30 @@ cfg = Configurator(
 
     # calibrators=[],
     #systematic_variations=[],
-    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring],#+[SF_ele_trigger],
-    weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_L1prefiring","sf_mu_trigger","sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}},
-    variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_L1prefiring","sf_mu_trigger", "sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
+    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight],
+    weights={"common": {"inclusive": ["genWeight", "lumi", "XS","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_L1prefiring","sf_mu_trigger", "sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]},
+        "bysample": {
+               "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
+                     "inclusive": ["wjet_reweight"],},
+            }    
+        },
+    variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_L1prefiring","sf_mu_trigger", "sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
 
    
     variables={
@@ -578,12 +572,17 @@ cfg = Configurator(
         # #"flav_genjet_parton":       HistConf([Axis(coll="matched_gen_to_b", field="partonFlavour", bins=20, start=-10, stop=10, label="gen jet matchedflav (parton))")]),
         #"flav_jet_parton":       HistConf([Axis(coll="BJet_csv", field="partonFlavour", bins=20, start=-10, stop=10, label="b jet flav (parton))")]),
 
-        # "HT_check":     HistConf([Axis(coll="LHE", field="HT", label="LHE HT", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
-        # "HT_check_fine":     HistConf([Axis(coll="LHE", field="HT", label="LHE HT", type="variable", bins=[0,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,1460,1720,1980,2240,2500,2800,3200,3500])]),
-        "HT_sum":       HistConf([Axis(coll="events", field="ht_sum", bins=35, start=0, stop=3500, label="reco HT")]),
-        "HT_sum_fine":     HistConf([Axis(coll="events", field="ht_sum", label="reco HT", type="variable", bins=[0,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,1460,1720,1980,2240,2500,2800,3200,3500])]),
+        "HT_check":     HistConf([Axis(coll="LHE", field="HT", label="LHE HT", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
+        "HT_check_fine":     HistConf([Axis(coll="LHE", field="HT", label="LHE HT", type="variable", bins=[0,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,1460,1720,1980,2240,2500,2800,3200,3500])]),
+        "HT_sum":       HistConf([Axis(coll="events", field="ht_sum", bins=35, start=0, stop=3500, label="reco HT [GeV]")]),
+        "HT_sum_fine":     HistConf([Axis(coll="events", field="ht_sum", label="reco HT [GeV]", type="variable", bins=[0,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,1460,1720,1980,2240,2500,2800,3200,3500])]),
         
-        # "ST_gen_jet":     HistConf([Axis(coll="events", field="ht_gen", label="gen ST", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
-        # "ST_fine_gen_jet": HistConf([Axis(coll="events", field="ht_gen", label="gen ST", type="variable", bins=[0,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,1460,1720,1980,2240,2500,2800,3200,3500])]),
+        "ST_gen_jet":     HistConf([Axis(coll="events", field="st_gen", label="gen ST [GeV]", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
+        "ST_fine_gen_jet": HistConf([Axis(coll="events", field="st_gen", label="gen ST [GeV]", type="variable", bins=[0,10,20,30,40,50,60,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,2500,3500])]),
+        # # # "gen_w_pt_ugly": HistConf([Axis(coll="events", field="gen_w_pt_ugly_sum", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
+        "gen_w_pt_by_pdg": HistConf([Axis(coll="events", field="gen_w_pt_by_pdg", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
+        # "gen_w_pt_dressed": HistConf([Axis(coll="events", field="gen_w_pt_dressed", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
+    
+    
     },
 )

@@ -44,7 +44,7 @@ def select_vbs_semileptonic(events, params, **kwargs):
 
     # veto b optional
 
-    #b_veto = (events.nBJet_csv == 0) if params.get("apply_b_veto", True) else True
+    #b_veto = (events.nBJetGood == 0) if params.get("apply_b_veto", True) else True
     #b_veto_gen = (ak.num(good_bjet) == 0)
     # if params.get("require_lep_central", False):
     lep = ak.firsts(events.LeptonGood)
@@ -133,7 +133,7 @@ whad_window_cut_mu = Cut(
 def in_whad_window_bveto_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
     four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
+    b_veto = (events.nBJetGood >= 1) 
     no_fat = (events.nFatJetCandidate180 == 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
@@ -182,7 +182,7 @@ whad_window_cut_bveto_mu = Cut(
 def in_msd_window_fatjet_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
     #yes_fat = (events.nFatJetCentral >= 1)
-    b_veto = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto = (events.nBJetGood >= 1) | (events.nBJet_ak8 > 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt", None)), np.nan)
@@ -288,7 +288,7 @@ whad_window_cut_e = Cut(
 def in_whad_window_bveto_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
     four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
+    b_veto = (events.nBJetGood >= 1) 
     no_fat = (events.nFatJetCandidate180 == 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
@@ -336,7 +336,7 @@ whad_window_cut_bveto_e = Cut(
 def in_msd_window_fatjet_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
     #yes_fat = (events.nFatJetCentral >= 1)
-    b_veto = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto = (events.nBJetGood >= 1) | (events.nBJet_ak8 > 0)
 
     loose_lep_veto = (events.nLeptonLoose < 2)
     yes_fat = (events.nFatJetCandidate == 1)
@@ -393,7 +393,7 @@ msd_window_cut_e = Cut(
 def whad_window_no_loose_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 >= 1) & (events.nMuonGood30 == 0)
     four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
+    b_veto = (events.nBJetGood >= 1) 
     no_fat = (events.nFatJetCandidate180 == 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
@@ -439,7 +439,7 @@ whad_window_cut_no_loose_e = Cut(
 def whad_window_cut_no_jet4_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
     four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
+    b_veto = (events.nBJetGood >= 1) 
     no_fat = (events.nFatJetCandidate180 == 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
@@ -485,7 +485,7 @@ whad_window_cut_no_jet4_e = Cut(
 def whad_window_cut_no_fj0_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
     four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
+    b_veto = (events.nBJetGood >= 1) 
     no_fat = (events.nFatJetCandidate180 == 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)

@@ -74,6 +74,7 @@ def calculate_signal_strength(full_dict, n_bins=0):
     print("signal: ", signal)
     print("background: ",background)
     return signal/np.sqrt(background)
+    
 group_of_samples= extract_yields_from_file("outputs/stable_UL_v0/output_merged_stable_UL_v0.coffea")
 
 strength=[]

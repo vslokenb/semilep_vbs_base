@@ -11,18 +11,30 @@ def overwrite_xsec(source_json, target_json, output_json):
 
     for sample in common_samples:
         try:
+            # Take xsec from first file in source
             source_xsec = source[sample]["files"][0]["metadata"]["xsec"]
-            target[sample]["files"][0]["metadata"]["xsec"] = source_xsec
+
+            # --- propagate to sample level (optional but recommended)
+            # target[sample]["xsec"] = source_xsec
+
+            # --- propagate to ALL file entries
+            for file_entry in target[sample].get("files", []):
+                file_entry.setdefault("metadata", {})
+                file_entry["metadata"]["xsec"] = source_xsec
+
         except (KeyError, IndexError, TypeError):
             print(f"⚠️  Skipping {sample}: xsec path not found")
 
     with open(output_json, "w") as f:
         json.dump(target, f, indent=2)
 
+    print(f"✅ Wrote updated JSON to {output_json}")
+
+
 
 # example usage
 overwrite_xsec(
-    source_json="v15_soup.json",
-    target_json="2018_bkg.json",
-    output_json="2018_bkg_with_xsec.json"
+    source_json="rare_2018.json_with_xsec.json",
+    target_json="all_2016_bkg_with_xsec.json",
+    output_json="all_2016_bkg_with_xsec.json"
 )
