@@ -1,0 +1,37 @@
+classifiers:
+  "2016_PreVFP":
+    boosted_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PreVFP_best_iter_70.json
+    boosted_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PreVFP_best_iter_70.json
+    resolved_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PreVFP_best_iter_227.json
+    resolved_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PreVFP_best_iter_227.json
+  "2016_PostVFP":
+    boosted_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+    boosted_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+    resolved_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_242.json
+    resolved_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_242.json
+  "2018":
+    boosted_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+    boosted_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+    resolved_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
+    resolved_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
+  "2017":
+    boosted_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+    boosted_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+    resolved_mu:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
+    resolved_e:
+      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json

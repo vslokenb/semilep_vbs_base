@@ -17,6 +17,10 @@ lepton_scale_factors:
       mvaFall17V2Iso_WP90: wp90iso
       mvaFall17V2noIso_WP80: wp80noiso
       mvaFall17V2noIso_WP90: wp90noiso
+      tight: Tight
+      medium: Medium
+      loose: Loose
+      veto: Veto
 
     JSONfiles: 
       '2016_PreVFP':
@@ -194,17 +198,21 @@ lepton_scale_factors:
     # needs to be provided by the user.
     trigger_sf:
       2016_PreVFP:
-        name: Electron-HLT-SF
-        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL16preVFB.json
+        name: ElectronTriggerSF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL16preVFP.json.gz
+        path: HLT_SF_Ele27_WPTight_Gsf
       2016_PostVFP:
-        name: Electron-HLT-SF
-        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL16postVFB.json
+        name: ElectronTriggerSF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL16postVFP.json.gz
+        path: HLT_SF_Ele27_WPTight_Gsf
       '2017':
-        name: Electron-HLT-SF
-        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL17.json
+        name: ElectronTriggerSF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL17.json.gz
+        path: HLT_SF_Ele35_WPTight_Gsf
       '2018':
-        name: Electron-HLT-SF
-        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL18.json
+        name: ElectronTriggerSF
+        file: /afs/cern.ch/user/v/vslokenb/vbs_semilep/ElectronTriggerSF_UL18.json.gz
+        path: HLT_SF_Ele32_WPTight_Gsf
       2022_preEE:
         2022_preEE:
         name: Electron-HLT-SF

@@ -119,7 +119,7 @@ def in_whad_window_mu(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    mask = four_j & within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & muon_ch & j2_pt_min 
+    mask = four_j & ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & muon_ch & j2_pt_min 
     return ak.values_astype(mask, np.bool_)
 
 whad_window_cut_mu = Cut(
@@ -167,7 +167,7 @@ def in_whad_window_bveto_mu(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    mask = four_j & b_veto & within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & b_veto & muon_ch & j2_pt_min 
+    mask = four_j & b_veto & ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & b_veto & muon_ch & j2_pt_min 
     return ak.values_astype(mask, np.bool_)
 
 whad_window_cut_bveto_mu = Cut(
@@ -221,7 +221,7 @@ def in_msd_window_fatjet_mu(events, params, **kwargs):
     W_vs_QCD_pNet_discrim = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "particleNet_WvsQCD", None)), np.nan) 
     isNotQCD = np.where(np.isnan(W_vs_QCD_pNet_discrim), False, W_vs_QCD_pNet_discrim > 0.709)
 
-    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & muon_ch & j2_pt_min & b_veto & isNotQCD#& jet_dR_cut 
+    mask = yes_fat & ~within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & muon_ch & j2_pt_min & b_veto & isNotQCD#& jet_dR_cut 
     return ak.values_astype(mask, np.bool_)
 
 
@@ -274,7 +274,7 @@ def in_whad_window_e(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    mask = four_j & within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & electron_ch & j2_pt_min 
+    mask = four_j & ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & electron_ch & j2_pt_min 
     return ak.values_astype(mask, np.bool_)
 
 whad_window_cut_e = Cut(
@@ -321,7 +321,7 @@ def in_whad_window_bveto_e(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    mask = four_j & b_veto & within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & b_veto & electron_ch & j2_pt_min 
+    mask = four_j & b_veto & ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & b_veto & electron_ch & j2_pt_min 
     return ak.values_astype(mask, np.bool_)
 
 whad_window_cut_bveto_e = Cut(
@@ -377,7 +377,7 @@ def in_msd_window_fatjet_e(events, params, **kwargs):
     isNotQCD = np.where(np.isnan(W_vs_QCD_pNet_discrim), False, W_vs_QCD_pNet_discrim > 0.709)
 
 
-    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & electron_ch & j2_pt_min & b_veto & isNotQCD
+    mask = yes_fat & ~within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & electron_ch & j2_pt_min & b_veto & isNotQCD
     return ak.values_astype(mask, np.bool_)
 
 
@@ -425,7 +425,7 @@ def whad_window_no_loose_e(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    mask = four_j & within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min 
+    mask = four_j & ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min 
     return ak.values_astype(mask, np.bool_)
 
 whad_window_cut_no_loose_e = Cut(
@@ -517,7 +517,7 @@ def whad_window_cut_no_fj0_e(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    mask =   within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min & loose_lep_veto
+    mask =   ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min & loose_lep_veto
     return ak.values_astype(mask, np.bool_)
 
 whad_window_cut_no_fj0_e = Cut(

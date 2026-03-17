@@ -1,0 +1,60 @@
+fakeleptonweights:
+  "2022_postEE":
+    Muon:
+      file:
+        - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_nonprompt_study_njet_met/lepton_weights.root
+      nominal:
+        - muon_pt_eta_weights_qcd_enriched_35_deepmet_resolution_3j_nominal
+      up:
+        - muon_pt_eta_weights_qcd_enriched_30_deepmet_resolution_3j_nominal
+      down:
+        - muon_pt_eta_weights_qcd_enriched_40_deepmet_resolution_3j_nominal
+    Electron:
+      file:
+        - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_nonprompt_study_njet_met/lepton_weights.root
+      nominal:
+        - electron_pt_eta_weights_qcd_enriched_35_deepmet_resolution_3j_nominal
+      up:
+        - electron_pt_eta_weights_qcd_enriched_30_deepmet_resolution_3j_nominal
+      down:
+        - electron_pt_eta_weights_qcd_enriched_40_deepmet_resolution_3j_nominal
+  "2018":
+    Muon:
+      file:
+        - /eos/user/v/vslokenb/vbs_semilep/outputs/nonprompt_estimation_tools/mar3_nonp_FR.root
+      nominal:
+        - muon_pt_eta_weights_qcd_enriched_35_deepmet_resolution_3j_nominal
+      up:
+        - muon_pt_eta_weights_qcd_enriched_30_deepmet_resolution_3j_nominal
+      down:
+        - muon_pt_eta_weights_qcd_enriched_40_deepmet_resolution_3j_nominal
+    Electron:
+      file:
+        - /eos/user/v/vslokenb/vbs_semilep/outputs/nonprompt_estimation_tools/mar3_nonp_FR.root
+      nominal:
+        - electron_pt_eta_weights_qcd_enriched_35_deepmet_resolution_3j_nominal
+      up:
+        - electron_pt_eta_weights_qcd_enriched_30_deepmet_resolution_3j_nominal
+      down:
+        - electron_pt_eta_weights_qcd_enriched_40_deepmet_resolution_3j_nominal
+  "2016_PostVFP":
+    Muon:
+      file:
+        - /eos/user/v/vslokenb/vbs_semilep/updated_lepton_mar8/nonprompt_FR/mar11_fr_weights.root
+      nominal:
+        - muon_pt_eta_weights_qcd_enriched_35_deepmet_resolution_3j_nominal
+      up:
+        - muon_pt_eta_weights_qcd_enriched_30_deepmet_resolution_3j_nominal
+      down:
+        - muon_pt_eta_weights_qcd_enriched_40_deepmet_resolution_3j_nominal
+    Electron:
+      file:
+        - /eos/user/v/vslokenb/vbs_semilep/updated_lepton_mar8/nonprompt_FR/mar11_fr_weights.root
+      nominal:
+        - electron_pt_eta_weights_qcd_enriched_35_deepmet_resolution_3j_nominal
+      up:
+        - electron_pt_eta_weights_qcd_enriched_30_deepmet_resolution_3j_nominal
+      down:
+        - electron_pt_eta_weights_qcd_enriched_40_deepmet_resolution_3j_nominal
+
+    

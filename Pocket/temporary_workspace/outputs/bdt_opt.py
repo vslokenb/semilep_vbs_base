@@ -99,11 +99,11 @@ def setup_dmatrix(input_df, norm_table, label_column="process", weight_column="w
 
 
     # exclude_cols = [label_column, "year_tag", "category", weight_column, "label", "events_genWeight", "process",  'weight_variation_PileupWeightUp', 'weight_variation_PileupWeightDown', 'weight_variation_sf_mu_idUp', 'weight_variation_sf_mu_idDown', 'weight_variation_sf_mu_isoUp', 'weight_variation_sf_mu_isoDown', 'weight_variation_sf_ele_idUp', 'weight_variation_sf_ele_idDown', 'weight_variation_sf_ele_recoUp', 'weight_variation_sf_ele_recoDown', 'weight_variation_sf_L1prefiringUp', 'weight_variation_sf_L1prefiringDown', 'weight_variation_sf_mu_triggerUp', 'weight_variation_sf_mu_triggerDown', 'weight_variation_sf_jet_puIdUp', 'weight_variation_sf_jet_puIdDown', 'weight_variation_sf_partonshower_isrUp', 'weight_variation_sf_partonshower_isrDown', 'weight_variation_sf_partonshower_fsrUp', 'weight_variation_sf_partonshower_fsrDown']
-    exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process", "w_had_jets_mass"] + \
+    exclude_cols = ["label", "year_tag", "category", "weight", "events_genWeight", "process" , "w_had_jets_mass","w_had_jets_N", "events_nCentralJetsGood", "events_nJetGood"] + \
                    [c for c in df.columns if c.startswith("weight_variation")] + \
-                   [c for c in df.columns if c.startswith("vbsjets")]
-                #    [c for c in df.columns if c.startswith("jet5")] + \
-                #    [c for c in df.columns if c.startswith("jet6")]
+                   [c for c in df.columns if c.startswith("vbsjets")] + \
+                   [c for c in df.columns if "jet5" in c] + \
+                   [c for c in df.columns if "jet6" in c]
     features = df.drop(columns=[c for c in exclude_cols if c in df.columns])
 
     X_trainval, X_test, y_trainval, y_test, w_trainval, w_test, idx_trainval, idx_test = train_test_split(
@@ -117,7 +117,7 @@ def setup_dmatrix(input_df, norm_table, label_column="process", weight_column="w
         X_trainval, y_trainval, w_trainval, idx_trainval,
         test_size=val_fraction, random_state=random_state, stratify=y_trainval
     )
-    scale_to_full_run2 = 5*1/0.1158 * (137938.0/41479.7)
+    scale_to_full_run2 = 5#*1/0.1158 * (137938.0/41479.7)
     # Create DMatrix objects
     print("start loading training matrix")
     dtrain = xgb.DMatrix(X_train, label=y_train, weight=scale_to_full_run2*abs(w_train))
@@ -148,7 +148,7 @@ def setup_dmatrix(input_df, norm_table, label_column="process", weight_column="w
 
     return dtrain, dval, dtest, idx_train, idx_val, idx_test, df, df_unit
 
-def training_bdt(dtrain, dval, num_round = 10, channel='whad_withbveto_mu'):
+def training_bdt(dtrain, dval, num_round = 500, channel='whad_withbveto_mu',year='2017'):
     params = {
         "objective": "binary:logistic",
         "eval_metric": "logloss",
@@ -164,7 +164,7 @@ def training_bdt(dtrain, dval, num_round = 10, channel='whad_withbveto_mu'):
     bdt_best = bdt[: bdt.best_iteration + 1]
 
     # Save only the *best* model
-    model_path = f"bdt/bdt_{channel}_best_iter_{bdt.best_iteration}.json"
+    model_path = f"bdt/bdt_{channel}_{year}_best_iter_{bdt.best_iteration}.json"
     bdt_best.save_model(model_path)
     print(f"Saved best model to {model_path}")
 
@@ -188,7 +188,7 @@ def plot_training_curves(evals_result, outpath="bdt/training_curves.png"):
     plt.close()
     print(f"Saved training curve to {outpath}")
 
-def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True):
+def test_bdt(bdt, dtest, dtrain, channel, year, df_test,df_train, tag="",unitary=True):
     """
     Evaluate trained BDT on a test set using the best iteration found during training.
     """
@@ -215,11 +215,11 @@ def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True)
     plt.plot([0, 1], [0, 1], "k--")
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
-    plt.title("Train vs Test ROC - BDT")
+    plt.title("Train vs Test ROC - BDT",fontsize=14)
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"bdt/roc_curve_{channel}_"+tag+".png", dpi=300)
+    plt.savefig(f"bdt/roc_curve_{channel}_{year}_"+tag+".png", dpi=300)
     plt.close()
     print("Saved ROC curve as 'roc_curve.png'")
 
@@ -361,7 +361,7 @@ def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True)
         plt.grid(True)
         plt.tight_layout()
 
-        outname = f"bdt/roc_VBS_EWK_vs_{bkg.replace('+','').replace('/','_')}_{channel}_{tag}.png"
+        outname = f"bdt/roc_VBS_EWK_vs_{bkg.replace('+','').replace('/','_')}_{channel}_{year}_{tag}.png"
         plt.savefig(outname, dpi=300)
         plt.close()
 
@@ -385,7 +385,7 @@ def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True)
     from matplotlib.cm import get_cmap
     cmap = get_cmap("tab10")
     colors = [cmap(i % 10) for i in range(len(groups))]
-    scale_to_full_run2 = 5*1/0.1158* (137938.0/41479.7)
+    scale_to_full_run2 = 5#*1/0.1158* (137938.0/41479.7)
     if unitary:
         for i, group in enumerate(groups):
             sub = df_plot[df_plot["group"] == group]
@@ -450,7 +450,8 @@ def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True)
     stack_labels = []
     stack_colors = []
     bottom = None  # to be filled after we compute first hist
-    scale_to_full_run2 = 5*1/0.1158 * (137938.0/41479.7)
+    scale_to_full_run2 = 5#*1/0.1158 * (137938.0/41479.7)
+    colors_t = [cmap(i % 10) for i in range(len(groups_t))]
 
     if unitary:
         for i, group in enumerate(groups_t):
@@ -468,7 +469,7 @@ def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True)
             if group == "Data":
                 plt.scatter(bin_centers, values_t, label=group, linewidth=1.8, marker='.',linestyle=None,color='black')
             else:
-                plt.step(bin_centers, values_t, where='mid', label=group,color=colors[i], linewidth=1.8,linestyle='--')
+                plt.step(bin_centers, values_t, where='mid', label=group,color=colors_t[i], linewidth=1.8,linestyle='--')
     else:
         # stack_values, stack_labels, stack_colors = [], [], []
         # for i, group in enumerate(groups):
@@ -525,7 +526,7 @@ def test_bdt(bdt, dtest, dtrain, channel, df_test,df_train, tag="",unitary=True)
     plt.legend(fontsize=8)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    outpath = f"bdt/bdt_discriminator_{channel}_"+tag+".png"
+    outpath = f"bdt/bdt_discriminator_{channel}_{year}_"+tag+".png"
     plt.savefig(outpath, dpi=300)
     plt.close()
     print(f"Saved discriminator plot: {outpath}")
@@ -617,7 +618,7 @@ def calculate_signal_strength(full_dict, n_bins=0):
     unc = (dx ** 2 / np.sqrt(background) ** 2 + signal ** 2 * (1 / 2 / np.sqrt(background) ** 3) ** 2 * dy ** 2) ** (1 / 2)
     return sig, unc
 
-def optimize_sig(group_of_samples,channel,n=39):
+def optimize_sig(group_of_samples,channel,year,n=39):
     strength=[]
     unc = []
     for i in range(n):
@@ -661,7 +662,7 @@ def optimize_sig(group_of_samples,channel,n=39):
         plt.yticks(np.linspace(0, 1, 6))
     plt.xlabel("BDT discrim score cut", fontsize=12)
     plt.ylabel("Significance", fontsize=12)
-    plt.title(f"BDT variable optimization - {channel}", fontsize=14)
+    plt.title(f"BDT variable optimization - {channel} {year}", fontsize=14)
     plt.grid(True, linestyle='--', alpha=0.4)
 
     # Nice tick marks
@@ -670,11 +671,12 @@ def optimize_sig(group_of_samples,channel,n=39):
 
     plt.tight_layout()
     #plt.show()
-    plt.savefig(f"bdt/optimize_bdt_{channel}.png")
+    plt.savefig(f"bdt/optimize_bdt_{channel}_{year}.png")
 def main():
     parser = argparse.ArgumentParser(description="Convert specific category from .coffea to pandas DataFrame")
     parser.add_argument("coffea_file", help="Path to input .coffea file")
     parser.add_argument("category", help="Event category key (e.g. whad_withbveto_e)")
+    parser.add_argument("year", help="Event year key (e.g. 2017)")
     parser.add_argument("--out", help="Optional output parquet/csv file", default=None)
 
     args = parser.parse_args()
@@ -707,15 +709,15 @@ def main():
     dtrain_pure= balance_signal_background_weights(dtrain)
     dval_pure= balance_signal_background_weights(dval)
     dtest_pure= balance_signal_background_weights(dtest)
-    bdt, evals_result = training_bdt(dtrain_pure, dval_pure, num_round=1000, channel=args.category)
+    bdt, evals_result = training_bdt(dtrain_pure, dval_pure, num_round=1000, channel=args.category,year=args.year)
     plot_training_curves(evals_result, outpath=f"bdt/training_curves_{args.category}.png")
     ### NORM TO 1
-    auc1, acc1, hist_data1 = test_bdt(bdt, dtest_pure, dtrain_pure, args.category,df_test_unit, df_train_unit, tag="unitary", unitary=True)
+    auc1, acc1, hist_data1 = test_bdt(bdt, dtest_pure, dtrain_pure, args.category, args.year, df_test_unit, df_train_unit, tag="unitary", unitary=True)
     ### NORM TO XSEC
-    auc2, acc2, hist_data2 = test_bdt(bdt, dtest, dtrain, args.category,df_test_xs, df_train_xs, tag="xsec", unitary=False)
+    auc2, acc2, hist_data2 = test_bdt(bdt, dtest, dtrain, args.category,args.year, df_test_xs, df_train_xs, tag="xsec", unitary=False)
    
-    plot_feature_importance(bdt,outpath=f"bdt/feature_importance_{args.category}.png")
-    optimize_sig(hist_data2,args.category)
+    plot_feature_importance(bdt,outpath=f"bdt/feature_importance_{args.category}_{args.year}.png")
+    optimize_sig(hist_data2,args.category,args.year)
 
 if __name__ == "__main__":
     main()

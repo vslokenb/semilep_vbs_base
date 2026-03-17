@@ -66,7 +66,9 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/plotting.yaml",
     f"{localdir}/params/pileup.yaml",
     f"{localdir}/params/jets_calibration.yaml",
-    # f"{localdir}/params/lumi.yaml",
+    f"{localdir}/params/lepton_scale_factors.yaml",
+    f"{localdir}/params/classifiers.yaml",
+    f"{localdir}/params/variations.yaml",
     update=True,
 )
 
@@ -167,11 +169,11 @@ cfg = Configurator(
             ## RUN 2 BKG
             #########
 
-            #"DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
 
-            #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
             
-            #"ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+            # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
             # "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
             # "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
             # "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
@@ -185,35 +187,35 @@ cfg = Configurator(
 
             
 
-            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # # "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8",
             # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # # "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
-            # # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-            # # "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-            # # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
-            # # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
-            # # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+            # "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
+            # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+            # "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+            # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
+            # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+            # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+            # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
 
-            "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
 
             
             
@@ -221,15 +223,15 @@ cfg = Configurator(
             
            
             # # ###### SIGNAL #########
-            "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
             "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
-            "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
+            # "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+            # "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
 
 
             # # # ##### DATA #######
@@ -237,7 +239,7 @@ cfg = Configurator(
             # "SingleElectron",
             # "EGamma",
             ],
-            "year": ["2017", "2016_PreVFP", "2016_PostVFP"],
+            "year": [ "2016_PostVFP"],
         },
     },
     workflow=VBSSemileptonicProcessor,
@@ -250,7 +252,7 @@ cfg = Configurator(
         nLepton_skim_cut,
         nJet_skim_cut,  
         met_skim_cut,
-        get_HLTsel(primaryDatasets=["SingleMuon", "SingleEle"]),
+        get_HLTsel(primaryDatasets=["SingleMuon", "EGamma"]),
     ],
 
     # 2) preselections 
@@ -266,16 +268,16 @@ cfg = Configurator(
         # # "whad_4jets_e":  [whad_window_cut_no_loose_e],
         # # "whad_4jets_looselep_e":  [whad_window_cut_no_fj0_e],
         # # "whad_4jets_looselep_fj_e": [whad_window_cut_e],  # |mjj^W - 80.4| < window
-        "boosted_jet_in_window_e": [msd_window_cut_e],
+        "boosted_e": [msd_window_cut_e],
         # # "whad_peak_mu": [whad_window_cut_mu],  # |mjj^W - 80.4| < window
-        "boosted_jet_in_window_mu": [msd_window_cut_mu],
-        "whad_withbveto_mu":  [whad_window_cut_bveto_mu],
-        "whad_withbveto_e": [whad_window_cut_bveto_e],
+        "boosted_mu": [msd_window_cut_mu],
+        "resolved_mu":  [whad_window_cut_bveto_mu],
+        "resolved_e": [whad_window_cut_bveto_e],
     },
 
    
-    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight],
-       weights={"common": {"inclusive": ["genWeight", "lumi", "XS","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"]},
+    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight]+[SF_ele_trigger],
+       weights={"common": {"inclusive": ["genWeight", "lumi", "XS","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"]},
         "bysample": {
                "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
                     "inclusive": ["wjet_reweight"],},
@@ -297,21 +299,21 @@ cfg = Configurator(
                      "inclusive": ["wjet_reweight"],},
             }    
         },
-        variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger", "sf_L1prefiring","sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
+        variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger", "sf_L1prefiring","sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
 
    
     variables={
-        "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Nom", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
-        "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Up", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
-        "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Dn", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
+        # "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Nom", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
+        # "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Up", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
+        # "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Dn", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
         
-        "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_Nom", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
-        "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystUp", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
-        "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystDn", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
+        # "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_Nom", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
+        # "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystUp", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
+        # "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystDn", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
         
-        "prefire_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Nom", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
-        "prefire_dn":  HistConf([Axis(coll="L1PreFiringWeight",field="Dn", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
-        "prefire_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Up", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
+        # "prefire_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Nom", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
+        # "prefire_dn":  HistConf([Axis(coll="L1PreFiringWeight",field="Dn", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
+        # "prefire_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Up", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
         
 
         # "psweight":     HistConf([Axis(coll="events", field="PSWeight", bins=30, start=-1.0, stop=12, label="PSWeight")]),
@@ -523,16 +525,201 @@ cfg = Configurator(
 
         # "HT_check":     HistConf([Axis(coll="LHE", field="HT", label="gen HT", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
         "HT_sum":       HistConf([Axis(coll="events", field="ht_sum", bins=35, start=0, stop=3500, label="reco HT [GeV]")]),
-        # "gen_w_pt":     HistConf([Axis(coll="events", field="gen_w_pt_by_pdg", bins=100, start=0, stop=1000, label="gen W pT [GeV]")])
+        
+        "bdt_boosted_mu":       HistConf([Axis(coll="events", field="bdt_boosted_mu", bins=40, start=0, stop=1, label="BDT mu boosted")]),
+        "bdt_resolved_mu":       HistConf([Axis(coll="events", field="bdt_resolved_mu", bins=40, start=0, stop=1, label="BDT mu resolved")]),
+        "bdt_boosted_e":       HistConf([Axis(coll="events", field="bdt_boosted_e", bins=40, start=0, stop=1, label="BDT e boosted")]),
+        "bdt_resolved_e":       HistConf([Axis(coll="events", field="bdt_resolved_e", bins=40, start=0, stop=1, label="BDT e resolved")]),
+        
+
+        "mass_jet1_jet2": HistConf([Axis(coll="mass", field="jet1_jet2", bins=100, start=0, stop=2000, label="mass jet1 jet2")]),
+        "mass_jet1_jet3": HistConf([Axis(coll="mass", field="jet1_jet3", bins=100, start=0, stop=2000, label="mass jet1 jet3")]),
+        "mass_jet1_jet4": HistConf([Axis(coll="mass", field="jet1_jet4", bins=100, start=0, stop=2000, label="mass jet1 jet4")]),
+        "mass_jet1_jet5": HistConf([Axis(coll="mass", field="jet1_jet5", bins=100, start=0, stop=2000, label="mass jet1 jet5")]),
+        "mass_jet1_jet6": HistConf([Axis(coll="mass", field="jet1_jet6", bins=100, start=0, stop=2000, label="mass jet1 jet6")]),
+        "mass_jet1_lepton1": HistConf([Axis(coll="mass", field="jet1_lepton1", bins=100, start=0, stop=2000, label="mass jet1 lepton1")]),
+
+        "mass_jet2_jet3": HistConf([Axis(coll="mass", field="jet2_jet3", bins=100, start=0, stop=2000, label="mass jet2 jet3")]),
+        "mass_jet2_jet4": HistConf([Axis(coll="mass", field="jet2_jet4", bins=100, start=0, stop=2000, label="mass jet2 jet4")]),
+        "mass_jet2_jet5": HistConf([Axis(coll="mass", field="jet2_jet5", bins=100, start=0, stop=2000, label="mass jet2 jet5")]),
+        "mass_jet2_jet6": HistConf([Axis(coll="mass", field="jet2_jet6", bins=100, start=0, stop=2000, label="mass jet2 jet6")]),
+        "mass_jet2_lepton1": HistConf([Axis(coll="mass", field="jet2_lepton1", bins=100, start=0, stop=2000, label="mass jet2 lepton1")]),
+
+        "mass_jet3_jet4": HistConf([Axis(coll="mass", field="jet3_jet4", bins=100, start=0, stop=2000, label="mass jet3 jet4")]),
+        "mass_jet3_jet5": HistConf([Axis(coll="mass", field="jet3_jet5", bins=100, start=0, stop=2000, label="mass jet3 jet5")]),
+        "mass_jet3_jet6": HistConf([Axis(coll="mass", field="jet3_jet6", bins=100, start=0, stop=2000, label="mass jet3 jet6")]),
+        "mass_jet3_lepton1": HistConf([Axis(coll="mass", field="jet3_lepton1", bins=100, start=0, stop=2000, label="mass jet3 lepton1")]),
+
+        "mass_jet4_jet5": HistConf([Axis(coll="mass", field="jet4_jet5", bins=100, start=0, stop=2000, label="mass jet4 jet5")]),
+        "mass_jet4_jet6": HistConf([Axis(coll="mass", field="jet4_jet6", bins=100, start=0, stop=2000, label="mass jet4 jet6")]),
+        "mass_jet4_lepton1": HistConf([Axis(coll="mass", field="jet4_lepton1", bins=100, start=0, stop=2000, label="mass jet4 lepton1")]),
+
+        "mass_jet5_jet6": HistConf([Axis(coll="mass", field="jet5_jet6", bins=100, start=0, stop=2000, label="mass jet5 jet6")]),
+        "mass_jet5_lepton1": HistConf([Axis(coll="mass", field="jet5_lepton1", bins=100, start=0, stop=2000, label="mass jet5 lepton1")]),
+
+        "mass_jet6_lepton1": HistConf([Axis(coll="mass", field="jet6_lepton1", bins=100, start=0, stop=2000, label="mass jet6 lepton1")]),
+
+        "mass_jet1_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="jet1_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass jet1 met")]),
+        "mass_jet2_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="jet2_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass jet2 met")]),
+        "mass_jet3_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="jet3_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass jet3 met")]),
+        "mass_jet4_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="jet4_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass jet4 met")]),
+        "mass_jet5_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="jet5_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass jet5 met")]),
+        "mass_jet6_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="jet6_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass jet6 met")]),
+        "mass_lepton1_DeepMETResolutionTune": HistConf([Axis(coll="mass", field="lepton1_DeepMETResolutionTune", bins=100, start=0, stop=2000, label="mass lepton1 met")]),
+
+        "dR_jet1_jet2": HistConf([Axis(coll="dR", field="jet1_jet2", bins=50, start=0, stop=6, label="dR jet1 jet2")]),
+        "dR_jet1_jet3": HistConf([Axis(coll="dR", field="jet1_jet3", bins=50, start=0, stop=6, label="dR jet1 jet3")]),
+        "dR_jet1_jet4": HistConf([Axis(coll="dR", field="jet1_jet4", bins=50, start=0, stop=6, label="dR jet1 jet4")]),
+        "dR_jet1_jet5": HistConf([Axis(coll="dR", field="jet1_jet5", bins=50, start=0, stop=6, label="dR jet1 jet5")]),
+        "dR_jet1_jet6": HistConf([Axis(coll="dR", field="jet1_jet6", bins=50, start=0, stop=6, label="dR jet1 jet6")]),
+        "dR_jet1_lepton1": HistConf([Axis(coll="dR", field="jet1_lepton1", bins=50, start=0, stop=6, label="dR jet1 lepton1")]),
+
+        "dR_jet2_jet3": HistConf([Axis(coll="dR", field="jet2_jet3", bins=50, start=0, stop=6, label="dR jet2 jet3")]),
+        "dR_jet2_jet4": HistConf([Axis(coll="dR", field="jet2_jet4", bins=50, start=0, stop=6, label="dR jet2 jet4")]),
+        "dR_jet2_jet5": HistConf([Axis(coll="dR", field="jet2_jet5", bins=50, start=0, stop=6, label="dR jet2 jet5")]),
+        "dR_jet2_jet6": HistConf([Axis(coll="dR", field="jet2_jet6", bins=50, start=0, stop=6, label="dR jet2 jet6")]),
+        "dR_jet2_lepton1": HistConf([Axis(coll="dR", field="jet2_lepton1", bins=50, start=0, stop=6, label="dR jet2 lepton1")]),
+
+        "dR_jet3_jet4": HistConf([Axis(coll="dR", field="jet3_jet4", bins=50, start=0, stop=6, label="dR jet3 jet4")]),
+        "dR_jet3_jet5": HistConf([Axis(coll="dR", field="jet3_jet5", bins=50, start=0, stop=6, label="dR jet3 jet5")]),
+        "dR_jet3_jet6": HistConf([Axis(coll="dR", field="jet3_jet6", bins=50, start=0, stop=6, label="dR jet3 jet6")]),
+        "dR_jet3_lepton1": HistConf([Axis(coll="dR", field="jet3_lepton1", bins=50, start=0, stop=6, label="dR jet3 lepton1")]),
+
+        "dR_jet4_jet5": HistConf([Axis(coll="dR", field="jet4_jet5", bins=50, start=0, stop=6, label="dR jet4 jet5")]),
+        "dR_jet4_jet6": HistConf([Axis(coll="dR", field="jet4_jet6", bins=50, start=0, stop=6, label="dR jet4 jet6")]),
+        "dR_jet4_lepton1": HistConf([Axis(coll="dR", field="jet4_lepton1", bins=50, start=0, stop=6, label="dR jet4 lepton1")]),
+
+        "dR_jet5_jet6": HistConf([Axis(coll="dR", field="jet5_jet6", bins=50, start=0, stop=6, label="dR jet5 jet6")]),
+        "dR_jet5_lepton1": HistConf([Axis(coll="dR", field="jet5_lepton1", bins=50, start=0, stop=6, label="dR jet5 lepton1")]),
+
+        "dR_jet6_lepton1": HistConf([Axis(coll="dR", field="jet6_lepton1", bins=50, start=0, stop=6, label="dR jet6 lepton1")]),
+
+        "dR_jet1_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="jet1_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR jet1 met")]),
+        "dR_jet2_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="jet2_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR jet2 met")]),
+        "dR_jet3_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="jet3_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR jet3 met")]),
+        "dR_jet4_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="jet4_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR jet4 met")]),
+        "dR_jet5_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="jet5_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR jet5 met")]),
+        "dR_jet6_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="jet6_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR jet6 met")]),
+        "dR_lepton1_DeepMETResolutionTune": HistConf([Axis(coll="dR", field="lepton1_DeepMETResolutionTune", bins=50, start=0, stop=6, label="dR lepton1 met")]),
+
+        "dphi_jet1_jet2": HistConf([Axis(coll="dphi", field="jet1_jet2", bins=64, start=-3.2, stop=3.2, label="dphi jet1 jet2")]),
+        "dphi_jet1_jet3": HistConf([Axis(coll="dphi", field="jet1_jet3", bins=64, start=-3.2, stop=3.2, label="dphi jet1 jet3")]),
+        "dphi_jet1_jet4": HistConf([Axis(coll="dphi", field="jet1_jet4", bins=64, start=-3.2, stop=3.2, label="dphi jet1 jet4")]),
+        "dphi_jet1_jet5": HistConf([Axis(coll="dphi", field="jet1_jet5", bins=64, start=-3.2, stop=3.2, label="dphi jet1 jet5")]),
+        "dphi_jet1_jet6": HistConf([Axis(coll="dphi", field="jet1_jet6", bins=64, start=-3.2, stop=3.2, label="dphi jet1 jet6")]),
+        "dphi_jet1_lepton1": HistConf([Axis(coll="dphi", field="jet1_lepton1", bins=64, start=-3.2, stop=3.2, label="dphi jet1 lepton1")]),
+
+        "dphi_jet2_jet3": HistConf([Axis(coll="dphi", field="jet2_jet3", bins=64, start=-3.2, stop=3.2, label="dphi jet2 jet3")]),
+        "dphi_jet2_jet4": HistConf([Axis(coll="dphi", field="jet2_jet4", bins=64, start=-3.2, stop=3.2, label="dphi jet2 jet4")]),
+        "dphi_jet2_jet5": HistConf([Axis(coll="dphi", field="jet2_jet5", bins=64, start=-3.2, stop=3.2, label="dphi jet2 jet5")]),
+        "dphi_jet2_jet6": HistConf([Axis(coll="dphi", field="jet2_jet6", bins=64, start=-3.2, stop=3.2, label="dphi jet2 jet6")]),
+        "dphi_jet2_lepton1": HistConf([Axis(coll="dphi", field="jet2_lepton1", bins=64, start=-3.2, stop=3.2, label="dphi jet2 lepton1")]),
+
+        "dphi_jet3_jet4": HistConf([Axis(coll="dphi", field="jet3_jet4", bins=64, start=-3.2, stop=3.2, label="dphi jet3 jet4")]),
+        "dphi_jet3_jet5": HistConf([Axis(coll="dphi", field="jet3_jet5", bins=64, start=-3.2, stop=3.2, label="dphi jet3 jet5")]),
+        "dphi_jet3_jet6": HistConf([Axis(coll="dphi", field="jet3_jet6", bins=64, start=-3.2, stop=3.2, label="dphi jet3 jet6")]),
+        "dphi_jet3_lepton1": HistConf([Axis(coll="dphi", field="jet3_lepton1", bins=64, start=-3.2, stop=3.2, label="dphi jet3 lepton1")]),
+
+        "dphi_jet4_jet5": HistConf([Axis(coll="dphi", field="jet4_jet5", bins=64, start=-3.2, stop=3.2, label="dphi jet4 jet5")]),
+        "dphi_jet4_jet6": HistConf([Axis(coll="dphi", field="jet4_jet6", bins=64, start=-3.2, stop=3.2, label="dphi jet4 jet6")]),
+        "dphi_jet4_lepton1": HistConf([Axis(coll="dphi", field="jet4_lepton1", bins=64, start=-3.2, stop=3.2, label="dphi jet4 lepton1")]),
+
+        "dphi_jet5_jet6": HistConf([Axis(coll="dphi", field="jet5_jet6", bins=64, start=-3.2, stop=3.2, label="dphi jet5 jet6")]),
+        "dphi_jet5_lepton1": HistConf([Axis(coll="dphi", field="jet5_lepton1", bins=64, start=-3.2, stop=3.2, label="dphi jet5 lepton1")]),
+
+        "dphi_jet6_lepton1": HistConf([Axis(coll="dphi", field="jet6_lepton1", bins=64, start=-3.2, stop=3.2, label="dphi jet6 lepton1")]),
+
+        "dphi_jet1_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="jet1_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi jet1 met")]),
+        "dphi_jet2_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="jet2_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi jet2 met")]),
+        "dphi_jet3_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="jet3_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi jet3 met")]),
+        "dphi_jet4_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="jet4_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi jet4 met")]),
+        "dphi_jet5_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="jet5_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi jet5 met")]),
+        "dphi_jet6_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="jet6_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi jet6 met")]),
+        "dphi_lepton1_DeepMETResolutionTune": HistConf([Axis(coll="dphi", field="lepton1_DeepMETResolutionTune", bins=64, start=-3.2, stop=3.2, label="dphi lepton1 met")]),
+
+        "deta_jet1_jet2": HistConf([Axis(coll="deta", field="jet1_jet2", bins=50, start=-5, stop=5, label="deta jet1 jet2")]),
+        "deta_jet1_jet3": HistConf([Axis(coll="deta", field="jet1_jet3", bins=50, start=-5, stop=5, label="deta jet1 jet3")]),
+        "deta_jet1_jet4": HistConf([Axis(coll="deta", field="jet1_jet4", bins=50, start=-5, stop=5, label="deta jet1 jet4")]),
+        "deta_jet1_jet5": HistConf([Axis(coll="deta", field="jet1_jet5", bins=50, start=-5, stop=5, label="deta jet1 jet5")]),
+        "deta_jet1_jet6": HistConf([Axis(coll="deta", field="jet1_jet6", bins=50, start=-5, stop=5, label="deta jet1 jet6")]),
+        "deta_jet1_lepton1": HistConf([Axis(coll="deta", field="jet1_lepton1", bins=50, start=-5, stop=5, label="deta jet1 lepton1")]),
+
+        "deta_jet2_jet3": HistConf([Axis(coll="deta", field="jet2_jet3", bins=50, start=-5, stop=5, label="deta jet2 jet3")]),
+        "deta_jet2_jet4": HistConf([Axis(coll="deta", field="jet2_jet4", bins=50, start=-5, stop=5, label="deta jet2 jet4")]),
+        "deta_jet2_jet5": HistConf([Axis(coll="deta", field="jet2_jet5", bins=50, start=-5, stop=5, label="deta jet2 jet5")]),
+        "deta_jet2_jet6": HistConf([Axis(coll="deta", field="jet2_jet6", bins=50, start=-5, stop=5, label="deta jet2 jet6")]),
+        "deta_jet2_lepton1": HistConf([Axis(coll="deta", field="jet2_lepton1", bins=50, start=-5, stop=5, label="deta jet2 lepton1")]),
+
+        "deta_jet3_jet4": HistConf([Axis(coll="deta", field="jet3_jet4", bins=50, start=-5, stop=5, label="deta jet3 jet4")]),
+        "deta_jet3_jet5": HistConf([Axis(coll="deta", field="jet3_jet5", bins=50, start=-5, stop=5, label="deta jet3 jet5")]),
+        "deta_jet3_jet6": HistConf([Axis(coll="deta", field="jet3_jet6", bins=50, start=-5, stop=5, label="deta jet3 jet6")]),
+        "deta_jet3_lepton1": HistConf([Axis(coll="deta", field="jet3_lepton1", bins=50, start=-5, stop=5, label="deta jet3 lepton1")]),
+
+        "deta_jet4_jet5": HistConf([Axis(coll="deta", field="jet4_jet5", bins=50, start=-5, stop=5, label="deta jet4 jet5")]),
+        "deta_jet4_jet6": HistConf([Axis(coll="deta", field="jet4_jet6", bins=50, start=-5, stop=5, label="deta jet4 jet6")]),
+        "deta_jet4_lepton1": HistConf([Axis(coll="deta", field="jet4_lepton1", bins=50, start=-5, stop=5, label="deta jet4 lepton1")]),
+
+        "deta_jet5_jet6": HistConf([Axis(coll="deta", field="jet5_jet6", bins=50, start=-5, stop=5, label="deta jet5 jet6")]),
+        "deta_jet5_lepton1": HistConf([Axis(coll="deta", field="jet5_lepton1", bins=50, start=-5, stop=5, label="deta jet5 lepton1")]),
+
+        "deta_jet6_lepton1": HistConf([Axis(coll="deta", field="jet6_lepton1", bins=50, start=-5, stop=5, label="deta jet6 lepton1")]),
+
+        "deta_jet1_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="jet1_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta jet1 met")]),
+        "deta_jet2_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="jet2_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta jet2 met")]),
+        "deta_jet3_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="jet3_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta jet3 met")]),
+        "deta_jet4_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="jet4_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta jet4 met")]),
+        "deta_jet5_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="jet5_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta jet5 met")]),
+        "deta_jet6_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="jet6_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta jet6 met")]),
+        "deta_lepton1_DeepMETResolutionTune": HistConf([Axis(coll="deta", field="lepton1_DeepMETResolutionTune", bins=50, start=-5, stop=5, label="deta lepton1 met")]),
+
+        "jet1_eta": HistConf([Axis(coll="jet1", field="eta", bins=50, start=-5, stop=5, label="jet1 eta")]),
+        "jet1_phi": HistConf([Axis(coll="jet1", field="phi", bins=64, start=-3.2, stop=3.2, label="jet1 phi")]),
+        "jet1_pt": HistConf([Axis(coll="jet1", field="pt", bins=100, start=0, stop=1000, label="jet1 pt")]),
+        "jet1_qgl": HistConf([Axis(coll="jet1", field="qgl", bins=50, start=0, stop=1, label="jet1 qgl")]),
+        "jet1_btagDeepFlavB": HistConf([Axis(coll="jet1", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet1 btagDeepFlavB")]),
+
+        "jet2_eta": HistConf([Axis(coll="jet2", field="eta", bins=50, start=-5, stop=5, label="jet2 eta")]),
+        "jet2_phi": HistConf([Axis(coll="jet2", field="phi", bins=64, start=-3.2, stop=3.2, label="jet2 phi")]),
+        "jet2_pt": HistConf([Axis(coll="jet2", field="pt", bins=100, start=0, stop=1000, label="jet2 pt")]),
+        "jet2_qgl": HistConf([Axis(coll="jet2", field="qgl", bins=50, start=0, stop=1, label="jet2 qgl")]),
+        "jet2_btagDeepFlavB": HistConf([Axis(coll="jet2", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet2 btagDeepFlavB")]),
+
+        "jet3_eta": HistConf([Axis(coll="jet3", field="eta", bins=50, start=-5, stop=5, label="jet3 eta")]),
+        "jet3_phi": HistConf([Axis(coll="jet3", field="phi", bins=64, start=-3.2, stop=3.2, label="jet3 phi")]),
+        "jet3_pt": HistConf([Axis(coll="jet3", field="pt", bins=100, start=0, stop=1000, label="jet3 pt")]),
+        "jet3_qgl": HistConf([Axis(coll="jet3", field="qgl", bins=50, start=0, stop=1, label="jet3 qgl")]),
+        "jet3_btagDeepFlavB": HistConf([Axis(coll="jet3", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet3 btagDeepFlavB")]),
+
+        "jet4_eta": HistConf([Axis(coll="jet4", field="eta", bins=50, start=-5, stop=5, label="jet4 eta")]),
+        "jet4_phi": HistConf([Axis(coll="jet4", field="phi", bins=64, start=-3.2, stop=3.2, label="jet4 phi")]),
+        "jet4_pt": HistConf([Axis(coll="jet4", field="pt", bins=100, start=0, stop=1000, label="jet4 pt")]),
+        "jet4_qgl": HistConf([Axis(coll="jet4", field="qgl", bins=50, start=0, stop=1, label="jet4 qgl")]),
+        "jet4_btagDeepFlavB": HistConf([Axis(coll="jet4", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet4 btagDeepFlavB")]),
+
+        "jet5_eta": HistConf([Axis(coll="jet5", field="eta", bins=50, start=-5, stop=5, label="jet5 eta")]),
+        "jet5_phi": HistConf([Axis(coll="jet5", field="phi", bins=64, start=-3.2, stop=3.2, label="jet5 phi")]),
+        "jet5_pt": HistConf([Axis(coll="jet5", field="pt", bins=100, start=0, stop=1000, label="jet5 pt")]),
+        "jet5_qgl": HistConf([Axis(coll="jet5", field="qgl", bins=50, start=0, stop=1, label="jet5 qgl")]),
+        "jet5_btagDeepFlavB": HistConf([Axis(coll="jet5", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet5 btagDeepFlavB")]),
+
+        "jet6_eta": HistConf([Axis(coll="jet6", field="eta", bins=50, start=-5, stop=5, label="jet6 eta")]),
+        "jet6_phi": HistConf([Axis(coll="jet6", field="phi", bins=64, start=-3.2, stop=3.2, label="jet6 phi")]),
+        "jet6_pt": HistConf([Axis(coll="jet6", field="pt", bins=100, start=0, stop=1000, label="jet6 pt")]),
+        "jet6_qgl": HistConf([Axis(coll="jet6", field="qgl", bins=50, start=0, stop=1, label="jet6 qgl")]),
+        "jet6_btagDeepFlavB": HistConf([Axis(coll="jet6", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet6 btagDeepFlavB")]),
+
+        "lepton1_eta": HistConf([Axis(coll="lepton1", field="eta", bins=50, start=-3, stop=3, label="lepton1 eta")]),
+        "lepton1_phi": HistConf([Axis(coll="lepton1", field="phi", bins=64, start=-3.2, stop=3.2, label="lepton1 phi")]),
+        "lepton1_pt": HistConf([Axis(coll="lepton1", field="pt", bins=100, start=0, stop=500, label="lepton1 pt")]),
     },
     #THIS IS WHERE YOU ADD COLUMN VARIABLES TO SAVE FOR EVENT INFORMATION PROCESSING
     columns = {
         "common": {
            "bycategory": {
-               "whad_withbveto_e": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("DeepMETResolutionTune", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet5",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet6",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"])],
-                "whad_withbveto_mu": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("DeepMETResolutionTune", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet5",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet6",["eta","phi","pt", "qgl","btagDeepFlavB"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"])],
-                "boosted_jet_in_window_e": [ColOut("events",["nJetGood", "nCentralJetsGood", "nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted"]), ColOut("DeepMETResolutionTune", ["pt","phi"]), ColOut("vbsjets", ["mass", "delta_eta", "delta_phi"]), ColOut("fatjet1", ["msoftdrop","btagDeepB","pt","eta","phi","particleNet_WvsQCD","particleNet_ZvsQCD","tau1","tau2","tau3","tau4"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("mass",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dR",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dphi",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("deta",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"])],
-                "boosted_jet_in_window_mu": [ColOut("events",["nJetGood", "nCentralJetsGood", "nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted"]), ColOut("DeepMETResolutionTune", ["pt","phi"]), ColOut("vbsjets", ["mass", "delta_eta", "delta_phi"]), ColOut("fatjet1", ["msoftdrop","btagDeepB","pt","eta","phi","particleNet_WvsQCD","particleNet_ZvsQCD","tau1","tau2","tau3","tau4"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("mass",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dR",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dphi",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("deta",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"])],
+               "resolved_e": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("DeepMETResolutionTune", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet5",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet6",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"])],
+                "resolved_mu": [ColOut("events",["nJetGood","nCentralJetsGood","mt_w_leptonic", "z_lep",]), ColOut("DeepMETResolutionTune", ["pt","phi"]),ColOut("w_had_jets", ["centrality_resolved","mass"]), ColOut("vbsjets", ["delta_eta","mass", "delta_phi"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet5",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet6",["eta","phi","pt", "qgl","btagDeepFlavB"]), ColOut("lepton1",["eta","phi","pt"]), ColOut("mass",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dR",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("dphi",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"]), ColOut("deta",["jet1_jet2", "jet1_jet3", "jet1_jet4", "jet1_jet5", "jet1_jet6", "jet1_lepton1", "jet2_jet3", "jet2_jet4", "jet2_jet5", "jet2_jet6", "jet2_lepton1", "jet3_jet4", "jet3_jet5", "jet3_jet6", "jet3_lepton1", "jet4_jet5", "jet4_jet6", "jet4_lepton1", "jet5_jet6", "jet5_lepton1", "jet6_lepton1", "jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","jet5_DeepMETResolutionTune","jet6_DeepMETResolutionTune","lepton1_DeepMETResolutionTune"])],
+                "boosted_e": [ColOut("events",["nJetGood", "nCentralJetsGood", "nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted"]), ColOut("DeepMETResolutionTune", ["pt","phi"]), ColOut("vbsjets", ["mass", "delta_eta", "delta_phi"]), ColOut("fatjet1", ["msoftdrop","btagDeepB","pt","eta","phi","particleNet_WvsQCD","particleNet_ZvsQCD","tau1","tau2","tau3","tau4"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("mass",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dR",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dphi",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("deta",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"])],
+                "boosted_mu": [ColOut("events",["nJetGood", "nCentralJetsGood", "nFatJetGood","mt_w_leptonic","z_lep","z_fat","centrality_boosted"]), ColOut("DeepMETResolutionTune", ["pt","phi"]), ColOut("vbsjets", ["mass", "delta_eta", "delta_phi"]), ColOut("fatjet1", ["msoftdrop","btagDeepB","pt","eta","phi","particleNet_WvsQCD","particleNet_ZvsQCD","tau1","tau2","tau3","tau4"]), ColOut("jet1",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet2",["eta","phi","pt", "qgl", "btagDeepFlavB"]),ColOut("jet3",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("jet4",["eta","phi","pt", "qgl", "btagDeepFlavB"]), ColOut("mass",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dR",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("dphi",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"]), ColOut("deta",["jet1_jet2","jet1_jet3","jet1_jet4","jet1_lepton1","jet2_jet3","jet2_jet4","jet2_lepton1","jet3_jet4","jet3_lepton1","jet4_lepton1","jet1_DeepMETResolutionTune","jet2_DeepMETResolutionTune","jet3_DeepMETResolutionTune","jet4_DeepMETResolutionTune","lepton1_DeepMETResolutionTune","jet1_fatjet1","jet2_fatjet1","jet3_fatjet1","jet4_fatjet1","lepton1_fatjet1","DeepMETResolutionTune_fatjet1"])],
                 }
         }
     },

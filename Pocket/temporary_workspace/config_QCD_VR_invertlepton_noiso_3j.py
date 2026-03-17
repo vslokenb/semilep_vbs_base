@@ -6,7 +6,7 @@ from pocket_coffea.parameters.cuts import passthrough
 from pocket_coffea.parameters.histograms import HistConf, Axis
 from pocket_coffea.lib.weights.common import common_weights
 from pocket_coffea.lib.weights.common.common import SF_L1prefiring
-#from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
+# from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
 from pocket_coffea.parameters import defaults
 import numpy as np
 import awkward as ak
@@ -350,7 +350,7 @@ cfg = Configurator(
             ## SOME DATA
             #########
             f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
-            f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
+            f"{localdir}/datasets/SingleElectron.json", # 2022_postEE EGamma
             # #f"{localdir}/datasets/EGamma_G.json"
             # #f"{localdir}/datasets/Muon.json",
             # f"{localdir}/datasets/Muon_2022E.json"
@@ -363,7 +363,7 @@ cfg = Configurator(
             #########
             ## RUN 2 BKG
             #########
-            #"WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -396,9 +396,9 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            #"DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -409,8 +409,8 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            #"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            #"TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
             # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
             # "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
@@ -472,12 +472,12 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            #"SingleMuon", ## 2017B Single Muon dataset
+            # "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            "EGamma",
+            # "EGamma",
             # "Muon"
             ],
-            "year": ["2018"],
+            "year": ["2016_PostVFP"],
         },
     },
     workflow=VBSSemileptonicProcessor,
@@ -672,7 +672,7 @@ cfg = Configurator(
         "z_lep":   HistConf([Axis(coll="events", field="z_lep", bins=40, start=-1.0, stop=1.0, label=r"$Zepp. lepton$")]),
         "z_fat":      HistConf([Axis(coll="events", field="z_fat", bins=40, start=-1.0, stop=1.0, label=r"$Zepp. boosted jet$")]),
         
-        "centrality_resolved":  HistConf([Axis(coll="events", field="centrality_resolved", bins=40, start=-5.0, stop=5.0, label=r"$Centrality_{resolved}$")]),
+        "centrality_resolved":  HistConf([Axis(coll="w_had_jets", field="centrality_resolved", bins=40, start=-5.0, stop=5.0, label=r"$Centrality_{resolved}$")]),
         "centrality_boosted":   HistConf([Axis(coll="events", field="centrality_boosted", bins=40, start=-5.0, stop=5.0, label=r"$Centrality_{boosted}$")]),
 
         #"qgl_vbs1_resolved":  HistConf([Axis(coll="events", field="qgl_vbs1_resolved", bins=40, start=0, stop=1.0, label=r"$QGL VBS jet1 (resolved)$")]),

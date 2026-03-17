@@ -6,7 +6,7 @@ from pocket_coffea.parameters.cuts import passthrough
 from pocket_coffea.parameters.histograms import HistConf, Axis
 from pocket_coffea.lib.weights.common import common_weights
 from pocket_coffea.lib.weights.common.common import SF_L1prefiring
-#from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
+from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
 from pocket_coffea.parameters import defaults
 import numpy as np
 import awkward as ak
@@ -110,9 +110,11 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/triggers.yaml",
     f"{localdir}/params/plotting.yaml",
     # f"{localdir}/params/lumi.yaml",
+    f"{localdir}/params/lepton_scale_factors.yaml",
     f"{localdir}/params/jets_calibration.yaml",
     f"{localdir}/params/pileup.yaml",
     f"{localdir}/params/fakelepton_weights_noiso_3j.yaml",
+    f"{localdir}/params/variations.yaml",
     update=True,
 )
 
@@ -234,7 +236,7 @@ cfg = Configurator(
             #######
             ## RUN 2 BKG
             # #########
-            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #
             f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
@@ -351,6 +353,8 @@ cfg = Configurator(
             #########
             f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
             f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
+            f"{localdir}/datasets/SingleElectron.json", ## 2017B Single Muon dataset
+            
             # #f"{localdir}/datasets/EGamma_G.json"
             # #f"{localdir}/datasets/Muon.json",
             # f"{localdir}/datasets/Muon_2022E.json"
@@ -397,7 +401,7 @@ cfg = Configurator(
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
-            #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
+            # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -409,7 +413,7 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
             # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
             # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
@@ -474,10 +478,10 @@ cfg = Configurator(
             #########
             # "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            "EGamma",
+            # "EGamma",
             # "Muon"
             ],
-            "year": ["2018"],
+            "year": ["2016_PostVFP"],
         },
     },
     workflow=VBSSemileptonicProcessor,
@@ -507,15 +511,15 @@ cfg = Configurator(
     },
 
    
-    weights_classes=common_weights+[MuonGoodLeadWeight,ElectronGoodLeadWeight]+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight],#+[PileupWeight],
+    weights_classes=common_weights+[MuonGoodLeadWeight,ElectronGoodLeadWeight]+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight]+[SF_ele_trigger],#+[PileupWeight],
     #weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele
-    weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "genWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]},
+    weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "genWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]},
         # "bysample": {
         #         "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
         #              "inclusive": ["wjet_reweight"],},
         #     }    
         },
-    variations={"weights": {"common": {"inclusive": ["lumi", "XS","PileupWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
+    variations={"weights": {"common": {"inclusive": ["lumi", "XS","PileupWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_ele_trigger","sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
     # weights={
     #        "common": {
     #            "inclusive": ["genWeight", "lumi", "XS","muon_inverttight_to_fake","electron_inverttight_to_fake"]

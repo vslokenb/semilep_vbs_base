@@ -649,11 +649,11 @@ jets_calibration:
   rescale_MET_config:
     2016_PreVFP:
       apply: True
-      MET_collection: "MET"
+      MET_collection: "PuppiMET"
       Jet_collection: "Jet"
     2016_PostVFP:
       apply: True
-      MET_collection: "MET"
+      MET_collection: "PuppiMET"
       Jet_collection: "Jet"
     "2017":
       apply: True

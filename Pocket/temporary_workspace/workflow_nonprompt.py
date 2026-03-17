@@ -7,6 +7,8 @@ from pocket_coffea.lib.objects import lepton_selection, jet_selection, btagging,
 from types import SimpleNamespace
 import vector
 import math
+import xgboost as xgb
+
 vector.register_awkward()
 
 def veto_jer_forward_unmatched(jets,variations):
@@ -111,15 +113,15 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonGood"] = mu[mask_muon_ip]
         #ev["MuonGood"]      = ev.MuonGood_0[(np.abs(ev.MuonGood_0.dxy) < 0.2) & np.abs(ev.MuonGood_0.dz) < 0.5]
         ev["ElectronGood_0"] = lepton_selection(ev, "Electron", self.params)
-        ele = ev.ElectronGood_0
+        ele = ev.Electron#Good_0
         mask2 = (
             (np.abs(ele.dxy) < 0.05) & (np.abs(ele.eta) < 1.479) & (np.abs(ele.dz) < 0.1) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
         ) | (
-            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.5) & (np.abs(ele.dz) < 0.2) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
+            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.4) & (np.abs(ele.dz) < 0.2) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
         )
 
-        ev["ElectronGood"] = ele[mask2 & (ele.convVeto == 1)]
-
+        ev["ElectronGood"] = ele[mask2 & (ele.pt > 38) & (ele.cutBased >= 3)]
+        # ELECTRONS IN SIMPLE NAMEPSACE ARE NOT USED
         veto_criteria = SimpleNamespace(
             object_preselection = {
                 "Muon": {
@@ -242,22 +244,32 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonLoose"] = ev.MuonLoose[mask4]
         ev["MuonMedium"] = ev.MuonMedium[mask_4]
 
-        ev["ElectronVeto"]     = lepton_selection(ev, "Electron", veto_criteria)
-        ev["ElectronMedium"]     = lepton_selection(ev, "Electron", medium_criteria)
-        ev["ElectronLoose"]     = lepton_selection(ev, "Electron", loose_criteria)
+        ev["ElectronVeto"] = ev.Electron #lepton_selection(ev, "Electron", loose_criteria)
 
         mask3 = (
+            (np.abs(ev.ElectronVeto.dxy) < 0.05) & (np.abs(ev.ElectronVeto.eta) < 1.479) & (np.abs(ev.ElectronVeto.dz) < 0.1) 
+        ) | (
+            (np.abs(ev.ElectronVeto.dxy) < 0.1) & (np.abs(ev.ElectronVeto.eta) >= 1.479) & (np.abs(ev.ElectronVeto.eta) < 2.4) & (np.abs(ev.ElectronVeto.dz) < 0.2) #& (ev.ElectronVeto.sieie < 0.03) & (ev.ElectronVeto.eInvMinusPInv < 0.014)
+        )
+        ev["ElectronVeto"] = ev.ElectronVeto[mask3 & (ev.ElectronVeto.cutBased >= 2) & (ev.ElectronVeto.pt >= 10)]
+        
+        ev["ElectronLoose"] = ev.Electron #lepton_selection(ev, "Electron", loose_criteria)
+
+        mask3_0 = (
             (np.abs(ev.ElectronLoose.dxy) < 0.05) & (np.abs(ev.ElectronLoose.eta) < 1.479) & (np.abs(ev.ElectronLoose.dz) < 0.1) 
         ) | (
-            (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.5) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
+            (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.4) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
         )
+        ev["ElectronLoose"] = ev.ElectronLoose[mask3_0 & (ev.ElectronLoose.cutBased >= 2) & (ev.ElectronLoose.pt >= 38)]
+       
+        ev["ElectronMedium"] = ev.Electron
         mask_3 = (
             (np.abs(ev.ElectronMedium.dxy) < 0.05) & (np.abs(ev.ElectronMedium.eta) < 1.479) & (np.abs(ev.ElectronMedium.dz) < 0.1) 
         ) | (
-            (np.abs(ev.ElectronMedium.dxy) < 0.1) & (np.abs(ev.ElectronMedium.eta) >= 1.479) & (np.abs(ev.ElectronMedium.eta) < 2.5) & (np.abs(ev.ElectronMedium.dz) < 0.2) #& (ev.ElectronMedium.sieie < 0.03) & (ev.ElectronMedium.eInvMinusPInv < 0.014)
+            (np.abs(ev.ElectronMedium.dxy) < 0.1) & (np.abs(ev.ElectronMedium.eta) >= 1.479) & (np.abs(ev.ElectronMedium.eta) < 2.4) & (np.abs(ev.ElectronMedium.dz) < 0.2) #& (ev.ElectronMedium.sieie < 0.03) & (ev.ElectronMedium.eInvMinusPInv < 0.014)
         )
-        ev["ElectronLoose"] = ev.ElectronLoose[mask3]
-        ev["ElectronMedium"] = ev.ElectronMedium[mask_3]
+
+        ev["ElectronMedium"] = ev.ElectronMedium[mask_3 & (ev.ElectronMedium.cutBased >= 2) & (ev.ElectronMedium.pt >= 38)]
 
         #ev["MuonIncluFake"] = lepton_selection(ev, "Muon", inclufake_criteria)
         #mask_inclufake_impact = (
@@ -877,6 +889,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nElectronGood"] = ak.num(ev.ElectronGood)
         ev["nLeptonGood"]   = ev.nMuonGood + ev.nElectronGood
         ev["nJetGood"]      = ak.num(ev.JetGood)
+        ev["nJetAll"]      = ak.num(ev.Jet)
         ev["nJetGoodCentral"]      = ak.num(ev.JetGoodCentral)
         ev["nBJetTight"]     = ak.num(ev.BJetTight)
         ev["nBJetLoose"]     = ak.num(ev.BJetLoose)

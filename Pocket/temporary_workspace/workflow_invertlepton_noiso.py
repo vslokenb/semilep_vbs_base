@@ -8,6 +8,7 @@ from pocket_coffea.lib.objects import lepton_selection, jet_selection, btagging,
 from types import SimpleNamespace
 import vector
 import math
+import xgboost as xgb
 
 vector.register_awkward()
 
@@ -112,14 +113,14 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonGood"] = mu[mask_muon_ip]
         #ev["MuonGood"]      = ev.MuonGood_0[(np.abs(ev.MuonGood_0.dxy) < 0.2) & np.abs(ev.MuonGood_0.dz) < 0.5]
         ev["ElectronGood_0"] = lepton_selection(ev, "Electron", self.params)
-        ele = ev.ElectronGood_0
+        ele = ev.Electron#Good_0
         mask2 = (
             (np.abs(ele.dxy) < 0.05) & (np.abs(ele.eta) < 1.479) & (np.abs(ele.dz) < 0.1) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
         ) | (
-            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.5) & (np.abs(ele.dz) < 0.2) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
+            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.4) & (np.abs(ele.dz) < 0.2) #& (ele.cutBased >= 4) & (ele.lostHits <= 1)
         )
 
-        ev["ElectronGood"] = ele[mask2 & (ele.convVeto == 1)]
+        ev["ElectronGood"] = ele[mask2 & (ele.pt > 38) & (ele.cutBased >= 3)]
 
         veto_criteria = SimpleNamespace(
             object_preselection = {
@@ -168,7 +169,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                 "Muon": {
                     "pt": 30.0,
                     "eta": 2.4,
-                    "id": "mediumId",
+                    "id": "looseId",
                     "iso": 500.0,
                 }
             }
@@ -242,22 +243,32 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonLoose"] = ev.MuonLoose[mask4]
         ev["MuonMedium"] = ev.MuonMedium[mask_4]
 
-        ev["ElectronVeto"]     = lepton_selection(ev, "Electron", veto_criteria)
-        ev["ElectronMedium"]     = lepton_selection(ev, "Electron", medium_criteria)
-        ev["ElectronLoose"]     = lepton_selection(ev, "Electron", loose_criteria)
+        ev["ElectronVeto"] = ev.Electron #lepton_selection(ev, "Electron", loose_criteria)
 
         mask3 = (
+            (np.abs(ev.ElectronVeto.dxy) < 0.05) & (np.abs(ev.ElectronVeto.eta) < 1.479) & (np.abs(ev.ElectronVeto.dz) < 0.1) 
+        ) | (
+            (np.abs(ev.ElectronVeto.dxy) < 0.1) & (np.abs(ev.ElectronVeto.eta) >= 1.479) & (np.abs(ev.ElectronVeto.eta) < 2.4) & (np.abs(ev.ElectronVeto.dz) < 0.2) #& (ev.ElectronVeto.sieie < 0.03) & (ev.ElectronVeto.eInvMinusPInv < 0.014)
+        )
+        ev["ElectronVeto"] = ev.ElectronVeto[mask3 & (ev.ElectronVeto.cutBased >= 2) & (ev.ElectronVeto.pt >= 10)]
+        
+        ev["ElectronLoose"] = ev.Electron #lepton_selection(ev, "Electron", loose_criteria)
+
+        mask3_0 = (
             (np.abs(ev.ElectronLoose.dxy) < 0.05) & (np.abs(ev.ElectronLoose.eta) < 1.479) & (np.abs(ev.ElectronLoose.dz) < 0.1) 
         ) | (
-            (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.5) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
+            (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.4) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
         )
+        ev["ElectronLoose"] = ev.ElectronLoose[mask3_0 & (ev.ElectronLoose.cutBased >= 2) & (ev.ElectronLoose.pt >= 38)]
+       
+        ev["ElectronMedium"] = ev.Electron
         mask_3 = (
             (np.abs(ev.ElectronMedium.dxy) < 0.05) & (np.abs(ev.ElectronMedium.eta) < 1.479) & (np.abs(ev.ElectronMedium.dz) < 0.1) 
         ) | (
-            (np.abs(ev.ElectronMedium.dxy) < 0.1) & (np.abs(ev.ElectronMedium.eta) >= 1.479) & (np.abs(ev.ElectronMedium.eta) < 2.5) & (np.abs(ev.ElectronMedium.dz) < 0.2) #& (ev.ElectronMedium.sieie < 0.03) & (ev.ElectronMedium.eInvMinusPInv < 0.014)
+            (np.abs(ev.ElectronMedium.dxy) < 0.1) & (np.abs(ev.ElectronMedium.eta) >= 1.479) & (np.abs(ev.ElectronMedium.eta) < 2.4) & (np.abs(ev.ElectronMedium.dz) < 0.2) #& (ev.ElectronMedium.sieie < 0.03) & (ev.ElectronMedium.eInvMinusPInv < 0.014)
         )
-        ev["ElectronLoose"] = ev.ElectronLoose[mask3 ]
-        ev["ElectronMedium"] = ev.ElectronMedium[mask_3]
+
+        ev["ElectronMedium"] = ev.ElectronMedium[mask_3 & (ev.ElectronMedium.cutBased >= 2) & (ev.ElectronMedium.pt >= 38)]
 
         loose, tight = ak.unzip(ak.cartesian([ev.ElectronLoose, ev.ElectronGood], nested=True))
         dR = loose.delta_r(tight)
@@ -392,6 +403,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         # deta and dR btw tagging jets
         ev["vbsjets", "delta_eta"] = np.abs(v1.eta - v2.eta)
         ev["vbs_dR"] = ak.fill_none(v1.delta_r(v2), np.nan)
+        ev["vbsjets", "delta_phi"] = np.abs(v1.phi - v2.phi)
 
 
         ##### NOW REPEAT VBS ID BUT NEED SOME BOOST CATEGORIZATION #####
@@ -551,6 +563,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["mt_w_leptonic_deepMET_resolutiontune"] = compute_MT(lead_lep, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_responsetune"] = compute_MT(lead_lep, ev.DeepMETResponseTune)
         ev["mt_w_leptonic_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResolutionTune)
+        ev["mt_w_leptonic_deepMET_resolutiontune_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResolutionTune)
+        ev["mt_w_leptonic_deepMET_responsetune_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResponseTune)
+        
         w_lep = ev.PuppiMET + lead_lep
         whad = ev.w_had_jets.jet1 + ev.w_had_jets.jet2
         # print("w leptonic pT: ", w_lep.pt)
@@ -769,7 +784,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
         ev['wleptonic_pt'] = ak.fill_none(w_lep.pt,np.nan)
         ev['wleptonic_phi'] = ak.fill_none(w_lep.phi,np.nan)
-        ev['centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
+        ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)
         ev['centrality_boosted'] = ak.fill_none(centrality(ev.wleptonic_eta,wfj,v1b,v2b),np.nan)
 
         ev['qgl_vbs1_resolved'] = ak.fill_none(v1.qgl,np.nan)
@@ -813,20 +828,86 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["ElectronGood38"] = ev.ElectronGood[(ev.ElectronGood.pt > 38)]
         ev["MuonGood30"] = ev.MuonGood[(ev.MuonGood.pt > 30)]
         
-        # # Optional: debug print
-        # print("Fixed genJetIdx:", genJetIdx_fixed)
+        
+        jets_sorted = ev.JetGood[ak.argsort(ev.JetGood.pt, ascending=False)]
+        fj_sorted = ev.candidate_boost[ak.argsort(ev.candidate_boost.pt, ascending=False)]
+        lepton_sorted = ev.LeptonGood[ak.argsort(ev.LeptonGood.pt, ascending=False)]
 
-        # # Create mask for valid matches
-        # valid_mask = (genJetIdx_fixed >= 0) & (genJetIdx_fixed < ak.num(ev.GenJet))
+        n_jets = max(6, int(np.max(ak.num(jets_sorted, axis=1))))
+        for i in range(n_jets):
+            ev[f'jet{i+1}'] = ak.firsts(jets_sorted[:, i:i+1])
+        n_fatjets = max(1, int(np.max(ak.num(fj_sorted, axis=1))))
+        for i in range(n_fatjets):
+            ev[f'fatjet{i+1}'] = ak.firsts(fj_sorted[:, i:i+1])
+        for i in range(np.max(ak.num(lepton_sorted, axis=1))):  # max number of good leptons in any event
+            ev[f'lepton{i+1}'] = ak.firsts(lepton_sorted[:, i:i+1])
+        
+        # object_names = [name for name in ev.fields if name.startswith(("jet", "fatjet", "lepton"))]
+        names=['jet1','jet2','jet3','jet4','jet5','jet6', 'lepton1', 'DeepMETResolutionTune','fatjet1']
+        objects=[ev.jet1, ev.jet2, ev.jet3, ev.jet4, ev.jet5, ev.jet6, ev.lepton1, ev.DeepMETResolutionTune, ev.fatjet1]
+        ev["deta"] = {}
+        ev["dphi"] ={}
+        ev["dR"] ={}
+        ev["mass"] ={} 
+        for i in range(len(names)):
+            a = objects[i]
+            for j in range(i+1, len(names)):
+                b = objects[j]
+                try:
+                    dphi = delta_phi(a.phi, b.phi)
+                    deta = np.abs(a.eta - b.eta)
+                    dR   = np.sqrt(dphi**2 + deta**2)
+                    try:
+                        if names[i] == "fatjet1" or names[j] == "fatjet1":
+                            mass = (a + b).msoftdrop
+                        else:
+                            mass = (a + b).mass
+                    except:
+                        mass = 0
+                except:
+                    deta = 0
+                    dR   = 0
+                    mass = 0
+                    dphi = 0
+                
+                
+                # Store them
+                ev["deta", f"{names[i]}_{names[j]}"] = deta
+                ev["dphi", f"{names[i]}_{names[j]}"] = dphi
+                ev["dR",   f"{names[i]}_{names[j]}"] = dR
+                ev["mass", f"{names[i]}_{names[j]}"] = mass
+        if hasattr(self.params, 'classifiers'):
+            for region in ["boosted_mu","boosted_e","resolved_mu","resolved_e"]:
+                arrays_to_stack = []
+                y_pred = []
+                for imodel,model_path in enumerate(self.params.classifiers[self._year][region]):
+                    model = xgb.XGBClassifier()
+                    model.load_model(model_path)
+                    if imodel == 0:
+                        features = model.get_booster().feature_names
+                        for name in features:
+                            if name.startswith("events_n"):
+                                field_name = name.replace("events_n", "")
+                                val = eval(f"ak.num(ev.{field_name})")
+                            elif name.startswith("events_"):
+                                field_name = name.replace("events_", "")
+                                val = ev[field_name]
+                            elif name.startswith("w_had_jets_"):
+                                field_name = name.replace("w_had_jets_", "")
+                                val = eval(f"ev.w_had_jets.{field_name}")
+                            elif "_" in name:
+                                path = name.replace("_", ".", 1)
+                                val = eval(f"ev.{path}")
+                            else:
+                                val = ev[name]
+                            if val.ndim > 1:
+                                val = ak.pad_none(val, 1, axis=1)[:, 0]
+                            val = ak.fill_none(val, np.nan)
+                            arrays_to_stack.append(ak.to_numpy(val))
+                        X_test = np.column_stack(arrays_to_stack)
+                    y_pred.append(model.get_booster().inplace_predict(X_test))
+                ev[f"bdt_{region}"] = np.mean(np.array(y_pred),axis=0)
 
-        # # Safe indexing
-        # safe_genJetIdx = ak.where(valid_mask, genJetIdx_fixed, -1)
-        # matched_genjets = ak.where(valid_mask, ev.GenJet[safe_genJetIdx], None)
-
-        # Save result to events
-        #ev['matched_gen_to_b'] = ev.GenJet[genJetIdx_nested]
-
-        #ev['qgl_fatjet'] = ak.fill_none(wfj.qgl,np.nan)
         
 
     def count_objects(self, variation):

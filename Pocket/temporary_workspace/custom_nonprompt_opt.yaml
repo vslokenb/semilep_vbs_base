@@ -1,0 +1,14 @@
+queue: workday
+chunksize: 50000
+scaleout: 200
+mem-per-worker: 16GB
+disk-per-worker: 12GB
+skip-bad-files: false
+custom-setup-commands:
+  - echo $HOME
+  - source /afs/cern.ch/work/j/jinw/public/myenv/bin/activate
+  - export PYTHONPATH=/afs/cern.ch/work/j/jinw/public/PocketCoffea:$PYTHONPATH
+  - echo $PYTHONPATH
+  - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  - echo $LD_LIBRARY_PATH
+local-virtualenv: false

@@ -1,0 +1,16 @@
+scaleout: 200
+cores-per-worker: 1
+mem-per-worker: "16GB"
+disk-per-worker: "12GB"
+chunksize: 50000
+skip-bad-files: false
+worker-image: /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-latest
+death-timeout: "3600"
+queue: "workday"
+adaptive: false
+performance-report: true
+# custom-setup-commands:
+#   - echo $HOME
+#   - export PYTHONPATH='/afs/cern.ch/user/v/vslokenb/local_edit_poco/PocketCoffea'
+conda-env: false
+local-virtualenv: false
