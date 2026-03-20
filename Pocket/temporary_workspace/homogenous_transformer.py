@@ -15,6 +15,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from typing import Any, Dict, Optional
 import torch
+import torch.nn.functional as F
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve, auc
@@ -23,7 +24,7 @@ import networkx as nx
 # from networkx.algorithms import community
 # %run visualize.py #IDK IF I CAN DO THIS
 # from visualize import GraphVisualization 
-
+from graph_builder import get_hographical_fast
 from torch_geometric.data import Data, HeteroData
 from torch_geometric.data.storage import GlobalStorage
 from torch_geometric.utils import to_networkx
@@ -36,7 +37,8 @@ from torch.nn import (
     Sequential,
     Sigmoid,
     LayerNorm,
-    GELU
+    GELU,
+    Parameter
 )
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
@@ -47,8 +49,15 @@ from torch_geometric.nn import GINEConv, GPSConv, global_add_pool, global_max_po
 from torch_geometric.nn.attention import PerformerAttention
 
 import mplhep as hep
+
+from torch_geometric.nn.conv import MessagePassing
+from torch_geometric.utils import softmax as pyg_softmax
+
 hep.style.use("CMS")
 
+_DR_TYPE_IDX   = 1   # column index in the one-hot block corresponding to dR
+_NUM_EDGE_TYPES = 4
+ 
 
 def load_category_from_coffea(coffea_file, category_name, out_prefix):
     #Load and combine all processes for a given category from a .coffea file
@@ -1247,7 +1256,400 @@ class HeteroGraph(torch.nn.Module):
         return self.mlp(out)
 
 
-def neural_net_initialization(full_data):
+ 
+class PhysicsTransformerConv(MessagePassing):
+    """
+    Multi-head graph attention with three physics-motivated additions.
+ 
+    Parameters
+    ----------
+    in_channels     : int   — input node feature dimension
+    out_channels    : int   — per-head output dimension
+    heads           : int   — number of attention heads
+    edge_dim        : int   — encoded edge feature dimension (after edge_emb)
+    dropout         : float
+    use_dr_far_bias     : bool  — enable ΔR-based attention decay
+    use_dr_near_bias     : bool  — enable ΔR-based attention decay
+    use_type_bias   : bool  — enable per-edge-type attention bias
+    use_edge_gate   : bool  — enable edge gate after aggregation
+    raw_edge_dim    : int   — raw edge_attr dimension (needed for gate / type bias)
+                              should be 1 + NUM_EDGE_TYPES = 5
+    """
+ 
+    def __init__(
+        self,
+        in_channels  : int,
+        out_channels : int,
+        heads        : int   = 3,
+        edge_dim     : int   = 32,
+        dropout      : float = 0.1,
+        use_dr_near_bias  : bool  = True,
+        use_dr_far_bias  : bool  = False,
+        use_type_bias: bool  = True,
+        use_edge_gate: bool  = True,
+        raw_edge_dim : int   = 5,    # 1 scalar + 4 one-hot
+    ):
+        super().__init__(aggr="add", node_dim=0)
+ 
+        self.in_channels   = in_channels
+        self.out_channels  = out_channels
+        self.heads         = heads
+        self.edge_dim      = edge_dim
+        self.dropout       = dropout
+        self.use_dr_near_bias   = use_dr_near_bias
+        self.use_dr_far_bias   = use_dr_far_bias
+        self.use_type_bias = use_type_bias
+        self.use_edge_gate = use_edge_gate
+        self.raw_edge_dim  = raw_edge_dim
+ 
+        d = out_channels   # per-head dimension
+ 
+        # ── Standard transformer projections ──────────────────────────────────
+        self.W_q = Linear(in_channels, heads * d, bias=False)
+        self.W_k = Linear(in_channels, heads * d, bias=False)
+        self.W_v = Linear(in_channels, heads * d, bias=False)
+ 
+        # Edge features projected into key and value spaces
+        self.W_ek = Linear(edge_dim, heads * d, bias=False)
+        self.W_ev = Linear(edge_dim, heads * d, bias=False)
+ 
+        # Output projection: concatenate heads → hidden
+        self.W_o = Linear(heads * d, heads * d)
+ 
+        # ── Addition 1: ΔR distance bias ──────────────────────────────────────
+        # One learned slope per head; bias = -slope * dR_value
+        # Initialised near zero so training starts close to standard attention.
+        if use_dr_near_bias or use_dr_far_bias:
+            self.dr_slope = Parameter(torch.zeros(heads))
+
+        # ── Addition 2: edge-type attention bias ──────────────────────────────
+        # Shape (heads, num_edge_types) — one scalar per head per type.
+        if use_type_bias:
+            self.type_bias = Parameter(torch.zeros(heads, _NUM_EDGE_TYPES))
+ 
+        # ── Addition 3: edge gate ─────────────────────────────────────────────
+        # Takes *encoded* edge features (edge_dim) → scalar gate per head.
+        if use_edge_gate:
+            self.edge_gate_mlp = Sequential(
+                Linear(edge_dim, edge_dim // 2),
+                ReLU(),
+                Linear(edge_dim // 2, heads),
+                Sigmoid(),
+            )
+ 
+        self.reset_parameters()
+ 
+    def reset_parameters(self):
+        for module in [self.W_q, self.W_k, self.W_v, self.W_ek, self.W_ev, self.W_o]:
+            torch.nn.init.xavier_uniform_(module.weight)
+ 
+    # ── Forward ───────────────────────────────────────────────────────────────
+ 
+    def forward(
+        self,
+        x          : Tensor,       # (N, in_channels)
+        edge_index : Tensor,       # (2, E)
+        edge_attr  : Tensor,       # (E, edge_dim)       — encoded
+        raw_edge_attr: Tensor = None,  # (E, raw_edge_dim) — original, for bias/gate
+    ) -> Tensor:
+ 
+        # If raw_edge_attr not provided, skip physics additions gracefully
+        if raw_edge_attr is None:
+            raw_edge_attr = torch.zeros(
+                edge_attr.size(0), self.raw_edge_dim, device=edge_attr.device
+            )
+ 
+        H, d = self.heads, self.out_channels
+ 
+        # Project queries (from destination nodes, index 1)
+        Q = self.W_q(x).view(-1, H, d)   # (N, H, d)
+ 
+        # Propagate; messages built in message(), aggregated with add, then W_o
+        out = self.propagate(
+            edge_index,
+            x          = x,
+            Q          = Q,
+            edge_attr  = edge_attr,
+            raw_edge   = raw_edge_attr,
+        )
+        return self.W_o(out)             # (N, H*d)
+ 
+    def message(
+        self,
+        x_i       : Tensor,   # dst node features  (E, in_ch)
+        x_j       : Tensor,   # src node features  (E, in_ch)
+        Q_i       : Tensor,   # dst queries         (E, H, d)
+        edge_attr : Tensor,   # encoded edge feat   (E, edge_dim)
+        raw_edge  : Tensor,   # raw edge feat       (E, raw_edge_dim)
+        index     : Tensor,   # dst node indices    (E,)  — for softmax
+    ) -> Tensor:
+ 
+        H, d = self.heads, self.out_channels
+        E    = x_j.size(0)
+ 
+        # Keys and values incorporate both source node and edge features
+        K = (self.W_k(x_j) + self.W_ek(edge_attr)).view(E, H, d)   # (E, H, d)
+        V = (self.W_v(x_j) + self.W_ev(edge_attr)).view(E, H, d)   # (E, H, d)
+ 
+        # ── Attention logit ───────────────────────────────────────────────────
+        # Base: scaled dot-product  (E, H)
+        attn = (Q_i * K).sum(dim=-1) / (d ** 0.5)
+ 
+        # Addition 1: ΔR distance bias
+        # raw_edge[:, 0] = scalar value; raw_edge[:, 1:] = one-hot type
+        # ΔR edges have one-hot index _DR_TYPE_IDX == 1, so col 1+1=2 in raw_edge
+        if self.use_dr_near_bias:
+            dr_oh  = raw_edge[:, 1 + _DR_TYPE_IDX]          # (E,) 1 if dR edge, else 0
+            dr_val = raw_edge[:, 0] * dr_oh                 # (E,) dR value, 0 for non-dR
+            # slope shape: (H,) → broadcast over E
+            # positive slope → larger dR → more negative logit → less attention
+            attn = attn - dr_val.unsqueeze(-1) * self.dr_slope.abs().unsqueeze(0)
+ 
+        if self.use_dr_far_bias:
+            dr_oh  = raw_edge[:, 1 + _DR_TYPE_IDX]          # (E,) 1 if dR edge, else 0
+            dr_val = raw_edge[:, 0] * dr_oh                 # (E,) dR value, 0 for non-dR
+            # slope shape: (H,) → broadcast over E
+            # positive slope → larger dR → more positive logit → more attention
+            attn = attn + dr_val.unsqueeze(-1) * self.dr_slope.abs().unsqueeze(0)
+ 
+        # Addition 2: edge-type bias
+        # type_bias: (H, num_edge_types); one-hot block: raw_edge[:, 1:5]
+        if self.use_type_bias:
+            type_oh = raw_edge[:, 1:1 + _NUM_EDGE_TYPES]    # (E, 4)
+            # (E, 4) @ (4, H) → (E, H)
+            type_contrib = type_oh @ self.type_bias.T
+            attn = attn + type_contrib
+ 
+        # Softmax over incoming edges per destination node
+        attn = pyg_softmax(attn, index)                       # (E, H)
+        attn = F.dropout(attn, p=self.dropout, training=self.training)
+ 
+        # Weighted sum of values
+        msg = (attn.unsqueeze(-1) * V)                        # (E, H, d)
+ 
+        # Addition 3: edge gate — per-head scalar on the outgoing message
+        if self.use_edge_gate:
+            gate = self.edge_gate_mlp(edge_attr)              # (E, H)
+            msg  = msg * gate.unsqueeze(-1)                   # (E, H, d)
+ 
+        return msg.view(E, H * d)                             # (E, H*d)
+ 
+    def aggregate(self, inputs: Tensor, index: Tensor, dim_size=None) -> Tensor:
+        # sum aggregation (aggr="add" in __init__)
+        return super().aggregate(inputs, index, dim_size=dim_size)
+ 
+
+######### RNN STYLE LAYER #############
+
+class RawInputInjection(torch.nn.Module):
+    """
+    Between every pair of transformer conv blocks, concatenate the original
+    raw node features back into the current node embedding and project back
+    to the working dimension.
+ 
+    This mirrors how a vanilla RNN feeds x_t at every timestep — the model
+    cannot 'forget' the input because it is always present. 
+ 
+    At each boundary:
+ 
+        h_in  : (N, hidden_dim)   current node embedding from conv block
+        raw_x : (N, raw_dim)      original data.x, frozen throughout
+ 
+        concat: (N, hidden_dim + raw_dim)
+           ↓  Linear + LayerNorm + ReLU
+        h_out : (N, hidden_dim)   raw physics re-injected, same shape as before
+ 
+    Parameters
+    ----------
+    raw_dim    : int — raw node feature dimension  (data.x columns)
+    hidden_dim : int — working node embedding dim  (channels * heads)
+    """
+ 
+    def __init__(self, raw_dim: int, hidden_dim: int):
+        super().__init__()
+        self.proj = Sequential(
+            Linear(hidden_dim + raw_dim, hidden_dim),
+            LayerNorm(hidden_dim),
+            ReLU(),
+        )
+ 
+    def forward(self, h: Tensor, raw_x: Tensor) -> Tensor:
+        """
+        Parameters
+        ----------
+        h     : (N, hidden_dim)
+        raw_x : (N, raw_dim)
+ 
+        Returns
+        -------
+        (N, hidden_dim)
+        """
+        return self.proj(torch.cat([h, raw_x], dim=-1))
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PhysicsHomoGraph
+# ──────────────────────────────────────────────────────────────────────────────
+ 
+class PhysicsHomoGraph(torch.nn.Module):
+    """
+    Homogeneous graph transformer with PhysicsTransformerConv.
+ 
+    Same interface as HomoGraph; extra kwargs control which physics additions
+    are active — makes them scannable via the Optuna hparam scan.
+ 
+    Extra parameters vs HomoGraph
+    -----------------------------
+    use_dr_far_bias   : add ΔR-based attention decay              (default True)
+    use_dr_near_bias   : add ΔR-based attention decay              (default True)
+    use_type_bias : add per-edge-type attention bias          (default True)
+    use_edge_gate : add sigmoid edge gate after aggregation   (default True)
+    """
+ 
+    def __init__(
+        self,
+        channels     : int,
+        num_layers   : int,
+        u_dim        : int,
+        heads        : int   = 3,
+        dropout      : float = 0.1,
+        use_dr_near_bias  : bool  = True,
+        use_dr_far_bias  : bool  = False,
+        use_type_bias: bool  = True,
+        use_edge_gate: bool  = True,
+        use_raw_inject: bool = True,
+    ):
+        super().__init__()
+ 
+        self.channels      = channels
+        self.heads         = heads
+        self.use_dr_far_bias   = use_dr_far_bias
+        self.use_dr_near_bias   = use_dr_near_bias
+        self.use_type_bias = use_type_bias
+        self.use_edge_gate = use_edge_gate
+        self.use_raw_inject = use_raw_inject
+ 
+        # ── Encoders (lazy init — input dims unknown until first forward) ──────
+        self.node_emb = None
+        self.edge_emb = None
+ 
+        # ── Edge dimension upscaling between layers ────────────────────────────
+        self.edge_emb_rd = ModuleList([
+            Sequential(
+                Linear(channels * (heads ** i), channels * (heads ** (i + 1))),
+                ReLU(),
+            )
+            for i in range(num_layers - 1)
+        ])
+ 
+        # ── Message passing ────────────────────────────────────────────────────
+        self.convs  = ModuleList()
+        self.norms  = ModuleList()
+        self.norms2 = ModuleList()
+        self.ffn    = ModuleList()
+ 
+        for layer_idx in range(num_layers):
+            in_ch    = channels if layer_idx == 0 else channels * heads
+            edge_dim = channels * (heads ** layer_idx)
+ 
+            self.convs.append(
+                PhysicsTransformerConv(
+                    in_channels   = in_ch,
+                    out_channels  = channels,
+                    heads         = heads,
+                    edge_dim      = edge_dim,
+                    dropout       = dropout,
+                    use_dr_near_bias   = use_dr_near_bias,
+                    use_dr_far_bias   = use_dr_far_bias,
+                    use_type_bias = use_type_bias,
+                    use_edge_gate = use_edge_gate,
+                    raw_edge_dim  = 1 + _NUM_EDGE_TYPES,  # 5
+                )
+            )
+            self.norms.append(LayerNorm(channels * heads))
+            self.norms2.append(LayerNorm(channels * heads))
+            self.ffn.append(Sequential(
+                Linear(channels * heads, 4 * channels * heads),
+                GELU(),
+                Linear(4 * channels * heads, channels * heads),
+            ))
+ 
+        self.res_proj = Linear(channels, channels * heads)
+ 
+        # ── Global feature encoder ────────────────────────────────────────────
+        self.u_mlp = Sequential(
+            Linear(u_dim, channels),
+            LayerNorm(channels),
+            ReLU(),
+        )
+ 
+        # ── Output MLP ────────────────────────────────────────────────────────
+        self.mlp = Sequential(
+            Linear(channels * heads + channels, channels // 2),
+            ReLU(),
+            Linear(channels // 2, channels // 4),
+            ReLU(),
+            Linear(channels // 4, 1),
+            Sigmoid(),
+        )
+ 
+    # ── Forward ───────────────────────────────────────────────────────────────
+ 
+    def forward(self, data: Data) -> Tensor:
+        x          = data.x
+        edge_index = data.edge_index
+        edge_attr  = data.edge_attr   # (E, 1 + NUM_EDGE_TYPES) — raw
+        batch      = data.batch
+        device     = x.device
+ 
+        # ── Lazy init ─────────────────────────────────────────────────────────
+        if self.node_emb is None:
+            self.node_emb = Linear(x.size(1), self.channels).to(device)
+ 
+        if self.edge_emb is None:
+            self.edge_emb = Sequential(
+                Linear(edge_attr.size(1), self.channels),
+                ReLU(),
+                Linear(self.channels, self.channels),
+            ).to(device)
+ 
+        if self.use_raw_inject and self.raw_injectors is None:
+            hidden_dim = self.channels * self.heads
+            self.raw_injectors = ModuleList([
+                RawInputInjection(raw_dim=x.size(1), hidden_dim=hidden_dim)
+                for _ in range(self.num_layers - 1)
+            ]).to(device)
+        # Keep raw edge_attr for the physics additions; encode a separate copy
+        raw_x = x
+        raw_ea = edge_attr                        # (E, 5)  — never modified
+        h      = self.node_emb(x)                # (N, channels)
+        ea     = self.edge_emb(edge_attr)         # (E, channels)
+ 
+        # ── Message passing ───────────────────────────────────────────────────
+        for layer_idx, conv in enumerate(self.convs):
+            if layer_idx > 0:
+                ea = self.edge_emb_rd[layer_idx - 1](ea)
+ 
+            h_new = conv(h, edge_index, ea, raw_edge_attr=raw_ea)
+ 
+            # Residual
+            h = h_new + (self.res_proj(h) if layer_idx == 0 else h)
+ 
+            # Pre-norm + FFN (Post-LN style, matching original)
+            h = self.norms[layer_idx](h)
+            h = self.norms2[layer_idx](h + self.ffn[layer_idx](h))
+            
+            if self.use_raw_inject and layer_idx < self.num_layers - 1:
+                h = self.raw_injectors[layer_idx](h, raw_x)  # (N, hidden_dim)
+ 
+ 
+        # ── Pooling + global features ─────────────────────────────────────────
+        pooled = global_add_pool(h, batch)        # (B, channels*heads)
+        u      = self.u_mlp(data.u)               # (B, channels)
+        out    = torch.cat([pooled, u], dim=-1)
+        return self.mlp(out)                      # (B, 1)
+
+def neural_net_initialization(full_data): # NOW DEPRECATED!!!!!
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("CUDA available:", torch.cuda.is_available())
     if torch.cuda.is_available():
@@ -1661,7 +2063,7 @@ def get_kin_range(df, kin, cfg):
     raise ValueError(f"Invalid axis spec for {kin}")
 
 
-def plot_kinematic_vs_score_2d(df, scores, kinematics, bins=(20,20), max_events=None):
+def plot_kinematic_vs_score_2d(df, scores, kinematics, bins=(20,20), max_events=None,outdir='bias_plots'):
     if max_events is not None:
         df = df.iloc[:max_events]
         scores = scores[:max_events]
@@ -1732,7 +2134,7 @@ def plot_kinematic_vs_score_2d(df, scores, kinematics, bins=(20,20), max_events=
             ax.legend()
 
         plt.tight_layout()
-        plt.savefig(f"score_comp_{kin}_2017_mu.png")
+        plt.savefig(f"{outdir}/score_comp_{kin}.png")
         plt.close()
 
 process_groups = {
@@ -1943,6 +2345,41 @@ def plot_roc_per_background(df, scores, outdir="roc_groups"):
 
         print(f"Saved {outname}")
 
+def auto_bias_report(df_split, scores, score_col="score", 
+                     corr_threshold=0.5, outdir="bias_plots"):
+    """
+    For each numeric column in df_split, compute weighted Spearman correlation 
+    with classifier score. Flag high-correlation variables and auto-plot them.
+    """
+    import scipy.stats as stats
+    os.makedirs(outdir, exist_ok=True)
+    
+    scores_np = scores.cpu().numpy() if hasattr(scores, "cpu") else scores
+    weights   = df_split["weight"].values if "weight" in df_split else np.ones(len(df_split))
+    weights   = np.abs(weights)
+    
+    skip = {"label", "weight", "process", "year_tag", "category"}
+    numeric_cols = [c for c in df_split.select_dtypes("number").columns if c not in skip]
+    
+    records = []
+    for col in numeric_cols:
+        vals = df_split[col].values
+        valid = np.isfinite(vals) & np.isfinite(scores_np)
+        if valid.sum() < 100:
+            continue
+        # Weighted rank correlation proxy: bin the variable, compute mean score per bin
+        rho, pval = stats.spearmanr(vals[valid], scores_np[valid])
+        records.append({"variable": col, "spearman_rho": rho, "p_value": pval})
+    
+    corr_df = pd.DataFrame(records).sort_values("spearman_rho", key=abs, ascending=False)
+    corr_df.to_csv(f"{outdir}/score_correlations.csv", index=False)
+    
+    # Auto-plot flagged variables
+    flagged = corr_df[corr_df["spearman_rho"].abs() > corr_threshold]["variable"].tolist()
+    print(f"Flagged {len(flagged)} variables with |ρ| > {corr_threshold}: {flagged}")
+    plot_kinematic_vs_score_2d(df_split, scores, flagged, outdir=outdir)
+    
+    return corr_df
 
 def main():
 
@@ -1956,29 +2393,49 @@ def main():
     ########## SAMPLE USAGE ###############
     ##### python homogenous_transformer.py /eos/user/v/vslokenb/vbs_semilep/outputs/v9_rerun_btag/output_merged_v9_rerun_btag.coffea whad_withbveto_mu --out '/eos/user/v/vslokenb/vbs_semilep/outputs/with_btag.parquet'
     #######################################
-    # df_init, norm = load_category_from_coffea(args.coffea_file, args.category)
-
-    # df_init.to_parquet(args.out, index=False)
 
     df = load_category_dataframe(args.out)
-    data_list=get_hographical(df)
-    # data_list = balance_signal_background_weights_graphs( data_list,    balance_to="unity")
+    data_list=get_hographical_fast(df) ### SOME UPDATES
   
-    from torch_geometric.loader import DataLoader
-    train_val_list, test_list = train_test_split(data_list, test_size=0.2, random_state=42)
-    train_list, val_list = train_test_split(train_val_list, test_size=0.25, random_state=42 )
-    # 0.25 x 0.8 = 0.2, so final split is 60% train / 20% val / 20% test
-    #  0.5 * 0.9 = 0.45, so split is 45, 45, 10 (need stats for debugging)
+    from hparam_scan import run_scan, build_model_from_params
 
-    train_loader = DataLoader(balance_signal_background_weights_graphs( train_list, balance_to="unity"), batch_size=32, shuffle=True)
-    val_loader   = DataLoader(balance_signal_background_weights_graphs( val_list, balance_to="unity"), batch_size=64, shuffle=False)
-    test_loader  = DataLoader(balance_signal_background_weights_graphs( test_list, balance_to="unity"), batch_size=64, shuffle=False)
+    eos_outdir = f"/eos/home-v/vslokenb/vbs_semilep/outputs/scans/{args.category}"
+
+    best_params = run_scan(
+        data_list,
+        n_trials   = 20,
+        study_name = f"vbs_{args.category}",
+        outdir     = eos_outdir,
+    )
+
+    from torch_geometric.loader import DataLoader
+
+    #   # Use the best random_state for the final split
+    rs = best_params["random_state"]
+    train_val_list, test_list  = train_test_split(data_list, test_size=0.2,  random_state=rs)
+    train_list,     val_list   = train_test_split(train_val_list, test_size=0.25, random_state=rs)
+
+    train_loader = DataLoader(
+        balance_signal_background_weights_graphs(train_list, best_params["balance_to"]),
+        batch_size=best_params["batch_size"], shuffle=True)
+    val_loader   = DataLoader(
+        balance_signal_background_weights_graphs(val_list,   best_params["balance_to"]),
+        batch_size=best_params["batch_size"] * 2, shuffle=False)
+    test_loader  = DataLoader(
+        balance_signal_background_weights_graphs(test_list,  best_params["balance_to"]),
+        batch_size=best_params["batch_size"] * 2, shuffle=False)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    u_dim  = data_list[0].u.size(1)
+    model, optimizer, scheduler = build_model_from_params(best_params, u_dim, device)
 
     print(f"Train size: {len(train_list)}, Val size: {len(val_list)}, Test size: {len(test_list)}")
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    patience = best_params["es_patience"]     # was hardcoded to 15
+
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
-    model, optimizer, scheduler, device = neural_net_initialization(data_list)
+    # model, optimizer, scheduler, device = neural_net_initialization(data_list)
     criterion = torch.nn.BCELoss(reduction="none")
 
     @torch.enable_grad()
@@ -2090,16 +2547,16 @@ def main():
 
 
 
-    num_epochs = 500
+    num_epochs = 200
     train_losses = []
     val_errors   = []
     val_aucs     = []
     train_aucs   = []
 
-    patience = 15  # how many epochs to wait for improvement
+    patience = best_params["es_patience"]  # how many epochs to wait for improvement
     best_val_error = float('inf')
     epochs_no_improve = 0
-    best_model_path = f"best_model_{args.category}_2016_prevfp.pt"  # path to save the best model
+    best_model_path = f"best_model_{args.category}.pt"  # path to save the best model
 
     for epoch in range(1, num_epochs + 1):
         # -------- TRAIN --------
@@ -2210,7 +2667,7 @@ def main():
     {"labels": test_labels, "probs": test_probs, "weights": test_weights, "name": "Test"},
     {"labels": train_labels, "probs": train_probs, "weights": train_weights, "name": "Train"}], 
     title="Train vs Test ROC", 
-    filename=f"roc_test_vs_train_test_{args.category}_2016_prevfp.png")
+    filename=f"roc_test_vs_train_test_{args.category}.png")
 
     print("\n===== FINAL TEST RESULTS =====")
     print(f"Test Error: {test_error:.4f}")
@@ -2219,9 +2676,10 @@ def main():
     df_test = df.loc[[data.idx for data in test_list]]
     # df_test['score'] = test_probs.numpy() 
     print(df_test.head())
-    plot_kinematic_vs_score_2d(df_test, test_probs, ["mass_jet1_jet2", "mass_jet3_jet4", "jet1_pt","jet2_pt", "events_mt_w_leptonic", "vbsjets_mass", "w_had_jets_mass", "vbsjets_delta_eta","jet1_qgl","jet2_qgl", "jet3_qgl","jet4_qgl", "events_nCentralJetsGood", "events_nJetGood"])
+    # plot_kinematic_vs_score_2d(df_test, test_probs, ["mass_jet1_jet2", "mass_jet3_jet4", "jet1_pt","jet2_pt", "events_mt_w_leptonic", "vbsjets_mass", "w_had_jets_mass", "vbsjets_delta_eta","jet1_qgl","jet2_qgl", "jet3_qgl","jet4_qgl", "events_nCentralJetsGood", "events_nJetGood"])
     plot_score_distributions_stacked(df_test, test_probs)
     plot_roc_per_background(df_test, test_probs)
+    auto_bias_report(df_test,test_probs)
 
 if __name__ == "__main__":
     main()
