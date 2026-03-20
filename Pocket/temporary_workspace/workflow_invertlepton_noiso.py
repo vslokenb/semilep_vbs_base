@@ -559,7 +559,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         # ------------- W Leptonic -------------
         #lead_lep = ak.firsts(ev.LeptonGood)
-        ev["mt_w_leptonic"] = compute_MT(lead_lep, ev.PuppiMET)
+        ev["mt_w_leptonic"] = compute_MT(lead_lep, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_resolutiontune"] = compute_MT(lead_lep, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_responsetune"] = compute_MT(lead_lep, ev.DeepMETResponseTune)
         ev["mt_w_leptonic_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResolutionTune)
@@ -618,7 +618,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #ev["lead_wlep_MET_deta"] = np.abs(lead_lep.eta - ev.PuppiMET.eta)
 
         #dPhi between lead lepton and MET
-        ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.PuppiMET.phi)
+        ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.DeepMETResolutionTune.phi)
         ev["lead_wlep_wfatjet1_dphi"] = delta_phi(lead_lep.phi, wfj.phi)
         ev["lead_wlep_wjet1_dphi"] = delta_phi(lead_lep.phi, wj1.phi)
         ev["lead_wlep_wjet2_dphi"] = delta_phi(lead_lep.phi, wj2.phi)
@@ -777,11 +777,11 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             C = np.minimum(eta_plus, eta_minus)
             return C
         
-        ev['neutrino_pz'] = ak.fill_none(solve_neutrino_pz(lead_lep, ev.PuppiMET),np.nan)
-        ev['neutrino_eta'] = ak.fill_none(np.arcsinh(ev.neutrino_pz / ev.PuppiMET.pt),np.nan)
+        ev['neutrino_pz'] = ak.fill_none(solve_neutrino_pz(lead_lep, ev.DeepMETResolutionTune),np.nan)
+        ev['neutrino_eta'] = ak.fill_none(np.arcsinh(ev.neutrino_pz / ev.DeepMETResolutionTune.pt),np.nan)
         ev['lead_wlep_neutrino_deta']  = np.abs(lead_lep.eta - ev.neutrino_eta)
         ev['lead_wlep_neutrino_dR'] = np.sqrt(ev.lead_wlep_neutrino_deta**2 + ev.lead_wlep_MET_dphi**2)
-        ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(w_lep.pt)),np.nan)
+        ev['wleptonic_eta'] = ak.fill_none(np.arcsinh((ev.neutrino_pz+lead_lep.pz)/(ev.DeepMETResolutionTune.pt)),np.nan)
         ev['wleptonic_pt'] = ak.fill_none(w_lep.pt,np.nan)
         ev['wleptonic_phi'] = ak.fill_none(w_lep.phi,np.nan)
         ev['w_had_jets','centrality_resolved'] = ak.fill_none(centrality(ev.wleptonic_eta, whad,v1,v2),np.nan)

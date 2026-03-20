@@ -92,7 +92,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     "pt": 10.0,
                     "eta": 2.4,
                     "id": "looseId",
-                    "iso": 0.40,
+                    "iso": 500,
                 }
             }
         )
@@ -109,7 +109,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     "pt": 30.0,
                     "eta": 2.4,
                     "id": "looseId",
-                    "iso": 0.25,
+                    "iso": 500,
                 }
             }
         )

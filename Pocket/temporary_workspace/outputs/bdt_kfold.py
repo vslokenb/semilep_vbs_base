@@ -171,11 +171,11 @@ def setup_dmatrix(input_df, norm_table, table_absweight_to_weight,
 
     exclude_cols = (
         ["label", "year_tag", "category", "weight", "events_genWeight", "process",
-         "w_had_jets_mass", "w_had_jets_N", "events_nCentralJetsGood", "events_nJetGood"]
+         "w_had_jets_mass", "w_had_jets_N"]#, "events_nCentralJetsGood", "events_nJetGood"]
         + [c for c in df.columns if c.startswith("weight_variation")]
         + [c for c in df.columns if c.startswith("vbsjets")]
-        + [c for c in df.columns if "jet5" in c]
-        + [c for c in df.columns if "jet6" in c]
+        # + [c for c in df.columns if "jet5" in c]
+        # + [c for c in df.columns if "jet6" in c]
     )
     features = df.drop(columns=[c for c in exclude_cols if c in df.columns])
 
