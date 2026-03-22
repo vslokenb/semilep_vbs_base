@@ -237,9 +237,9 @@ cfg = Configurator(
             f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #
-            #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             # XSEC STUDIES
             #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
@@ -260,11 +260,11 @@ cfg = Configurator(
             
             #END XSEC STUDIES
 
-            #f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
@@ -351,7 +351,7 @@ cfg = Configurator(
             #########
             f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
             f"{localdir}/datasets/SingleElectron.json", # 2022_postEE EGamma
-            # #f"{localdir}/datasets/EGamma_G.json"
+            f"{localdir}/datasets/EGamma.json"
             # #f"{localdir}/datasets/Muon.json",
             # f"{localdir}/datasets/Muon_2022E.json"
 
@@ -366,14 +366,14 @@ cfg = Configurator(
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17",
@@ -396,9 +396,9 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -410,7 +410,7 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
             "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
             # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
             # "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
@@ -472,12 +472,12 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            # "SingleMuon", ## 2017B Single Muon dataset
+            "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            # "EGamma",
+            "EGamma",
             # "Muon"
             ],
-            "year": ["2016_PostVFP"],
+            "year": ["2018"],
         },
     },
     workflow=VBSSemileptonicProcessor,

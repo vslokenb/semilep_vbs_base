@@ -276,7 +276,7 @@ def select_vbs_semileptonic(events, params, **kwargs):
     # wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     # wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < params["wjj_pt"])
 
-    cut_mt_w = (events.mt_w_leptonic < 185.0)
+    cut_mt_w = (events.mt_w_leptonic_deepMET_resolutiontune < 185.0)
 
     # veto b optional
 
@@ -352,7 +352,7 @@ qcd_enriched_cut_35 = Cut(
         "met_pt": 30.0,
         "recoil_jet_pt": 35,
         "njet": 0,
-        "met_def": "puppimet",
+        "met_def": "deepmet_resolution",
     },
     function=select_QCD_CR,
 )

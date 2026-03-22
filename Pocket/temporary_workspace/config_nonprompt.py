@@ -109,10 +109,11 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/object_preselection_run2_v9.yaml",
     f"{localdir}/params/triggers.yaml",
     f"{localdir}/params/plotting.yaml",
-    #f"{localdir}/params/lumi.yaml",
-    #f"{localdir}/params/event_flags.yaml",
-    f"{localdir}/params/jets_calibration.yaml",
     f"{localdir}/params/pileup.yaml",
+    f"{localdir}/params/jets_calibration.yaml",
+    f"{localdir}/params/lepton_scale_factors.yaml",
+    f"{localdir}/params/classifiers.yaml",
+    f"{localdir}/params/variations.yaml",
     update=True,
 )
 
@@ -252,6 +253,7 @@ cfg = Configurator(
             ## SOME DATA
             #########
             f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
+            f"{localdir}/datasets/SingleElectron.json", ## 2017B Single Muon dataset
             f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
             # #f"{localdir}/datasets/EGamma_G.json"
             # #f"{localdir}/datasets/Muon.json",
@@ -375,7 +377,7 @@ cfg = Configurator(
             ## SOME DATA
             #########
             "SingleMuon", ## 2017B Single Muon dataset
-            #"SingleElectron",
+            "SingleElectron",
             "EGamma",
             # "Muon"
             ],
@@ -448,7 +450,7 @@ cfg = Configurator(
     #variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco"]}}}, #"pileup"
     #weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "pileup", "sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco"]}},
     #variations={"weights": {"common": {"inclusive": ["pileup", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco"]}}}, #"pileup"
-    weights={"common": {"inclusive": ["lumi", "XS","PileupWeight", "genWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]},
+    weights={"common": {"inclusive": ["lumi", "XS","PileupWeight", "genWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]},
         # "bysample": {
         #         "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
         #              "inclusive": ["wjet_reweight"],},
@@ -536,5 +538,6 @@ cfg = Configurator(
                 Axis(coll="MuonGood", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$"),
                 Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$")
             ] ),
+        "mt_w_leptonic": HistConf([Axis(coll="events", field="mt_w_leptonic",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
     },
 )

@@ -20,7 +20,7 @@ def nJet_skim(events, params, **kwargs):
 nJet_skim_cut = Cut(name="nJet_skim", params={}, function=nJet_skim)
 
 def met_skim(events, params, **kwargs):
-    met_cut = (events.PuppiMET.pt > 30)
+    met_cut = (events.DeepMETResolutionTune.pt > 30)
     return met_cut
 
 met_skim_cut = Cut(name="met_skim", params={}, function=met_skim)
@@ -51,7 +51,7 @@ vbs_semileptonic_presel = Cut(
 
 def w_check_mu(events, params, **kwargs):
     muon_ch = (events.nMuonGood == 1) #& (events.nMuonGood30 == 1)
-    met_cut = (events.PuppiMET.pt      > 30)
+    met_cut = (events.DeepMETResolutionTune.pt      > 30)
 
     mask =  muon_ch & met_cut 
     return ak.values_astype(mask, np.bool_)
@@ -66,7 +66,7 @@ w_check_mu = Cut(
 
 def w_check_e(events, params, **kwargs):
     muon_ch = (events.nElectronGood == 1) #& (events.nMuonGood30 == 1)
-    met_cut = (events.PuppiMET.pt  > 30)
+    met_cut = (events.DeepMETResolutionTune.pt  > 30)
 
     mask =  muon_ch & met_cut 
     return ak.values_astype(mask, np.bool_)
@@ -118,7 +118,7 @@ z_check_e = Cut(
 def w_check_mu_2j(events, params, **kwargs):
     two_j  = (events.nJetGood30    >= 2)
     muon_ch = (events.nMuonGood == 1) #& (events.nMuonGood30 == 1)
-    met_cut = (events.PuppiMET.pt      > 30)
+    met_cut = (events.DeepMETResolutionTune.pt      > 30)
 
     mask =  muon_ch & met_cut & two_j
     return ak.values_astype(mask, np.bool_)
@@ -134,7 +134,7 @@ w_check_mu_2j = Cut(
 def w_check_e_2j(events, params, **kwargs):
     two_j  = (events.nJetGood30    >= 2)
     muon_ch = (events.nElectronGood == 1) #& (events.nMuonGood30 == 1)
-    met_cut = (events.PuppiMET.pt  > 30)
+    met_cut = (events.DeepMETResolutionTune.pt  > 30)
 
     mask =  muon_ch & met_cut & two_j
     return ak.values_astype(mask, np.bool_)

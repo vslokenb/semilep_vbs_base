@@ -397,7 +397,7 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+             "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
@@ -475,10 +475,10 @@ cfg = Configurator(
             #########
             "SingleMuon", ## 2017B Single Muon dataset
             "SingleElectron",
-            # "EGamma",
+            "EGamma",
             # "Muon"
             ],
-            "year": ["2016_PostVFP"],
+            "year": ["2018"],
         },
     },
     workflow=VBSSemileptonicProcessor,
@@ -639,5 +639,6 @@ cfg = Configurator(
                 Axis(coll="MuonGood", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$"),
                 Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$")
             ] ),
+        "mt_w_leptonic": HistConf([Axis(coll="events", field="mt_w_leptonic",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
     },
 )

@@ -15,6 +15,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from typing import Any, Dict, Optional
 import torch
+from torch import Tensor
 import torch.nn.functional as F
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
@@ -783,7 +784,7 @@ def visualize_graph(graph, index):
 
     # --- Global features ---
     if hasattr(graph, 'u') and graph.u is not None:
-        u_vals = graph.u.squeeze().tolist()
+        u_vals = graph.u.squeeze(-1).tolist()
         if not isinstance(u_vals, list):
             u_vals = [u_vals]
         plt.title("Global: " + ", ".join([f"{v:.2f}" for v in u_vals]), fontsize=10)
@@ -1523,6 +1524,7 @@ class PhysicsHomoGraph(torch.nn.Module):
  
         self.channels      = channels
         self.heads         = heads
+        self.num_layers     = num_layers
         self.use_dr_far_bias   = use_dr_far_bias
         self.use_dr_near_bias   = use_dr_near_bias
         self.use_type_bias = use_type_bias
@@ -1532,7 +1534,8 @@ class PhysicsHomoGraph(torch.nn.Module):
         # ── Encoders (lazy init — input dims unknown until first forward) ──────
         self.node_emb = None
         self.edge_emb = None
- 
+        # raw_injectors built lazily once raw_dim is known from data.x
+        self.raw_injectors = None
         # ── Edge dimension upscaling between layers ────────────────────────────
         self.edge_emb_rd = ModuleList([
             Sequential(
@@ -2388,6 +2391,7 @@ def main():
     parser.add_argument("category", help="Event category key (e.g. whad_withbveto_e)")
     parser.add_argument("--out", help="Optional output parquet/csv file", default=None)
     parser.add_argument(    '--attn_type', default='multihead',    help="Global attention type such as 'multihead' or 'performer'.")
+    parser.add_argument("--skip_scan", action="store_true", help="Load best params from JSON instead of running scan")
 
     args = parser.parse_args()
     ########## SAMPLE USAGE ###############
@@ -2397,16 +2401,20 @@ def main():
     df = load_category_dataframe(args.out)
     data_list=get_hographical_fast(df) ### SOME UPDATES
   
-    from hparam_scan import run_scan, build_model_from_params
+    from hparam_scan import run_scan, build_model_from_params, load_best_trial
 
-    eos_outdir = f"/eos/home-v/vslokenb/vbs_semilep/outputs/scans/{args.category}"
+    eos_outdir = f"/eos/home-v/vslokenb/vbs_semilep/outputs/scans/whad_withbveto_mu"
 
-    best_params = run_scan(
-        data_list,
-        n_trials   = 20,
-        study_name = f"vbs_{args.category}",
-        outdir     = eos_outdir,
-    )
+    if args.skip_scan:
+        best_params = load_best_trial(f"vbs_whad_withbveto_mu", outdir=eos_outdir)
+        print(f"Loaded best params from {eos_outdir}")
+    else:
+        best_params = run_scan(
+            data_list,
+            n_trials   = 50,
+            study_name = f"vbs_{args.category}",
+            outdir     = eos_outdir,
+        )
 
     from torch_geometric.loader import DataLoader
 
@@ -2455,7 +2463,7 @@ def main():
             optimizer.zero_grad()
             # model.redraw_projection.redraw_projections()
 
-            out = model(data).squeeze()      # logits
+            out = model(data).squeeze(-1)      # logits
             y   = data.y.float()
 
             # out = torch.sigmoid(out)
@@ -2516,7 +2524,7 @@ def main():
         for data in loader:
             data = data.to(device)
 
-            out = model(data).squeeze()     # logits
+            out = model(data).squeeze(-1)     # logits
             y   = data.y.float()
             # out = torch.sigmoid(out)
             loss_per_event = criterion(out, y)

@@ -16,7 +16,7 @@ import awkward as ak
 from pocket_coffea.lib.weights import WeightWrapper, WeightData, WeightDataMultiVariation, WeightLambda
 from pocket_coffea.lib.scale_factors import sf_pileup_reweight
 
-safe_weights_classes = [w for w in common_weights if w.name not in ["signOf_genWeight"]]
+# safe_weights_classes = [w for w in common_weights if w.name not in ["signOf_genWeight"]]
 
 
 import workflow_reweight, custom_cut_functions_reweight, reweighting_st
@@ -53,12 +53,14 @@ default_parameters = defaults.get_default_parameters()
 defaults.register_configuration_dir("config_dir", localdir + "/params")
 parameters = defaults.merge_parameters_from_files(
     default_parameters,
-    # f"{localdir}/params/lumi.yaml",
-    f"{localdir}/params/variations.yaml",
-    f"{localdir}/params/object_preselection_run2.yaml",
+    f"{localdir}/params/object_preselection_run2_v9.yaml",
     f"{localdir}/params/triggers.yaml",
     f"{localdir}/params/plotting.yaml",
     f"{localdir}/params/pileup.yaml",
+    f"{localdir}/params/jets_calibration.yaml",
+    f"{localdir}/params/lepton_scale_factors.yaml",
+    f"{localdir}/params/classifiers.yaml",
+    f"{localdir}/params/variations.yaml",
     update=True,
 )
 
@@ -85,21 +87,21 @@ cfg = Configurator(
             ## RUN 2 BKG
             # #########
 
-            f"{localdir}/datasets/WJetsToLNu_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_Pt-400To600_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_Pt-600ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_Pt-400To600_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_Pt-600ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
 
             f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #
             f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # XSEC STUDIES
-            f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # # XSEC STUDIES
+            # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             
             #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17_2.json",
             #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17_2.json",
@@ -133,26 +135,26 @@ cfg = Configurator(
             
 
             f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
 
-            f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
 
             f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             #f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
 
             f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
             f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.json",
@@ -180,12 +182,12 @@ cfg = Configurator(
             # #########
             # ## RUN 2 SIGNAL
             # ########
-            f"{localdir}/datasets/WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            f"{localdir}/datasets/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            f"{localdir}/datasets/WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            f"{localdir}/datasets/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            f"{localdir}/datasets/WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            f"{localdir}/datasets/WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
+            # f"{localdir}/datasets/WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
+            # f"{localdir}/datasets/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
+            # f"{localdir}/datasets/WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
+            # f"{localdir}/datasets/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
+            # f"{localdir}/datasets/WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
+            # f"{localdir}/datasets/WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
  
             ########
             ## RUN 3 BKG
@@ -219,31 +221,14 @@ cfg = Configurator(
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
             "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-
-            #"WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-
-            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17_2",
-            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17_2",
-            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_17_2",
-            
+            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_fix",
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_fix",
@@ -327,7 +312,7 @@ cfg = Configurator(
             # "SingleMuon", ## 2017 Single Muon dataset
             # "SingleElectron",## 2017 Single Electron dataset
             ],
-            "year": ["2017"],
+            "year": ["2016_PostVFP","2018"],
         },
     },
     workflow=VBSSemileptonicProcessor,
@@ -340,7 +325,7 @@ cfg = Configurator(
         nLepton_skim_cut,
         # nJet_skim_cut,  
         # met_skim_cut,
-        get_HLTsel(primaryDatasets=["SingleMuon", "SingleEle"]),
+        get_HLTsel(primaryDatasets=["SingleMuon", "EGamma"]),
     ],
 
     # 2) preselections 
@@ -366,30 +351,30 @@ cfg = Configurator(
 
     # calibrators=[],
     #systematic_variations=[],
-    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight],
-    weights={"common": {"inclusive": ["genWeight", "lumi", "XS","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_L1prefiring","sf_mu_trigger", "sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]},
-        "bysample": {
-               "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
-                    "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
-                     "inclusive": ["wjet_reweight"],},
-            }    
+    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight]+[SF_ele_trigger],
+    weights={"common": {"inclusive": ["genWeight", "lumi", "XS","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"]},
+        # "bysample": {
+        #        "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
+        #             "inclusive": ["wjet_reweight"],},
+        #         "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
+        #              "inclusive": ["wjet_reweight"],},
+        #     }    
         },
-    variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_L1prefiring","sf_mu_trigger", "sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
+    variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger", "sf_ele_trigger","sf_L1prefiring","sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
 
    
     variables={
@@ -448,6 +433,11 @@ cfg = Configurator(
         "puppimet_phi":    HistConf([Axis(coll="PuppiMET", field="phi", bins=50, start=-4, stop=4, label=r"$\phi^{miss}$ [GeV]")]),
         "puppimet":        HistConf([Axis(coll="PuppiMET", field="pt", bins=50, start=0, stop=250, label=r"$p_T^{miss}$ [GeV]")]),
         "mt_w_lep":   HistConf([Axis(coll="events", field="mt_w_leptonic", bins=30, start=0, stop=200, label=r"$m_T(W_{lep})$ [GeV]")]),
+        "DeepMETResponseTune_phi":    HistConf([Axis(coll="DeepMETResponseTune", field="phi", bins=50, start=-4, stop=4, label=r"$\phi^{miss}$ [GeV]")]),
+        "DeepMETResponseTune_pt":        HistConf([Axis(coll="DeepMETResponseTune", field="pt", bins=50, start=0, stop=250, label=r"$p_T^{miss}$ [GeV]")]),
+        "DeepMETResolutionTune_phi":    HistConf([Axis(coll="DeepMETResolutionTune", field="phi", bins=50, start=-4, stop=4, label=r"$\phi^{miss}$ [GeV]")]),
+        "DeepMETResolutionTune_pt":        HistConf([Axis(coll="DeepMETResolutionTune", field="pt", bins=50, start=0, stop=250, label=r"$p_T^{miss}$ [GeV]")]),
+
         # "neutrino_pz":  HistConf([Axis(coll="events", field="neutrino_pz", bins=50, start=0, stop=250, label=r"$p_z^{\nu}$ [GeV]")]),
         # "neutrino_eta":  HistConf([Axis(coll="events", field="neutrino_eta", bins=32, start=-4.0, stop=4.0, label=r"$\eta^{\nu}$ [GeV]")]),
 
@@ -580,7 +570,7 @@ cfg = Configurator(
         "ST_gen_jet":     HistConf([Axis(coll="events", field="st_gen", label="gen ST [GeV]", type="variable", bins=[0,70,100,200,400,600,800,1200,2500,3500])]),
         "ST_fine_gen_jet": HistConf([Axis(coll="events", field="st_gen", label="gen ST [GeV]", type="variable", bins=[0,10,20,30,40,50,60,70,75,80,85,90,95,100,120,140,160,180,200,240,280,320,360,400,440,480,520,560,600,640,680,720,760,800,880,960,1040,1120,1200,2500,3500])]),
         # # # "gen_w_pt_ugly": HistConf([Axis(coll="events", field="gen_w_pt_ugly_sum", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
-        "gen_w_pt_by_pdg": HistConf([Axis(coll="events", field="gen_w_pt_by_pdg", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
+        # "gen_w_pt_by_pdg": HistConf([Axis(coll="events", field="gen_w_pt_by_pdg", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
         # "gen_w_pt_dressed": HistConf([Axis(coll="events", field="gen_w_pt_dressed", label="gen W pT [GeV]", bins=80, start=0,stop=800)]),
     
     

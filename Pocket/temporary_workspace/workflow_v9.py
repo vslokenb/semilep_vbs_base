@@ -703,7 +703,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         n_fatjets = max(1, int(np.max(ak.num(fj_sorted, axis=1))))
         for i in range(n_fatjets):
             ev[f'fatjet{i+1}'] = ak.firsts(fj_sorted[:, i:i+1])
-        for i in range(np.max(ak.num(lepton_sorted, axis=1))):  # max number of good leptons in any event
+
+        n_leptons = max(1, int(np.max(ak.num(lepton_sorted, axis=1))))
+        for i in range(n_leptons):  # max number of good leptons in any event
             ev[f'lepton{i+1}'] = ak.firsts(lepton_sorted[:, i:i+1])
         
         # object_names = [name for name in ev.fields if name.startswith(("jet", "fatjet", "lepton"))]
