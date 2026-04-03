@@ -462,7 +462,7 @@ def test_bdt(models, dtest, dtrain, channel, year, df_test, df_train,
                          label=group + " (train)", color=color,
                          linewidth=1.8, linestyle='--')
 
-    hep.cms.label("Preliminary", data=False, loc=0, fontsize=16, lumi=138.0, com=13)
+    hep.cms.label("Preliminary", data=False, loc=0, fontsize=16, lumi=16.98, com=13)
     plt.xlabel("BDT Discriminator Output", fontsize=14)
     plt.ylabel("Yields", fontsize=14)
     plt.legend(fontsize=8)

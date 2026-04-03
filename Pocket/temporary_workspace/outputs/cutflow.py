@@ -3,7 +3,7 @@ import coffea.util
 import numpy as np
 
 # Load file
-file = coffea.util.load("ht_study_dy_kfact_v3_signal_test/output_merged_ht_study_dy_kfact_v3_signal_test.coffea")
+file = coffea.util.load("/eos/user/v/vslokenb/vbs_semilep/outputs/check_signal_yield/output_merged_check_signal_yield.coffea")
 histos = file['sumw']
 
 # Define groups
@@ -11,12 +11,12 @@ groups = {
     "WJets_NLO": ["WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8"],
     "QCD": [
         "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-        "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV",
+        "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-        "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV",
+        "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
     ],
@@ -29,6 +29,7 @@ groups = {
     "DY": [
         "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
         "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+        "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
         "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",                                                                                                           
         "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",                                                                                                          
         "DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",                                                                                                          
@@ -37,19 +38,29 @@ groups = {
         "DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",                                                                                                         
         "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",                                                                                                        
         "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8", 
+        "DYJetsToLL_M-4to50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8",
+        "DYJetsToLL_M-4to50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8",
+        "DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8",
+        "DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8",
     ],
-    "Multiboson": [
+    "triboson and gluglu": [
         "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
         "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+        "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
         "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+        "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
+    ],
+    "Vgamma": [
         "WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8",
         "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
         "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
     ],
     "top": [
         "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
-        "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
-        "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
+        "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+        "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+        "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+        "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
     ],
     "WV_VBS": [
         "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
@@ -58,6 +69,9 @@ groups = {
         "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
         "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+        "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+        "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+        "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
     ],
     "WJets_LO_HT": [
         "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -82,16 +96,27 @@ categories = list(histos.keys())
 group_category_sumw = {}
 
 # Loop over all samples
-for sample in histos[categories[0]]:  # Just to get sample list
+# Just to get sample list
+for sample in histos[categories[0]]:
     group = next((g for s, g in sample_to_group.items() if s in sample), "Other")
+    print(sample, "==========", group)
 
     if group not in group_category_sumw:
         group_category_sumw[group] = {cat: 0.0 for cat in categories}
 
     for cat in categories:
-        sample_val_dict = histos[cat][sample]
-        val = sample_val_dict[list(sample_val_dict.keys())[0]]
+        # histos['sumw'][category][sample]
+        sample_dict = histos[cat][sample]
+
+        # one base-sample level
+        base_sample = next(iter(sample_dict))
+
+        # nominal systematic
+        val = sample_dict[base_sample].get('nominal', 0.0)
+
         group_category_sumw[group][cat] += val
+
+
 
 # Only keep non-empty groups
 plot_groups = sorted([

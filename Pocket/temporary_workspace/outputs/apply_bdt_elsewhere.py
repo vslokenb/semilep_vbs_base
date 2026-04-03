@@ -182,7 +182,7 @@ def plot_training_curves(evals_result, outpath="bdt/training_curves.png"):
     plt.close()
     print(f"Saved training curve to {outpath}")
 
-def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
+def test_bdt(model_file, dtrain, channel, df_train, tag="", unitary=True):
     """
     Evaluate trained BDT on a test set using the best iteration found during training.
     """
@@ -196,24 +196,15 @@ def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
         print("Best iteration:", best_iteration)
     else:
         raise ValueError(f"Could not find iteration number in filename: {model_file}")
+
     bdt = xgb.Booster()
     bdt.load_model(model_file)
-    # Use only trees up to the best iteration
     ypred = bdt.predict(dtrain, iteration_range=(0, best_iteration + 1))
-    # ypred_training = bdt.predict(dtrain, iteration_range=(0, bdt.best_iteration + 1) )
-
     ytrue = dtrain.get_label()
-    # # ytrue_training = dtrain.get_label()
 
     auc = roc_auc_score(ytrue, ypred)
-    # acc = accuracy_score(ytrue, ypred > 0.5)
-    # # auc_t = roc_auc_score(ytrue_training, ypred_training)
-    # # acc_t = accuracy_score(ytrue_training, ypred_training > 0.5)
-
-    # print(f" Test AUC (best iter {bdt.best_iteration}): {auc:.4f}")
-    # print(f" Test Accuracy: {acc:.4f}")
-
     fpr, tpr, _ = roc_curve(ytrue, ypred)
+
     plt.figure(figsize=(6, 6))
     plt.plot(fpr, tpr, label=f"Test AUC = {auc:.3f}", linewidth=2)
     plt.plot([0, 1], [0, 1], "k--", linewidth=1)
@@ -223,120 +214,114 @@ def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"bdt/eval_2018_roc_curve_{channel}_{tag}.png", dpi=300)
+    plt.savefig(f"bdt/eval_2017_roc_curve_{channel}_{tag}.png", dpi=300)
     plt.close()
-    print(f"Saved ROC curve as 'eval_2018_roc_curve_{channel}_{tag}.png'")
+    print(f"Saved ROC curve as 'eval_2017_roc_curve_{channel}_{tag}.png'")
 
-
+    # ---- setup ----
     df_plot = df_train.copy()
     df_plot["bdt_score"] = ypred
 
-    # df_plot_t = df_train.copy()
-    # df_plot_t["bdt_score"] = ypred_training
+    process_groups = {
+        "VBS_EWK": ["WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                    "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8"],
+        "Top/ttbar": ["ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+                      "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                      "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                      "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                      "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                      "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                      "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                      "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                      "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8"],
+        "W+jets": ["WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                   "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8"],
+        "DY": ["DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+               "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8"],
+        "Data": ["SingleMuon"],
+    }
 
     def map_to_group(proc):
         for group_name, members in process_groups.items():
             if proc in members:
                 return group_name
         return "Other"
-    
 
-    process_groups = {
-    "VBS_EWK": ["WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8"],     
-
-    "Top/ttbar": ["ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
-            "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-            "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-            "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
-            "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
-            "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-            "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
-            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8"],
-
-    "W+jets": ["WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8"],
-    "DY": ["DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8","DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8"],
-    "Data": ["SingleMuon"],
-    }
     df_plot["group"] = df_plot["process"].apply(map_to_group)
-    # df_plot_t["group"] = df_plot_t["process"].apply(map_to_group)
-
-
     groups = sorted(df_plot["group"].unique())
-    # groups_t = sorted(df_plot_t["group"].unique())
+    has_data = "Data" in groups
+
     bins = np.linspace(0, 1, 40)
     bin_centers = 0.5 * (bins[:-1] + bins[1:])
     hist_data = {}
-    # hist_data_t = {}
-    plt.figure(figsize=(8, 6))
 
-    # Prepare containers for stacking
-    stack_values = []
-    stack_labels = []
-    stack_colors = []
-    bottom = None  # to be filled after we compute first hist
-
-    # Optional colormap for unique colors
     from matplotlib.cm import get_cmap
     cmap = get_cmap("tab10")
-    colors = [cmap(i % 10) for i in range(len(groups))]
+    colors = {g: cmap(i % 10) for i, g in enumerate(groups)}
 
-    scale_to_full_run2 = (137938.0/41479.7) #1/0.1158 *
+    scale_to_full_run2 = 137938.0 / 41479.7
 
+    # ---- build figure with optional ratio panel ----
+    if has_data and not unitary:
+        fig, (ax, rax) = plt.subplots(
+            2, 1, figsize=(8, 8),
+            gridspec_kw={"height_ratios": [3, 1]},
+            sharex=True
+        )
+        fig.subplots_adjust(hspace=0.06)
+    else:
+        fig, ax = plt.subplots(figsize=(8, 6))
+        rax = None
+
+    # ---- fill histograms ----
     if unitary:
         for i, group in enumerate(groups):
             sub = df_plot[df_plot["group"] == group]
-            scale = 1 / np.sum(sub['weight'])
-            values, edges = np.histogram(sub["bdt_score"], bins=bins, weights=scale*sub["weight"])
-            w2, _ = np.histogram(sub["bdt_score"], bins=bins, weights=scale*sub["weight"]**2)
-            hist_data[group] = {
-                "yields": values,
-                "stat_unc": np.sqrt(w2), 
-                "edges": edges,
-                "centers": bin_centers,
-                "sumw": np.sum(sub["weight"])
-            }
+            scale = 1 / np.sum(sub["weight"])
+            values, _ = np.histogram(sub["bdt_score"], bins=bins, weights=scale * sub["weight"])
+            w2, _    = np.histogram(sub["bdt_score"], bins=bins, weights=(scale * sub["weight"]) ** 2)
+            hist_data[group] = {"yields": values, "stat_unc": np.sqrt(w2)}
             if group == "Data":
-                plt.scatter(bin_centers, values, label=group, linewidth=1.8, marker='.',color='black')
+                ax.scatter(bin_centers, values, label=group, marker=".", color="black")
             else:
-                plt.step(bin_centers, values, where='mid', label=group,color=colors[i], linewidth=1.8)
+                ax.step(bin_centers, values, where="mid", label=group,
+                        color=colors[group], linewidth=1.8)
     else:
         stack_values, stack_labels, stack_colors = [], [], []
-        for i, group in enumerate(groups):
+        data_vals = data_err = None
+
+        for group in groups:
             sub = df_plot[df_plot["group"] == group]
-            values, edges = np.histogram(sub["bdt_score"], bins=bins, weights=scale_to_full_run2*sub["weight"])
-            w2, _ = np.histogram(sub["bdt_score"], bins=bins, weights=(scale_to_full_run2*sub["weight"])**2)
-            hist_data[group] = {
-                "yields": values,
-                "stat_unc": np.sqrt(w2), 
-                "edges": edges,
-                "centers": bin_centers,
-                "sumw": scale_to_full_run2*np.sum(sub["weight"])
-            }
+            values, _ = np.histogram(sub["bdt_score"], bins=bins,
+                                     weights=scale_to_full_run2 * sub["weight"])
+            w2, _     = np.histogram(sub["bdt_score"], bins=bins,
+                                     weights=(scale_to_full_run2 * sub["weight"]) ** 2)
+            hist_data[group] = {"yields": values, "stat_unc": np.sqrt(w2)}
+
             if group == "Data":
-                data_vals, data_err = values, hist_data[group]["stat_unc"]
+                data_vals = values
+                data_err  = np.sqrt(w2)
             else:
                 stack_values.append(values)
                 stack_labels.append(group)
-                stack_colors.append(colors[i])
+                stack_colors.append(colors[group])
+
         if stack_values:
-            plt.hist(
+            ax.hist(
                 [bin_centers] * len(stack_values),
                 bins=bins,
                 weights=stack_values,
@@ -345,47 +330,54 @@ def test_bdt(model_file, dtrain, channel,df_train, tag="",unitary=True):
                 label=stack_labels,
                 edgecolor="none",
             )
-        if "data_vals" in locals():
-            plt.errorbar(
-                bin_centers,
-                data_vals,
-                yerr=data_err,
-                label="Data",
-                linewidth=1.8,
-                marker="o",
-                color="black",
-                linestyle="none",
-                zorder=10,
-            )
-        plt.yscale('log')
-    # scale_factor = 1/3
-    # for group in groups_t:
-    #     sub_t = df_plot_t[df_plot_t["group"] == group]
-    #     values_t, edges_t = np.histogram(sub_t["bdt_score"], bins=bins, weights=sub_t["weight"])
-    #     w2_t, _ = np.histogram(sub_t["bdt_score"], bins=bins, weights=sub_t["weight"]**2)
-    #     values_t *= scale_factor
-    #     w2_t *= scale_factor
-    #     hist_data_t[group] = {
-    #         "yields": values_t,
-    #         "stat_unc": np.sqrt(w2_t), 
-    #         "edges": edges_t,
-    #         "centers": bin_centers,
-    #         "sumw": np.sum(sub_t["weight"])
-    #     }
+        if data_vals is not None:
+            ax.errorbar(bin_centers, data_vals, yerr=data_err,
+                        label="Data", marker="o", color="black",
+                        linestyle="none", linewidth=1.8, zorder=10)
+        ax.set_yscale("log")
 
-    #     plt.errorbar(bin_centers, values_t, yerr = hist_data[group]["stat_unc"], label=group, linewidth=1.8)
-    plt.xlabel("BDT Discriminator Output")
-    plt.ylabel("Yield")
-    plt.title(f"BDT - {channel}")
-    plt.legend(fontsize=8)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    outpath = f"bdt/eval2018_discriminator_{channel}_"+tag+".png"
-    plt.savefig(outpath, dpi=300)
-    plt.close()
+        # ---- ratio panel ----
+        if rax is not None and data_vals is not None and stack_values:
+            mc_total     = np.sum(stack_values, axis=0)
+            mc_total_err = np.sqrt(sum(hist_data[g]["stat_unc"]**2
+                                       for g in stack_labels))
+
+            ratio      = np.where(mc_total > 0, data_vals / mc_total, np.nan)
+            ratio_err  = np.where(mc_total > 0, data_err / mc_total,  np.nan)
+
+            # MC stat uncertainty band around 1
+            mc_rel_err = np.where(mc_total > 0, mc_total_err / mc_total, 0)
+            rax.fill_between(bins,
+                             np.r_[1 - mc_rel_err, (1 - mc_rel_err)[-1]],
+                             np.r_[1 + mc_rel_err, (1 + mc_rel_err)[-1]],
+                             step="post", alpha=0.3, color="gray", label="MC stat. unc.")
+
+            rax.errorbar(bin_centers, ratio, yerr=ratio_err,
+                         marker="o", color="black", linestyle="none",
+                         linewidth=1.5, zorder=10)
+            rax.axhline(1.0, color="black", linestyle="--", linewidth=1)
+            rax.set_ylim(0.5, 1.5)
+            rax.set_ylabel("Data / MC", fontsize=11)
+            rax.set_xlabel("BDT Discriminator Output", fontsize=12)
+            rax.grid(True, alpha=0.3)
+        else:
+            ax.set_xlabel("BDT Discriminator Output", fontsize=12)
+    
+    if rax is None:
+        ax.set_xlabel("BDT Discriminator Output", fontsize=12)
+
+    ax.set_ylabel("Yield", fontsize=12)
+    ax.set_title(f"BDT - {channel}")
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+
+    outpath = f"bdt/eval2017_discriminator_{channel}_{tag}.png"
+    fig.savefig(outpath, dpi=300)
+    plt.close(fig)
     print(f"Saved discriminator plot: {outpath}")
-
     return hist_data
+
 def plot_feature_importance(bdt_best, outpath="bdt/feature_importance.png"):
     ax = xgb.plot_importance(bdt_best, max_num_features=100, importance_type="gain")
     fig = ax.figure

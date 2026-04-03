@@ -20,7 +20,7 @@ from coffea.util import load, save
 from coffea import processor
 
 # Directory containing .coffea files
-input_dir = "ht_study_dy_kfact_v3_signal_test"  # <-- Change this to your directory
+input_dir = "reweight_v3"  # <-- Change this to your directory
 output_file = input_dir+"/output_merged_"+input_dir+".coffea"
 
 # Find all .coffea files in the directory
