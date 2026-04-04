@@ -295,7 +295,7 @@ cfg = Configurator(
                     "inclusive": ["wjet_reweight"],},
                 "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
                     "inclusive": ["wjet_reweight"],},
-                "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
+                "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8":{
                      "inclusive": ["wjet_reweight"],},
             }    
         },

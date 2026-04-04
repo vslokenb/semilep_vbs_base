@@ -59,7 +59,15 @@ from custom_cut_functions_nonprompt import (
     qcd_enriched_cut_35_deepmet_resolution_3j,
     qcd_enriched_cut_30_deepmet_resolution_3j,
     qcd_enriched_cut_40_deepmet_resolution_3j,
-    qcd_enriched_cut_45_deepmet_resolution_3j
+    qcd_enriched_cut_35_deepmet20_resolution_3j,
+    qcd_enriched_cut_30_deepmet20_resolution_3j,
+    qcd_enriched_cut_40_deepmet20_resolution_3j,
+    qcd_enriched_cut_45_deepmet_resolution_3j,
+    qcd_enriched_cut_35_deepmet_resolution_3j60,
+    qcd_enriched_cut_35_deepmet_resolution_3j45,
+    qcd_enriched_cut_35_deepmet_resolution_3j_mT,
+    qcd_enriched_cut_35_deepmet_resolution_3j60_mT,
+    qcd_enriched_cut_20_deepmet_resolution_3j,
 )
 
 
@@ -98,7 +106,7 @@ from custom_cut_functions_nonprompt import (
 cloudpickle.register_pickle_by_value(workflow_nonprompt)
 cloudpickle.register_pickle_by_value(reweighting_st)
 cloudpickle.register_pickle_by_value(custom_cut_functions_nonprompt)
-
+from reweighting_st import ratio_function
 localdir = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -137,13 +145,13 @@ cfg = Configurator(
             #######
             ## RUN 2 BKG
             # #########
-            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
-            #
-            #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # XSEC STUDIES
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # #
+            # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # # XSEC STUDIES
             #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
@@ -163,35 +171,35 @@ cfg = Configurator(
             
             #END XSEC STUDIES
 
-            #f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
             
 
-            f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
 
-            #f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
 
-            f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
 
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
+            # #f"{localdir}/datasets/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
 
-            f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
-            f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.json",
+            # f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
+            # f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.json",
             # f"{localdir}/datasets/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8.json",
             # f"{localdir}/datasets/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.json",
             # f"{localdir}/datasets/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.json",
@@ -252,13 +260,30 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
-            f"{localdir}/datasets/SingleElectron.json", ## 2017B Single Muon dataset
-            f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
+            # f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
+            # f"{localdir}/datasets/SingleElectron.json", ## 2017B Single Muon dataset
+            # f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
             # #f"{localdir}/datasets/EGamma_G.json"
             # #f"{localdir}/datasets/Muon.json",
             # f"{localdir}/datasets/Muon_2022E.json"
 
+                        #### only 1 era below
+            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            f"{localdir}/datasets/SingleMuon_fast.json",
+            f"{localdir}/datasets/SingleElectron_fast.json",
+            f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_fast.json",
+            f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
+            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             
         ],
         "filter": {
@@ -267,17 +292,17 @@ cfg = Configurator(
             #########
             ## RUN 2 BKG
             #########
-            "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
+            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17",
@@ -296,7 +321,7 @@ cfg = Configurator(
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_fix2",
             # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_fix2",
             
-            #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -378,10 +403,10 @@ cfg = Configurator(
             #########
             "SingleMuon", ## 2017B Single Muon dataset
             "SingleElectron",
-            "EGamma",
+            # "EGamma",
             # "Muon"
             ],
-            "year": ["2018"],
+            "year": ["2016_PostVFP"],
         },
     },
     workflow=VBSSemileptonicProcessor,
@@ -402,46 +427,56 @@ cfg = Configurator(
    
     categories={
         "baseline": [passthrough],
-        "qcd_enriched_30": [qcd_enriched_cut_30],
-        "qcd_enriched_35": [qcd_enriched_cut_35],
-        "qcd_enriched_40": [qcd_enriched_cut_40],
-        "qcd_enriched_45": [qcd_enriched_cut_45],
-        "qcd_enriched_30_2j": [qcd_enriched_cut_30_2j],
-        "qcd_enriched_35_2j": [qcd_enriched_cut_35_2j],
-        "qcd_enriched_40_2j": [qcd_enriched_cut_40_2j],
-        "qcd_enriched_45_2j": [qcd_enriched_cut_45_2j],
-        "qcd_enriched_30_3j": [qcd_enriched_cut_30_3j],
-        "qcd_enriched_35_3j": [qcd_enriched_cut_35_3j],
-        "qcd_enriched_40_3j": [qcd_enriched_cut_40_3j],
-        "qcd_enriched_45_3j": [qcd_enriched_cut_45_3j],
-        "qcd_enriched_30_4j": [qcd_enriched_cut_30_4j],
-        "qcd_enriched_35_4j": [qcd_enriched_cut_35_4j],
-        "qcd_enriched_40_4j": [qcd_enriched_cut_40_4j],
-        "qcd_enriched_45_4j": [qcd_enriched_cut_45_4j],
-        "qcd_enriched_30_deepmet_response": [qcd_enriched_cut_30_deepmet_response],
-        "qcd_enriched_35_deepmet_response": [qcd_enriched_cut_35_deepmet_response],
-        "qcd_enriched_40_deepmet_response": [qcd_enriched_cut_40_deepmet_response],
-        "qcd_enriched_45_deepmet_response": [qcd_enriched_cut_45_deepmet_response],
+        # "qcd_enriched_30": [qcd_enriched_cut_30],
+        # "qcd_enriched_35": [qcd_enriched_cut_35],
+        # "qcd_enriched_40": [qcd_enriched_cut_40],
+        # "qcd_enriched_45": [qcd_enriched_cut_45],
+        # "qcd_enriched_30_2j": [qcd_enriched_cut_30_2j],
+        # "qcd_enriched_35_2j": [qcd_enriched_cut_35_2j],
+        # "qcd_enriched_40_2j": [qcd_enriched_cut_40_2j],
+        # "qcd_enriched_45_2j": [qcd_enriched_cut_45_2j],
+        # "qcd_enriched_30_3j": [qcd_enriched_cut_30_3j],
+        # "qcd_enriched_35_3j": [qcd_enriched_cut_35_3j],
+        # "qcd_enriched_40_3j": [qcd_enriched_cut_40_3j],
+        # "qcd_enriched_45_3j": [qcd_enriched_cut_45_3j],
+        # "qcd_enriched_30_4j": [qcd_enriched_cut_30_4j],
+        # "qcd_enriched_35_4j": [qcd_enriched_cut_35_4j],
+        # "qcd_enriched_40_4j": [qcd_enriched_cut_40_4j],
+        # "qcd_enriched_45_4j": [qcd_enriched_cut_45_4j],
+        # "qcd_enriched_30_deepmet_response": [qcd_enriched_cut_30_deepmet_response],
+        # "qcd_enriched_35_deepmet_response": [qcd_enriched_cut_35_deepmet_response],
+        # "qcd_enriched_40_deepmet_response": [qcd_enriched_cut_40_deepmet_response],
+        # "qcd_enriched_45_deepmet_response": [qcd_enriched_cut_45_deepmet_response],
         "qcd_enriched_30_deepmet_resolution": [qcd_enriched_cut_30_deepmet_resolution],
         "qcd_enriched_35_deepmet_resolution": [qcd_enriched_cut_35_deepmet_resolution],
         "qcd_enriched_40_deepmet_resolution": [qcd_enriched_cut_40_deepmet_resolution],
         "qcd_enriched_45_deepmet_resolution": [qcd_enriched_cut_45_deepmet_resolution],
-        "qcd_enriched_30_deepmet_response_2j": [qcd_enriched_cut_30_deepmet_response_2j],
-        "qcd_enriched_35_deepmet_response_2j": [qcd_enriched_cut_35_deepmet_response_2j],
-        "qcd_enriched_40_deepmet_response_2j": [qcd_enriched_cut_40_deepmet_response_2j],
-        "qcd_enriched_45_deepmet_response_2j": [qcd_enriched_cut_45_deepmet_response_2j],
-        "qcd_enriched_30_deepmet_resolution_2j": [qcd_enriched_cut_30_deepmet_resolution_2j],
+        # "qcd_enriched_30_deepmet_response_2j": [qcd_enriched_cut_30_deepmet_response_2j],
+        # "qcd_enriched_35_deepmet_response_2j": [qcd_enriched_cut_35_deepmet_response_2j],
+        # "qcd_enriched_40_deepmet_response_2j": [qcd_enriched_cut_40_deepmet_response_2j],
+        # "qcd_enriched_45_deepmet_response_2j": [qcd_enriched_cut_45_deepmet_response_2j],
+        # "qcd_enriched_30_deepmet_resolution_2j": [qcd_enriched_cut_30_deepmet_resolution_2j],
         "qcd_enriched_35_deepmet_resolution_2j": [qcd_enriched_cut_35_deepmet_resolution_2j],
         "qcd_enriched_40_deepmet_resolution_2j": [qcd_enriched_cut_40_deepmet_resolution_2j],
         "qcd_enriched_45_deepmet_resolution_2j": [qcd_enriched_cut_45_deepmet_resolution_2j],
-        "qcd_enriched_30_deepmet_response_3j": [qcd_enriched_cut_30_deepmet_response_3j],
-        "qcd_enriched_35_deepmet_response_3j": [qcd_enriched_cut_35_deepmet_response_3j],
-        "qcd_enriched_40_deepmet_response_3j": [qcd_enriched_cut_40_deepmet_response_3j],
-        "qcd_enriched_45_deepmet_response_3j": [qcd_enriched_cut_45_deepmet_response_3j],
+        # "qcd_enriched_30_deepmet_response_3j": [qcd_enriched_cut_30_deepmet_response_3j],
+        # "qcd_enriched_35_deepmet_response_3j": [qcd_enriched_cut_35_deepmet_response_3j],
+        # "qcd_enriched_40_deepmet_response_3j": [qcd_enriched_cut_40_deepmet_response_3j],
+        # "qcd_enriched_45_deepmet_response_3j": [qcd_enriched_cut_45_deepmet_response_3j],
         "qcd_enriched_30_deepmet_resolution_3j": [qcd_enriched_cut_30_deepmet_resolution_3j],
         "qcd_enriched_35_deepmet_resolution_3j": [qcd_enriched_cut_35_deepmet_resolution_3j],
         "qcd_enriched_40_deepmet_resolution_3j": [qcd_enriched_cut_40_deepmet_resolution_3j],
-        "qcd_enriched_45_deepmet_resolution_3j": [qcd_enriched_cut_45_deepmet_resolution_3j]
+        "qcd_enriched_45_deepmet_resolution_3j": [qcd_enriched_cut_45_deepmet_resolution_3j],
+        "qcd_enriched_35_deepmet_resolution_3j60": [qcd_enriched_cut_35_deepmet_resolution_3j60],
+        "qcd_enriched_35_deepmet_resolution_3j45": [qcd_enriched_cut_35_deepmet_resolution_3j45],
+        "qcd_enriched_35_deepmet_resolution_3j_mT": [qcd_enriched_cut_35_deepmet_resolution_3j_mT],
+        "qcd_enriched_35_deepmet_resolution_3j60_mT": [qcd_enriched_cut_35_deepmet_resolution_3j60_mT],
+        "qcd_enriched_30_deepmet20_resolution_3j": [qcd_enriched_cut_30_deepmet20_resolution_3j],
+        "qcd_enriched_35_deepmet20_resolution_3j": [qcd_enriched_cut_35_deepmet20_resolution_3j],
+        "qcd_enriched_40_deepmet20_resolution_3j": [qcd_enriched_cut_40_deepmet20_resolution_3j],
+        "qcd_enriched_20_deepmet_resolution_3j": [qcd_enriched_cut_20_deepmet_resolution_3j],
+        
+    
     },
 
    
@@ -451,10 +486,26 @@ cfg = Configurator(
     #weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "pileup", "sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco"]}},
     #variations={"weights": {"common": {"inclusive": ["pileup", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco"]}}}, #"pileup"
     weights={"common": {"inclusive": ["lumi", "XS","PileupWeight", "genWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]},
-        # "bysample": {
-        #         "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
-        #              "inclusive": ["wjet_reweight"],},
-        #     }    
+        "bysample": {
+               "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8":{
+                     "inclusive": ["wjet_reweight"],},
+            }    
         },
     variations={"weights": {"common": {"inclusive": []}}},#"PileupWeight","sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]}}},
 
@@ -539,5 +590,7 @@ cfg = Configurator(
                 Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$")
             ] ),
         "mt_w_leptonic": HistConf([Axis(coll="events", field="mt_w_leptonic",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
+        "pt_miss": HistConf([Axis(coll="DeepMETResolutionTune", field="pt",bins=20, start=0, stop=100, label=r"$p_T_{miss})$ [GeV]")]),
+        
     },
 )

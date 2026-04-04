@@ -30,10 +30,10 @@ def select_vbs_semileptonic(events, params, **kwargs):
     
     one_loosest_mu = (ak.num(events.Muon) >= 1) #& (ak.num(events.Electron) == 0)
     one_loosest_ele = (ak.num(events.Electron) >= 1)
-    # ht_mask = (events.LHE.HT <= 70.)
+    ht_mask = (events.LHE.HT <= 70.)
     
     # w_pt_stitch = (events.gen_w_pt_by_pdg < 100)
-    mask = (one_loosest_mu | one_loosest_ele) #& ht_mask#& w_pt_stitch#& ht_mask#& met_cut & two_j & cut_mt_w & b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
+    mask = (one_loosest_mu | one_loosest_ele) & ht_mask#& w_pt_stitch#& ht_mask#& met_cut & two_j & cut_mt_w & b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(

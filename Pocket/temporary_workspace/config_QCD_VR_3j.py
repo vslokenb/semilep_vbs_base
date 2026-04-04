@@ -58,7 +58,7 @@ from custom_cut_functions_nonprompt import (
     whad_window_cut_baccept_mu,
     msd_window_cut_baccept_mu
 )
-
+from reweighting_st import ratio_function
 
 # class PileupWeight(WeightWrapper):
 #     name = "PileupWeight"
@@ -369,22 +369,22 @@ cfg = Configurator(
             #########
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
+            #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -395,8 +395,8 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
             # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
             # "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
@@ -459,7 +459,7 @@ cfg = Configurator(
             ## SOME DATA
             #########
             "SingleMuon", ## 2017B Single Muon dataset
-            "SingleElectron",
+            # "SingleElectron",
             "EGamma",
             # "Muon"
             ],
@@ -496,10 +496,26 @@ cfg = Configurator(
     weights_classes=common_weights+[MuonGoodLeadWeight,ElectronGoodLeadWeight]+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight]+[SF_ele_trigger],#+[PileupWeight],
     #weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele
     weights={"common": {"inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "genWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]},
-        # "bysample": {
-        #         "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
-        #              "inclusive": ["wjet_reweight"],},
-        #     }    
+        "bysample": {
+               "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
+                     "inclusive": ["wjet_reweight"],},
+            }     
         },
     variations={"weights": {"common": {"inclusive": ["lumi", "XS","PileupWeight","sf_mu_id", "sf_mu_iso", "sf_ele_id", "sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_ele_trigger","sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
     # weights={

@@ -66,9 +66,12 @@ def select_vbs_semileptonic(events, params, **kwargs):
     #     lep_central = True
     #one_loosest_lep = (ak.num(events.Muon) == 1) #& (ak.num(events.Electron) == 0)
 
-    # ht_mask = (events.LHE.HT <= 70.)
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
     # w_pt_stitch = (events.gen_w_pt_by_pdg < 100)
-    mask = one_lep & met_cut & two_j & cut_mt_w #& ht_mask#& b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
+    mask = one_lep & met_cut & two_j & cut_mt_w & ht_mask#& b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(

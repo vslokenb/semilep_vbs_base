@@ -104,9 +104,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonGood_0"]     = lepton_selection(ev, "Muon", tight_criteria)
         mu = ev.MuonGood_0
         mask_muon_ip = (
-            (np.abs(mu.dxy) < 0.02) & (np.abs(mu.eta) < 1.479) & (np.abs(mu.dz) < 0.1)
+            (np.abs(mu.dxy) < 0.2) & (np.abs(mu.eta) < 1.479) & (np.abs(mu.dz) < 0.5)
         ) | (
-            (np.abs(mu.dxy) < 0.02) & (np.abs(mu.eta) >= 1.479) & (np.abs(mu.eta) < 2.4) & (np.abs(mu.dz) < 0.1)
+            (np.abs(mu.dxy) < 0.2) & (np.abs(mu.eta) >= 1.479) & (np.abs(mu.eta) < 2.4) & (np.abs(mu.dz) < 0.5)
         )
 
 
@@ -240,7 +240,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ) | (
             (np.abs(ev.MuonMedium.pt) <= 20) & (np.abs(ev.MuonMedium.dxy) < 0.01) & (np.abs(ev.MuonMedium.dz) < 0.1)
         )
-        ev["MuonLoose"] = ev.MuonLoose[mask4]
+        # ev["MuonLoose"] = ev.MuonLoose[mask4]
         ev["MuonMedium"] = ev.MuonMedium[mask_4]
 
         ev["ElectronVeto"] = ev.Electron #lepton_selection(ev, "Electron", loose_criteria)
@@ -250,7 +250,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ) | (
             (np.abs(ev.ElectronVeto.dxy) < 0.1) & (np.abs(ev.ElectronVeto.eta) >= 1.479) & (np.abs(ev.ElectronVeto.eta) < 2.4) & (np.abs(ev.ElectronVeto.dz) < 0.2) #& (ev.ElectronVeto.sieie < 0.03) & (ev.ElectronVeto.eInvMinusPInv < 0.014)
         )
-        ev["ElectronVeto"] = ev.ElectronVeto[mask3 & (ev.ElectronVeto.cutBased >= 2) & (ev.ElectronVeto.pt >= 10)]
+        ev["ElectronVeto"] = ev.ElectronVeto[mask3 & (ev.ElectronVeto.cutBased >= 1) & (ev.ElectronVeto.pt >= 10)]
         
         ev["ElectronLoose"] = ev.Electron #lepton_selection(ev, "Electron", loose_criteria)
 
@@ -259,7 +259,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ) | (
             (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.4) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
         )
-        ev["ElectronLoose"] = ev.ElectronLoose[mask3_0 & (ev.ElectronLoose.cutBased >= 2) & (ev.ElectronLoose.pt >= 38)]
+        ev["ElectronLoose"] = ev.ElectronLoose[ (ev.ElectronLoose.cutBased >= 1) & (ev.ElectronLoose.pt >= 38)]#mask3_0 &
        
         ev["ElectronMedium"] = ev.Electron
         mask_3 = (
@@ -307,6 +307,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         lead_lep_loose = ak.firsts(ev.LeptonLoose)
         ev["MuonGoodLead"] = ak.firsts(ev.MuonGood[ak.argsort(ev.MuonGood.pt, ascending=False)])
         ev["ElectronGoodLead"] = ak.firsts(ev.ElectronGood[ak.argsort(ev.ElectronGood.pt, ascending=False)])
+
         #lep_i = ak.fill_none(getattr(lead_lep, "jetIdx", None), -1)
         #print(ev.LeptonGood.fields)
         ev["JetGood_0"], _ = jet_selection(ev, "Jet", self.params, self._year,"LeptonLoose") #MAYBE THIS SHOULD BE LOOSE LEPTON
@@ -493,6 +494,15 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             deta= (j1.eta - j2.eta)
             dR = np.sqrt(dphi**2 + deta **2)
             return dR
+
+        ev["ElectronGoodLead","dphi_met"] = abs(delta_phi(ev.ElectronGoodLead.phi,ev.DeepMETResolutionTune.phi))
+        ev["MuonGoodLead","dphi_met"] =  abs(delta_phi(ev.MuonGoodLead.phi,ev.DeepMETResolutionTune.phi))
+       
+
+        ev["ElectronGood","dphi_met"] = abs(delta_phi(ev.ElectronGood.phi,ev.DeepMETResolutionTune.phi))
+        ev["ElectronLoose","dphi_met"] =  abs(delta_phi(ev.ElectronLoose.phi,ev.DeepMETResolutionTune.phi))
+        ev["MuonGood","dphi_met"] =  abs(delta_phi(ev.MuonGood.phi,ev.DeepMETResolutionTune.phi))
+        ev["MuonLoose","dphi_met"] =  abs(delta_phi(ev.MuonLoose.phi,ev.DeepMETResolutionTune.phi))
 
         nonvbs_mask = (ev.JetGood.idx != vbs_i) & (ev.JetGood.idx != vbs_j) #& (ev.JetGood.idx != lep_i) #see if can better clean out dR tail at 0
         ev["CentralJets"] = ev.JetGood[nonvbs_mask]

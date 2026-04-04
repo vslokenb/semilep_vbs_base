@@ -13,7 +13,7 @@ import awkward as ak
 from pocket_coffea.lib.weights import WeightWrapper, WeightData, WeightDataMultiVariation, WeightLambda
 from pocket_coffea.lib.scale_factors import sf_pileup_reweight
 
-
+from reweighting_st import ratio_function
 import workflow_invertlepton_noiso, custom_cut_functions_nonprompt, reweighting_st
 from workflow_invertlepton_noiso import VBSSemileptonicProcessor
 from custom_cut_functions_nonprompt import (
@@ -175,14 +175,16 @@ class MuonGoodLeadWeight(WeightWrapper):
         # IMPORTANT: X=pt, Y=eta
         pt  = ak.where(has_mu, mu.pt, 0.0)
         eta = ak.where(has_mu, mu.eta, 0.0)
+        dphi = ak.where(has_mu,mu.dphi_met, 0.0)
         pt  = ak.where(has_mu, np.clip(pt, 26.0, 100.0), pt)
         eta = ak.where(has_mu, np.clip(eta, -2.4, 2.4), eta)
-        nominal = fake_muon_weights[year]["nominal"](pt, eta)
+        dphi = ak.where(has_mu, np.clip(dphi,0,3.14), dphi)
+        nominal = fake_muon_weights[year]["nominal"](pt, eta,dphi)
         nominal = ak.where(has_mu, nominal, 1.0)
-        up      = fake_muon_weights[year]["up"](pt, eta)
+        up      = fake_muon_weights[year]["up"](pt, eta, dphi)
         up      = ak.where(has_mu, up, 1.0)
         up = ak.fill_none(up,1.0)
-        down    = fake_muon_weights[year]["down"](pt, eta)
+        down    = fake_muon_weights[year]["down"](pt, eta, dphi)
         down    = ak.where(has_mu, down, 1.0)
         down = ak.fill_none(down,1.0)
         print("nominal ",nominal)
@@ -207,14 +209,16 @@ class ElectronGoodLeadWeight(WeightWrapper):
         # IMPORTANT: X=pt, Y=eta
         pt  = ak.where(has_ele, ele.pt, 0.0)
         eta = ak.where(has_ele, ele.eta, 0.0)
+        dphi = ak.where(has_ele,ele.dphi_met, 0.0)
         pt  = ak.where(has_ele, np.clip(pt, 35.0, 100.0), pt)
         eta = ak.where(has_ele, np.clip(eta, -2.4, 2.4), eta)
-        nominal = fake_electron_weights[year]["nominal"](pt, eta)
+        dphi = ak.where(has_ele, np.clip(dphi,0,3.14), dphi)
+        nominal = fake_electron_weights[year]["nominal"](pt, eta,dphi)
         nominal = ak.where(has_ele, nominal, 1.0)
-        up      = fake_electron_weights[year]["up"](pt, eta)
+        up      = fake_electron_weights[year]["up"](pt, eta, dphi)
         up      = ak.where(has_ele, up, 1.0)
         up = ak.fill_none(up,1.0)
-        down    = fake_electron_weights[year]["down"](pt, eta)
+        down    = fake_electron_weights[year]["down"](pt, eta, dphi)
         down    = ak.where(has_ele, down, 1.0)
         down = ak.fill_none(down,1.0)
         print("nominal ",nominal)
@@ -237,9 +241,9 @@ cfg = Configurator(
             f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #
-            #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
             # XSEC STUDIES
             #f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
@@ -260,11 +264,11 @@ cfg = Configurator(
             
             #END XSEC STUDIES
 
-            #f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            #f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
@@ -364,17 +368,17 @@ cfg = Configurator(
             #########
             ## RUN 2 BKG
             #########
-            "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17",
-            #"WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_17",
@@ -397,7 +401,7 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-             "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
@@ -473,9 +477,9 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            "SingleMuon", ## 2017B Single Muon dataset
-            "SingleElectron",
-            "EGamma",
+            # "SingleMuon", ## 2017B Single Muon dataset
+            # #"SingleElectron",
+            # "EGamma",
             # "Muon"
             ],
             "year": ["2018"],
@@ -551,7 +555,11 @@ cfg = Configurator(
            "common": {
                "inclusive": ["genWeight", "lumi", "XS","muon_inverttight_to_fake","electron_inverttight_to_fake"]
                },
-           },
+            "bysample": {
+                "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8":{
+                     "inclusive": ["wjet_reweight"],},
+                }, 
+            },
     variations={
            "weights": {
                "common": {

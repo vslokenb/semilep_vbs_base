@@ -92,7 +92,7 @@ from custom_cut_functions_nonprompt import (
 #             )
 
 
-
+from reweighting_st import ratio_function
 
 cloudpickle.register_pickle_by_value(workflow_invertlepton_noiso)
 cloudpickle.register_pickle_by_value(reweighting_st)
@@ -472,9 +472,9 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            "SingleMuon", ## 2017B Single Muon dataset
+            # "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            "EGamma",
+            # "EGamma",
             # "Muon"
             ],
             "year": ["2018"],
@@ -520,6 +520,26 @@ cfg = Configurator(
            "common": {
                "inclusive": ["genWeight", "lumi", "XS","muon_inverttight_to_fake","electron_inverttight_to_fake"]
                },
+            "bysample": {
+               "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
+                    "inclusive": ["wjet_reweight"],},
+                "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
+                     "inclusive": ["wjet_reweight"],},
+                }, 
            },
     variations={
            "weights": {

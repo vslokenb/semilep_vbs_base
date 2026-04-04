@@ -99,7 +99,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                     "pt": 30.0,
                     "eta": 2.4,
                     "id": "looseId",
-                    "iso": 0.25,
+                    "iso": 500,
                 }
             }
         )
@@ -121,7 +121,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ) | (
             (np.abs(ev.ElectronLoose.dxy) < 0.1) & (np.abs(ev.ElectronLoose.eta) >= 1.479) & (np.abs(ev.ElectronLoose.eta) < 2.4) & (np.abs(ev.ElectronLoose.dz) < 0.2) #& (ev.ElectronLoose.sieie < 0.03) & (ev.ElectronLoose.eInvMinusPInv < 0.014)
         )
-        ev["ElectronLoose"] = ev.ElectronLoose[mask3 & (ev.ElectronLoose.cutBased >= 2) & (ev.ElectronLoose.pt >= 10)]
+        ev["ElectronLoose"] = ev.ElectronLoose[mask3 & (ev.ElectronLoose.cutBased >= 1) & (ev.ElectronLoose.pt >= 10)]
         leptons = ak.with_name(
             ak.concatenate([ev.MuonGood, ev.ElectronGood], axis=1),
             "PtEtaPhiMCandidate",
@@ -150,7 +150,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ) | (
             (np.abs(ev.ElectronClean.dxy) < 0.1) & (np.abs(ev.ElectronClean.eta) >= 1.479) & (np.abs(ev.ElectronClean.eta) < 2.4) & (np.abs(ev.ElectronClean.dz) < 0.2) #& (ev.ElectronClean.sieie < 0.03) & (ev.ElectronClean.eInvMinusPInv < 0.014)
         )
-        ev["ElectronClean"] = ev.ElectronClean[mask3 & (ev.ElectronClean.cutBased >= 2) & (ev.ElectronClean.pt > 38)]
+        ev["ElectronClean"] = ev.ElectronClean[mask3 & (ev.ElectronClean.cutBased >= 1) & (ev.ElectronClean.pt > 38)]
         leptons = ak.with_name(
             ak.concatenate([ev.MuonGood, ev.ElectronGood], axis=1),
             "PtEtaPhiMCandidate",
@@ -172,7 +172,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #ev["JetGood"] = ev.Jet[(ev.Jet.jetId >= 6)&(ev.Jet.pt > 30)]
         #ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
 
-        ev["FatJetGood"], _ = jet_selection(ev,"FatJet", self.params, self._year, "LeptonGood")
+        ev["FatJetGood"], _ = jet_selection(ev,"FatJet", self.params, "2017", "LeptonGood")
         ev["FatJetGood", "idx"] = ak.local_index(ev.FatJetGood, axis=1)
         dR_fatjets_lep = ev.FatJetGood.metric_table(ev.LeptonGood)
         mask_lepjet_cleaning = ak.prod(dR_fatjets_lep > 0.8, axis=2) == 1
