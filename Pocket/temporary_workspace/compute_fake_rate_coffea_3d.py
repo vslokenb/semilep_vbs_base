@@ -13,16 +13,69 @@ def safe_divide(num, den):
     """Avoid division-by-zero; return 0 where den=0"""
     out = np.zeros_like(num)
     mask = den != 0
+    num[num<0] = 0 
     out[mask] = num[mask] / den[mask]
     for i in range(len(out)):
         out[i] = np.clip(out[i], 0, None)
     return out
 
-def division_variance(num,den):
+def division_variance(num, den):
     out = np.zeros_like(num)
-    mask = den != 0
+    mask = ((den > 0) & (num > 0))
     out[mask] = num[mask]/den[mask]**2 - num[mask]**2/den[mask]**3
     return out
+
+def fold_abs_eta(hist):
+    """
+    Find the signed-eta axis (any axis with edges symmetric around 0),
+    sum mirrored negative+positive bins, and return a new histogram
+    with abs(eta) edges.
+    """
+    eta_idx = None
+    for i, ax in enumerate(hist.axes):
+        edges = ax.edges
+        # symmetric around 0: first edge negative, last positive, same magnitude
+        if edges[0] < 0 and np.isclose(edges[0], -edges[-1], atol=1e-4):
+            eta_idx = i
+            break
+
+    if eta_idx is None:
+        print("  [fold_abs_eta] No symmetric eta axis found – skipping fold.")
+        return hist
+
+    edges  = hist.axes[eta_idx].edges
+    n_bins = len(edges) - 1
+    half   = n_bins // 2
+
+    # abs(eta) edges are just the positive half
+    abs_edges = edges[half:]          # shape (half+1,)
+
+    # indices: positive half [half .. n_bins-1]
+    # mirrored negative half [half-1 .. 0]  (reversed so bin0_neg <-> bin0_pos)
+    pos_idx = np.arange(half, n_bins)
+    neg_idx = np.arange(half - 1, -1, -1)
+
+    vals  = hist.values()
+    varis = hist.variances()
+
+    folded_vals  = (np.take(vals,  pos_idx, axis=eta_idx)
+                  + np.take(vals,  neg_idx, axis=eta_idx))
+    folded_vars  = (np.take(varis, pos_idx, axis=eta_idx)
+                  + np.take(varis, neg_idx, axis=eta_idx))
+
+    # Preserve original axis name (may be "" or "eta" or similar)
+    old_name  = hist.axes[eta_idx].name
+    new_axes  = list(hist.axes)
+    new_axes[eta_idx] = bh.axis.Variable(abs_edges)
+
+    new_hist = bh.Histogram(*new_axes, storage=bh.storage.Weight())
+    new_hist.values()[...]    = folded_vals
+    new_hist.variances()[...] = folded_vars
+
+    print(f"  [fold_abs_eta] axis {eta_idx} folded: "
+          f"{edges[0]:.2f}..{edges[-1]:.2f} → 0..{abs_edges[-1]:.2f} "
+          f"({n_bins} bins → {half} bins)")
+    return new_hist
 
 
 def scale_histogram(hist: Hist, factor: float) -> Hist:
@@ -45,76 +98,60 @@ def compute_ratio_hist(merged_accumulator, numerator_name, denominator_name, out
     """Compute ratio histogram and store inside accumulator."""
     num = merged_accumulator[numerator_name]
     den = merged_accumulator[denominator_name]
-    print("num.axes",len(num.axes))
-    # if len(num.axes)==3:
-    #     print("num ",num[1,0,:].values())
-    #     print("den ",den[1,0,:].values())
-    # elif len(num.axes)==5:
-    #     print("num ",num[1,0,:,:,:].values())
-    #     print("den ",den[1,0,:,:,:].values())
-    # else:
-    #     print("num ",num[1,0,:,:].values())
-    #     print("den ",den[1,0,:,:].values())
-    # Extract numpy arrays
-    
-    new_edges_pt_mu = np.array([26,30,32,35,40,100])
-    new_edges_pt_e = np.array([35,40,50,60,100])
-    new_edges_eta = np.array([-2.4,-2.15,-1.479,-0.5,0.5,1.479,2.15,2.4], dtype=float)
+    print("num.axes", len(num.axes))
+
+    new_edges_pt_mu = np.array([26, 30, 40, 100])
+    new_edges_pt_e  = np.array([35, 40, 50, 60, 100])
+    new_edges_eta   = np.array([-2.4, -2.15, -1.479, 0, 1.479, 2.15, 2.4], dtype=float)
+
     if "muon" in numerator_name:
-        if len(num.axes)==3 and "pt" in numerator_name:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_mu))]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_mu))]
-    # elif "muon" in numerator_name and "eta" in numerator_name:
-        if len(num.axes)==3 and "eta" in numerator_name:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges_eta))]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges_eta))]
-        elif len(num.axes)==5:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_mu)),bh.rebin(bh.axis.Variable(new_edges_eta)),:]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_mu)),bh.rebin(bh.axis.Variable(new_edges_eta)),:]
-            # print(num[0,0,:,:,:])
-            # print(den[0,0,:,:,:])
+        if len(num.axes) == 2 and "pt" in numerator_name:        # was 3
+            num = num[:, bh.rebin(bh.axis.Variable(new_edges_pt_mu))]
+            den = den[:, bh.rebin(bh.axis.Variable(new_edges_pt_mu))]
+        if len(num.axes) == 2 and "eta" in numerator_name:       # was 3
+            num = num[:, bh.rebin(bh.axis.Variable(new_edges_eta))]
+            den = den[:, bh.rebin(bh.axis.Variable(new_edges_eta))]
+        elif len(num.axes) == 4:                                  # was 5
+            num = num[:, bh.rebin(bh.axis.Variable(new_edges_pt_mu)),
+                          bh.rebin(bh.axis.Variable(new_edges_eta)), :]
+            den = den[:, bh.rebin(bh.axis.Variable(new_edges_pt_mu)),
+                          bh.rebin(bh.axis.Variable(new_edges_eta)), :]
+
     elif "electron" in numerator_name:
-        if len(num.axes)==3 and "pt" in numerator_name:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_e))]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_e))]
-    # elif "muon" in numerator_name and "eta" in numerator_name:
-        if len(num.axes)==3 and "eta" in numerator_name:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges_eta))]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges_eta))]
-        elif len(num.axes)==5:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_e)),bh.rebin(bh.axis.Variable(new_edges_eta)),:]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges_pt_e)),bh.rebin(bh.axis.Variable(new_edges_eta)),:]
-            # print(num[0,0,:,:,:])
-            # print(den[0,0,:,:,:])
-        # print('no mod?')
-    
-        #num = num[:,:,Hist.rebin(num.axes[2],Hist.new.Variable(new_edges, name=num.axes[2].name, label=num.axes[2].label))]
-            #den = den[:,:,Hist.rebin(den.axes[2],Hist.new.Variable(new_edges, name=den.axes[2].name, label=den.axes[2].label))]
-        #else:
-        #    num = num[:,:,Hist.rebin(num.axes[2],Hist.new.Variable(new_edges, name=num.axes[2].name, label=num.axes[2].label)),:]
-        #    den = den[:,:,Hist.rebin(den.axes[2],Hist.new.Variable(new_edges, name=den.axes[2].name, label=den.axes[2].label)),:]
-        #num = num.rebin(num.axes[2],Hist.new.Variable(new_edges, name=num.axes[2].name, label=num.axes[2].label))
-        #den = den.rebin(num.axes[2],Hist.new.Variable(new_edges, name=den.axes[2].name, label=den.axes[2].label))
-        #num = num.rebin(num.axes[2].name,Hist.new.Variable(new_edges, name=num.axes[2].name, label=num.axes[2].label))
-        #den = den.rebin(den.axes[2].name,Hist.new.Variable(new_edges, name=den.axes[2].name, label=den.axes[2].label))
-    num_vals = num.values()[()]
-    den_vals = den.values()[()]
-    # print("num.values()",num.values())
-    #print("num_vals",num_vals)
-    #print("den_vals",den_vals)
+        if len(num.axes) == 2 and "pt" in numerator_name:        # was 3
+            num = num[:, bh.rebin(bh.axis.Variable(new_edges_pt_e))]
+            den = den[:, bh.rebin(bh.axis.Variable(new_edges_pt_e))]
+        if len(num.axes) == 2 and "eta" in numerator_name:       # was 3
+            num = num[:, bh.rebin(bh.axis.Variable(new_edges_eta))]
+            den = den[:, bh.rebin(bh.axis.Variable(new_edges_eta))]
+        elif len(num.axes) == 4:                                  # was 5
+            num = num[:, bh.rebin(bh.axis.Variable(new_edges_pt_e)),
+                          bh.rebin(bh.axis.Variable(new_edges_eta)), :]
+            den = den[:, bh.rebin(bh.axis.Variable(new_edges_pt_e)),
+                          bh.rebin(bh.axis.Variable(new_edges_eta)), :]
+
+    num = fold_abs_eta(num)
+    den = fold_abs_eta(den)
+
+    num_vals   = num.values()[()]
+    den_vals   = den.values()[()]
     ratio_vals = safe_divide(num_vals, den_vals)
     ratio_vars = division_variance(num_vals, den_vals)
-    # print("ratio_vals ", ratio_vals)
-    # Clone histogram structure and insert ratio values
+
     ratio_hist = deepcopy(num)
-    ratio_hist.values()[...] = ratio_vals
+    ratio_hist.values()[...]    = ratio_vals
     ratio_hist.variances()[...] = ratio_vars
 
-    # Save into accumulator
     merged_accumulator[output_name] = ratio_hist
-    # print("ratio_hist ",ratio_hist)
     print(f"✔ Created ratio histogram '{output_name}'")
 
+def drop_variation_axis(h):
+    axes = [ax.name for ax in h.axes]
+    if 'variation' in axes:
+        assert h.values().shape[axes.index('variation')] == 1, \
+            f"Refusing to drop variation axis with {h.values().shape[axes.index('variation')]} bins"
+        return h[{'variation': 'nominal'}]
+    return h  # data passes through unchanged
 
 
 def main():
@@ -167,6 +204,7 @@ def main():
 
         for hname, hist_dic in acc['variables'].items():
             hist = hist_dic[dsname][dsname_era]
+            hist = drop_variation_axis(hist)
             hists_per_dataset[hname+"_"+dsname_era] = hist
             scaled_hist = scale_histogram(hist, scale)
             if hname=="nJets":

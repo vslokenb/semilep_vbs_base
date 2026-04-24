@@ -1,37 +1,27 @@
 classifiers:
-  "2016_PreVFP":
-    boosted_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PreVFP_best_iter_70.json
-    boosted_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PreVFP_best_iter_70.json
-    resolved_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PreVFP_best_iter_227.json
-    resolved_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PreVFP_best_iter_227.json
-  "2016_PostVFP":
-    boosted_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
-    boosted_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
-    resolved_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_242.json
-    resolved_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_242.json
   "2018":
     boosted_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_8_iter_171.json
     boosted_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_8_iter_171.json
     resolved_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_0_iter_177.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_1_iter_183.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_2_iter_173.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_3_iter_332.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_4_iter_295.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_5_iter_229.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_6_iter_169.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_7_iter_337.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_mu_8_iter_171.json
+    
     resolved_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
-  "2017":
-    boosted_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
-    boosted_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_boosted_jet_in_window_mu_2016_PostVFP_best_iter_82.json
-    resolved_mu:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
-    resolved_e:
-      - /afs/cern.ch/user/v/vslokenb/vbs_semilep/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt/bdt_whad_withbveto_mu_2016_PostVFP_best_iter_188.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_0_iter_266.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_1_iter_139.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_2_iter_196.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_3_iter_141.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_4_iter_163.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_5_iter_188.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_6_iter_174.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_7_iter_264.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_results_nJet/bdt_resolved_e_8_iter_176.json

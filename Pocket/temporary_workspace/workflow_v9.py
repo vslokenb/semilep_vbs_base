@@ -477,6 +477,11 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #ev["lead_wlep_MET_deta"] = np.abs(lead_lep.eta - ev.DeepMETResolutionTune.eta)
 
         #dPhi between lead lepton and MET
+        ev["ElectronGood","dphi_met"] = abs(delta_phi(ev.ElectronGood.phi,ev.DeepMETResolutionTune.phi))
+        ev["ElectronLoose","dphi_met"] =  abs(delta_phi(ev.ElectronLoose.phi,ev.DeepMETResolutionTune.phi))
+        ev["MuonGood","dphi_met"] =  abs(delta_phi(ev.MuonGood.phi,ev.DeepMETResolutionTune.phi))
+        ev["MuonLoose","dphi_met"] =  abs(delta_phi(ev.MuonLoose.phi,ev.DeepMETResolutionTune.phi))
+
         ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.DeepMETResolutionTune.phi)
         ev["lead_wlep_wfatjet1_dphi"] = delta_phi(lead_lep.phi, wfj.phi)
         ev["lead_wlep_wjet1_dphi"] = delta_phi(lead_lep.phi, wj1.phi)
@@ -721,18 +726,18 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                 b = objects[j]
                 try:
                     dphi = delta_phi(a.phi, b.phi)
-                    deta = np.abs(a.eta - b.eta)
-                    dR   = np.sqrt(dphi**2 + deta**2)
                     try:
+                        deta = np.abs(a.eta - b.eta)
+                        dR   = np.sqrt(dphi**2 + deta**2)
                         if names[i] == "fatjet1" or names[j] == "fatjet1":
                             mass = (a + b).msoftdrop
                         else:
                             mass = (a + b).mass
                     except:
                         mass = 0
+                        deta = 0
+                        dR   = 0
                 except:
-                    deta = 0
-                    dR   = 0
                     mass = 0
                     dphi = 0
                 

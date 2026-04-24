@@ -671,7 +671,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         #ev["lead_wlep_MET_deta"] = np.abs(lead_lep.eta - ev.PuppiMET.eta)
 
         #dPhi between lead lepton and MET
-        ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.PuppiMET.phi)
+        ev["lead_wlep_MET_dphi"] = delta_phi(lead_lep.phi, ev.DeepMETResolutionTune.phi)
         ev["lead_wlep_wfatjet1_dphi"] = delta_phi(lead_lep.phi, wfj.phi)
         ev["lead_wlep_wjet1_dphi"] = delta_phi(lead_lep.phi, wj1.phi)
         ev["lead_wlep_wjet2_dphi"] = delta_phi(lead_lep.phi, wj2.phi)

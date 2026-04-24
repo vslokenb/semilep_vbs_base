@@ -12,73 +12,165 @@ from copy import deepcopy
 def safe_divide(num, den):
     """Avoid division-by-zero; return 0 where den=0"""
     out = np.zeros_like(num)
-    # mask = ((den > 0) & (num > 0))
-    mask = (den != 0)
+    mask = den != 0
+    num[num<0] = 0 
     out[mask] = num[mask] / den[mask]
+    for i in range(len(out)):
+        out[i] = np.clip(out[i], 0, None)
     return out
 
-def division_variance(num,den):
+def division_variance(num, den):
     out = np.zeros_like(num)
     mask = ((den > 0) & (num > 0))
     out[mask] = num[mask]/den[mask]**2 - num[mask]**2/den[mask]**3
     return out
 
 
-def scale_histogram(hist: Hist, factor: float) -> Hist:
-    """Return a scaled copy of a coffea.hist.Hist"""
-    hnew = deepcopy(hist)
-    hnew.values()[...] *= factor
-    hnew.variances()[...] *= abs(factor)
-    return hnew
+def scale_histogram(hist, factor: float):
+    """Return a scaled copy using coffea's * operator."""
+    return hist * factor
+
+
+def add_histograms(h_existing, h_new):
+    v_e = h_existing.view()
+    v_n = h_new.view()
+
+    if v_e.shape == v_n.shape:
+        v_e.value[...] += v_n.value
+        v_e.variance[...] += v_n.variance
+        return h_existing
+
+    def expand_and_broadcast(arr, target_shape):
+        """Insert missing axes at position 1 (after category axis) then broadcast."""
+        while arr.ndim < len(target_shape):
+            arr = np.expand_dims(arr, axis=1)  # insert after category axis
+        return np.broadcast_to(arr, target_shape).copy()
+
+    if v_n.value.size <= v_e.value.size:
+        try:
+            v_e.value[...] += expand_and_broadcast(v_n.value, v_e.value.shape)
+            v_e.variance[...] += expand_and_broadcast(v_n.variance, v_e.variance.shape)
+        except ValueError as err:
+            print(f"  WARNING: could not broadcast {v_n.value.shape} -> {v_e.value.shape}: {err}")
+        return h_existing
+    else:
+        result = deepcopy(h_new)
+        v_r = result.view()
+        try:
+            v_r.value[...] += expand_and_broadcast(v_e.value, v_n.value.shape)
+            v_r.variance[...] += expand_and_broadcast(v_e.variance, v_n.variance.shape)
+        except ValueError as err:
+            print(f"  WARNING: could not broadcast {v_e.value.shape} -> {v_n.value.shape}: {err}")
+        return result
+
 
 
 def merge_hist_list(hist_list):
     """Sum a list of histograms with identical structure."""
     merged = deepcopy(hist_list[0])
     for h in hist_list[1:]:
-        merged.values()[...] += h.values()[...]
+        merged = add_histograms(merged, h)
     return merged
 
 
+def fold_abs_eta(hist):
+    """
+    Find the signed-eta axis (any axis with edges symmetric around 0),
+    sum mirrored negative+positive bins, and return a new histogram
+    with abs(eta) edges.
+    """
+    eta_idx = None
+    for i, ax in enumerate(hist.axes):
+        edges = ax.edges
+        # symmetric around 0: first edge negative, last positive, same magnitude
+        if edges[0] < 0 and np.isclose(edges[0], -edges[-1], atol=1e-4):
+            eta_idx = i
+            break
+
+    if eta_idx is None:
+        print("  [fold_abs_eta] No symmetric eta axis found – skipping fold.")
+        return hist
+
+    edges  = hist.axes[eta_idx].edges
+    n_bins = len(edges) - 1
+    half   = n_bins // 2
+
+    # abs(eta) edges are just the positive half
+    abs_edges = edges[half:]          # shape (half+1,)
+
+    # indices: positive half [half .. n_bins-1]
+    # mirrored negative half [half-1 .. 0]  (reversed so bin0_neg <-> bin0_pos)
+    pos_idx = np.arange(half, n_bins)
+    neg_idx = np.arange(half - 1, -1, -1)
+
+    vals  = hist.values()
+    varis = hist.variances()
+
+    folded_vals  = (np.take(vals,  pos_idx, axis=eta_idx)
+                  + np.take(vals,  neg_idx, axis=eta_idx))
+    folded_vars  = (np.take(varis, pos_idx, axis=eta_idx)
+                  + np.take(varis, neg_idx, axis=eta_idx))
+
+    # Preserve original axis name (may be "" or "eta" or similar)
+    old_name  = hist.axes[eta_idx].name
+    new_axes  = list(hist.axes)
+    new_axes[eta_idx] = bh.axis.Variable(abs_edges)
+
+    new_hist = bh.Histogram(*new_axes, storage=bh.storage.Weight())
+    new_hist.values()[...]    = folded_vals
+    new_hist.variances()[...] = folded_vars
+
+    print(f"  [fold_abs_eta] axis {eta_idx} folded: "
+          f"{edges[0]:.2f}..{edges[-1]:.2f} → 0..{abs_edges[-1]:.2f} "
+          f"({n_bins} bins → {half} bins)")
+    return new_hist
+
+
 def compute_weight_hist(merged_accumulator, numerator_name, denominator_name, output_name):
-    """Compute ratio histogram and store inside accumulator."""
+    """Compute weight histogram and store inside accumulator."""
     num = merged_accumulator[numerator_name]
     den = merged_accumulator[denominator_name]
-    
-    print("num.axes",num.axes)
-    if len(num.axes)==3:
-        print("num ",num[1,0,:].values())
-        print("den ",den[1,0,:].values())
+
+    print("num.axes", num.axes)
+    if len(num.axes) == 3:
+        print("num ", num[1, 0, :].values())
+        print("den ", den[1, 0, :].values())
     else:
-        print("num ",num[1,0,:,:].values())
-        print("den ",den[1,0,:,:].values())
-    # Extract numpy arrays
+        print("num ", num[1, 0, :, :].values())
+        print("den ", den[1, 0, :, :].values())
+
+    # ── pt rebinning ─────────────────────────────────────────────────────────
     if "muon" in numerator_name and "pt" in numerator_name:
-        new_edges = np.array([26,28,30,32,35,40,45,100])
-        if len(num.axes)==3:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges))]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges))]
+        new_edges = np.array([26, 28, 30, 32, 35, 40, 45, 100])
+        if len(num.axes) == 3:
+            num = num[:, :, bh.rebin(bh.axis.Variable(new_edges))]
+            den = den[:, :, bh.rebin(bh.axis.Variable(new_edges))]
         else:
-            num = num[:,:,bh.rebin(bh.axis.Variable(new_edges)),:]
-            den = den[:,:,bh.rebin(bh.axis.Variable(new_edges)),:]
-    # Extract numpy arrays
-    num_vals = num.values()[()]
-    den_vals = den.values()[()]
+            num = num[:, :, bh.rebin(bh.axis.Variable(new_edges)), :]
+            den = den[:, :, bh.rebin(bh.axis.Variable(new_edges)), :]
+
+    # ── fold signed eta → abs(eta) ────────────────────────────────────────────
+    num = fold_abs_eta(num)
+    den = fold_abs_eta(den)
+
+    # ── ratio ─────────────────────────────────────────────────────────────────
+    num_vals   = num.values()[()]
+    den_vals   = den.values()[()]
     ratio_vals = safe_divide(num_vals, den_vals)
     ratio_vars = division_variance(num_vals, den_vals)
-    # Clone histogram structure and insert ratio values
+
     ratio_hist = deepcopy(num)
-    ratio_hist.values()[...] = ratio_vals
+    ratio_hist.values()[...]    = ratio_vals
     ratio_hist.variances()[...] = ratio_vars
+    # merged_accumulator[output_name] = ratio_hist
 
     weight_hist = deepcopy(ratio_hist)
-    weight_hist.values()[...] = safe_divide(ratio_hist.values()[()], 1.0-ratio_hist.values()[()])
-    weight_hist.variances()[...] = ratio_hist.variances()[()] / (1.0-ratio_hist.values()[()]**4)
-    # Save into accumulator
-    merged_accumulator[output_name] = weight_hist
-    print("weight_hist ",weight_hist)
-    print(f"✔ Created weight histogram '{output_name}'")
+    weight_hist.values()[...] = safe_divide(ratio_hist.values()[()], 1.0 - ratio_hist.values()[()])
+    weight_hist.variances()[...] = ratio_hist.variances()[()] / (1.0 - ratio_hist.values()[()]**4)
 
+    merged_accumulator[output_name] = weight_hist
+    print("weight_hist ", weight_hist)
+    print(f"✔ Created weight histogram '{output_name}'")
 
 
 def main():
@@ -97,11 +189,9 @@ def main():
     factors = cfg.get("factors", {})
     weight_pairs = cfg.get("weight_pairs", [])
 
-    # --- Load input coffea pickles ---
     print("📦 Loading input coffea files...")
     accs = [util.load(f) for f in input_files]
 
-    # Extract dataset names from filename (customize if needed)
     def dataset_name_from_file(acc):
         period = list(acc['datasets_metadata']['by_datataking_period'].keys())[0]
         dataset = list(acc['datasets_metadata']['by_datataking_period'][period].keys())[0]
@@ -109,11 +199,8 @@ def main():
 
     def dataset_name_era_from_file(acc):
         dataset_era = list(acc['datasets_metadata']['by_dataset'].keys())[0]
-        dataset = acc['datasets_metadata']['by_dataset'][dataset_era]['sample']
-        period = acc['datasets_metadata']['by_dataset'][dataset_era]['year']
         return dataset_era
 
-    # --- Collect histograms per dataset ---
     merged_acc = {}
 
     for fname, acc in zip(input_files, accs):
@@ -130,23 +217,16 @@ def main():
             if hname not in merged_acc:
                 merged_acc[hname] = deepcopy(scaled_hist)
             else:
-                merged_acc[hname].values()[...] += scaled_hist.values()[...]
-                merged_acc[hname].variances()[...] += scaled_hist.variances()[...]
-                #if dsname in ['EGamma','Muon','SingleMuon']: 
-                #    print(scaled_hist.values()[...][:, np.newaxis, :].shape)
-                #    merged_acc[hname].values()[...] += scaled_hist.values()[...][:, np.newaxis, :]
-                #else:
-                #    merged_acc[hname].values()[...] += scaled_hist.values()[...]
+                merged_acc[hname] = add_histograms(merged_acc[hname], scaled_hist)
 
     print("✔ Finished linear-combination merging.")
 
-    # --- Compute ratio histograms ---
     if weight_pairs:
         print("📊 Computing weight histograms...")
         for pair in weight_pairs:
-            print("pair numerator ",pair["numerator"])
-            print("pair denominator ",pair["denominator"])
-            print("pair output ",pair["output"])
+            print("pair numerator ", pair["numerator"])
+            print("pair denominator ", pair["denominator"])
+            print("pair output ", pair["output"])
             compute_weight_hist(
                 merged_accumulator=merged_acc,
                 numerator_name=pair["numerator"],
@@ -154,7 +234,6 @@ def main():
                 output_name=pair["output"],
             )
 
-    # --- Save combined output ---
     print("💾 Writing output coffea:", output_file)
     util.save(merged_acc, output_file)
 

@@ -866,15 +866,17 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
                 b = objects[j]
                 try:
                     dphi = delta_phi(a.phi, b.phi)
-                    deta = np.abs(a.eta - b.eta)
-                    dR   = np.sqrt(dphi**2 + deta**2)
                     try:
+                        deta = np.abs(a.eta - b.eta)
+                        dR   = np.sqrt(dphi**2 + deta**2)
                         if names[i] == "fatjet1" or names[j] == "fatjet1":
                             mass = (a + b).msoftdrop
                         else:
                             mass = (a + b).mass
                     except:
                         mass = 0
+                        deta = 0
+                        dR   = 0
                 except:
                     deta = 0
                     dR   = 0

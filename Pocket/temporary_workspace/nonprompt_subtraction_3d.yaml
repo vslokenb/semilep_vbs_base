@@ -1,0 +1,51 @@
+factors:
+  DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8: -1.0
+  DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8: -1.0
+  TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8: -1.0
+  TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8: -1.0
+  WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8: -1.0
+  WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8: -1.0
+  SingleMuon: 1.0
+  EGamma: 1.0
+  SingleElectron: 1.0
+
+ratio_pairs:
+  - numerator: "electron_tight_pt_eta_dphi"
+    denominator: "electron_loose_pt_eta_dphi"
+    output: "electron_tighttoloose_pt_eta_dphi_fakerate"
+  - numerator: "muon_tight_pt_eta_dphi"
+    denominator: "muon_loose_pt_eta_dphi"
+    output: "muon_tighttoloose_pt_eta_dphi_fakerate"
+  - numerator: "electron_tight_pt"
+    denominator: "electron_loose_pt"
+    output: "electron_tighttoloose_pt_fakerate"
+  - numerator: "electron_tight_eta"
+    denominator: "electron_loose_eta"
+    output: "electron_tighttoloose_eta_fakerate"
+  - numerator: "electron_tight_dphi"
+    denominator: "electron_loose_dphi"
+    output: "electron_tighttoloose_dphi_fakerate"
+  - numerator: "muon_tight_pt"
+    denominator: "muon_loose_pt"
+    output: "muon_tighttoloose_pt_fakerate"
+  - numerator: "muon_tight_eta"
+    denominator: "muon_loose_eta"
+    output: "muon_tighttoloose_eta_fakerate"
+  - numerator: "muon_tight_dphi"
+    denominator: "muon_loose_dphi"
+    output: "muon_tighttoloose_dphi_fakerate"
+weight_pairs:
+  - numerator: "electron_tight_pt_eta_dphi"
+    denominator: "electron_loose_pt_eta_dphi"
+    output: "electron_pt_eta_dphi_weights"
+  - numerator: "muon_tight_pt_eta_dphi"
+    denominator: "muon_loose_pt_eta_dphi"
+    output: "muon_pt_eta_dphi_weights"

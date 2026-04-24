@@ -182,6 +182,56 @@ whad_window_cut_bveto_mu = Cut(
 )
 
 
+def in_whad_window_bveto_mu2(events, params, **kwargs):
+    muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
+    four_j  = (events.nJetGood30 >= 4)
+    b_veto = (events.nBJetGood == 0) 
+    no_fat = (events.nFatJetCandidate180 == 0)
+    loose_lep_veto = (events.nLeptonLoose < 2)
+    wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
+    wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
+    wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
+    within = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
+    # lead_lep_dR_cut1 = (events.lead_wlep_wjet1_dR > 0.8)
+    # lead_lep_dR_cut2 = (events.lead_wlep_wjet2_dR > 0.8)
+    lep = ak.firsts(events.MuonGood30)
+    j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
+    j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
+
+    j1_eta = ak.fill_none(getattr(j1, "eta", None), np.nan)
+    j2_eta = ak.fill_none(getattr(j2, "eta", None), np.nan)
+    lep_eta = ak.fill_none(getattr(lep, "eta", None), np.nan)
+
+    j1_pt_min = (j1.pt > 50)
+    j2_pt_min = (j2.pt > 30)
+
+
+    
+
+    eta_min = np.minimum(j1_eta, j2_eta)
+    eta_max = np.maximum(j1_eta, j2_eta)
+     
+    lep_central = j1_pt_min #& (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) 
+    
+    mjj_vbs   = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass", None)), np.nan)
+    deta_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+    # mT  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+
+    cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+    cut_mt = (events.mt_w_leptonic > 30.)
+
+    mask = four_j & b_veto & ~within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & no_fat & b_veto & muon_ch & j2_pt_min & cut_mt
+    return ak.values_astype(mask, np.bool_)
+
+whad_window_cut_bveto_mu2 = Cut(
+    name="whad_window_bveto_mu2",
+    params={"mjj_w_window": 20.0,
+            "mjj_vbs": 500.0,
+            "delta_eta_vbs": 2.5},  
+    function=in_whad_window_bveto_mu2,
+)
+
 def in_msd_window_fatjet_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
     #yes_fat = (events.nFatJetCentral >= 1)

@@ -12,7 +12,10 @@ def safe_divide(num, den):
     """Avoid division-by-zero; return 0 where den=0"""
     out = np.zeros_like(num)
     mask = den != 0
+    num[num<0] = 0 
     out[mask] = num[mask] / den[mask]
+    for i in range(len(out)):
+        out[i] = np.clip(out[i], 0, None)
     return out
 
 def division_variance(num,den):
@@ -199,7 +202,16 @@ def main():
     # print("✔ Finished linear-combination merging.")
 
 
-    # --- Save combined output ---
+    import collections
+
+    def to_defaultdict(obj):
+        """Recursively convert all dicts to defaultdict(None) for coffea compatibility."""
+        if isinstance(obj, (dict, collections.defaultdict)):
+            return collections.defaultdict(None, {k: to_defaultdict(v) for k, v in obj.items()})
+        return obj
+
+    # Just before util.save:
+    merged_acc = to_defaultdict(merged_acc)
     print("💾 Writing output coffea:", output_file)
     util.save(merged_acc, output_file)
 

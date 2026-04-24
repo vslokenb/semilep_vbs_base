@@ -225,3 +225,5 @@ plotting_style:
     datamc:
       ylim_log:
         lo: 0.1
+  variables:
+    

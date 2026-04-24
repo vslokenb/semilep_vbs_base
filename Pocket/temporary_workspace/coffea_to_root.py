@@ -4,37 +4,45 @@ import numpy as np
 from boost_histogram import Histogram
 
 def convert_boost_hist_to_root(h, name):
-    """
-    Convert a boost_histogram Histogram into a dict for uproot writing
-    """
-
     axes_types = [type(axis).__name__ for axis in h.axes]
-    ndim = axes_types.count('Variable')
-    
-    hist_dict = {}
     cat_names = list(h.axes[0])
-    if "Muon" in name or "EGamma" in name:
-        print(cat_names)
-        for icat in range(len(h.axes[0].edges)-1):
-            if ndim == 1:
-                print()
-                hist_dict[name+"_"+cat_names[icat]] = h[icat,:]
-            elif ndim == 2:
-                hist_dict[name+"_"+cat_names[icat]] = h[icat,:,:]
-            else:
-                raise NotImplementedError("Only 1D and 2D histograms are supported.")
-    else:
-        ndim = sum(1 for t in axes_types if t in ('Variable', 'Regular'))
+
+    # Detect whether axis[1] is a StrCategory (variation) or a physics axis
+    has_variation_axis = (len(h.axes) > 1 and type(h.axes[1]).__name__ == 'StrCategory')
+
+    # Count physics (Variable/Regular) axes only
+    physics_axes = [t for t in axes_types if t in ('Variable', 'Regular')]
+    ndim = len(physics_axes)
+
+    hist_dict = {}
+    ncat = len(cat_names)
+
+    if has_variation_axis:
         unc_names = list(h.axes[1])
-        print(cat_names,unc_names)
-        for icat in range(len(h.axes[0].edges)-1):
-            for iunc in range(len(h.axes[1].edges)-1):
+        nunc = len(unc_names)
+        for icat in range(ncat):
+            for iunc in range(nunc):
+                key = f"{name}_{cat_names[icat]}_{unc_names[iunc]}"
                 if ndim == 1:
-                    hist_dict[name+"_"+cat_names[icat]+"_"+unc_names[iunc]] = h[icat,iunc,:] 
+                    hist_dict[key] = h[icat, iunc, :]
                 elif ndim == 2:
-                    hist_dict[name+"_"+cat_names[icat]+"_"+unc_names[iunc]] = h[icat,iunc,:,:]
+                    hist_dict[key] = h[icat, iunc, :, :]
+                elif ndim == 3:
+                    hist_dict[key] = h[icat, iunc, :, :, :]
                 else:
-                    raise NotImplementedError("Only 1D and 2D histograms are supported.")
+                    raise NotImplementedError(f"Unsupported ndim={ndim}")
+    else:
+        for icat in range(ncat):
+            key = f"{name}_{cat_names[icat]}"
+            if ndim == 1:
+                hist_dict[key] = h[icat, :]
+            elif ndim == 2:
+                hist_dict[key] = h[icat, :, :]
+            elif ndim == 3:
+                hist_dict[key] = h[icat, :, :, :]
+            else:
+                raise NotImplementedError(f"Unsupported ndim={ndim}")
+
     return hist_dict
 
 
@@ -47,7 +55,7 @@ def coffea_to_root(infile, outfile):
 
         for name, hist in hists.items():
             if isinstance(hist, Histogram):
-                # boost_histogram object → ROOT TH1/TH2
+                # boost_histogram object → ROOT TH1/TH2/TH3
                 root_hists = convert_boost_hist_to_root(hist, name)
                 for hist_name,root_hist in root_hists.items():
                     rootfile[hist_name] = root_hist
@@ -65,4 +73,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     coffea_to_root(args.input, args.output)
-
