@@ -164,79 +164,91 @@ def derive_missing_das(existing_das, source_year, target_year):
 CLI_COMMAND = "dataset-discovery-cli"
 PEXPECT_TIMEOUT = 180  # seconds per DAS query
 
-
-def _find_site_index(text, preferred_site):
-    """
-    Parse the site listing printed by the CLI and return the index of the
-    preferred site, or 'a' (all) if not found.
-    """
-    for line in text.splitlines():
-        m = re.match(r"\s*(\d+)[.)]\s*" + re.escape(preferred_site), line)
-        if m:
-            return m.group(1)
-    return "a"
+# Broad pattern matching the REPL command prompt (e.g. "> ", ">>> ", "(base) ")
+REPL_PROMPT = r"[>\]#]\s*$"
+# Pattern for sub-prompts that ask for user input after a command
+INPUT_PROMPT = r":\s*$"
 
 
-def run_discovery(das_pattern, output_json, preferred_site="T3_US_FNALLPC", dry_run=False):
+def _wait_prompt(child, patterns, timeout=None):
+    """Wait for any of the given patterns; return the matched index."""
+    return child.expect(patterns, timeout=timeout or PEXPECT_TIMEOUT)
+
+
+def run_discovery(das_pattern, output_json, dry_run=False):
     """
-    Drive one round-trip of dataset-discovery-cli for das_pattern.
-    Saves results to output_json.  Returns True on success.
+    Drive one full transaction of dataset-discovery-cli using its REPL interface:
+
+        query   → <das_pattern>
+        select  → all
+        replicas            (round-robin, no further input)
+        save    → <output_json>
+        exit
+
+    Returns True if output_json was written.
     """
     if dry_run:
-        print(f"    [dry-run] dataset-discovery-cli query: {das_pattern}")
+        print(f"    [dry-run] would query: {das_pattern}")
         return False
 
     if not HAS_PEXPECT:
         print("ERROR: pexpect is not installed.  Run: pip install pexpect")
         return False
 
-    print(f"    Querying DAS: {das_pattern}")
+    print(f"    Querying: {das_pattern}")
     child = pexpect.spawn(CLI_COMMAND, timeout=PEXPECT_TIMEOUT, encoding="utf-8")
-    child.logfile_read = None  # set to sys.stdout to debug
+    # Uncomment the next line to see raw CLI output while debugging:
+    # child.logfile_read = sys.stdout
 
     try:
-        # 1. DAS name prompt
-        child.expect(r"(?i)(DAS name|dataset name).*:")
+        # Wait for the initial REPL prompt
+        child.expect(REPL_PROMPT)
+
+        # 1. query command → enter search string
+        child.sendline("query")
+        child.expect(INPUT_PROMPT)
         child.sendline(das_pattern)
 
-        # 2. Dataset selection
+        # Check whether any datasets were found before proceeding
         idx = child.expect([
-            r"(?i)(select|enter).*(dataset|selection).*:",
-            r"(?i)no (dataset|result)",
+            REPL_PROMPT,
+            r"(?i)no (dataset|result|match)",
             pexpect.EOF,
             pexpect.TIMEOUT,
         ])
         if idx != 0:
             print(f"    WARNING: no datasets found for {das_pattern}")
-            child.close(force=True)
+            try:
+                child.close(force=True)
+            except Exception:
+                pass
             return False
-        child.sendline("a")
 
-        # 3. Site selection – capture the site listing before sending our choice
-        idx = child.expect([
-            r"(?i)(select|choose).*site.*:",
-            pexpect.EOF,
-            pexpect.TIMEOUT,
-        ])
-        if idx != 0:
-            print(f"    WARNING: no site listing returned for {das_pattern}")
-            child.close(force=True)
-            return False
-        site_text = child.before  # text printed before this prompt
-        site_choice = _find_site_index(site_text, preferred_site)
-        if site_choice == "a":
-            print(f"    NOTE: {preferred_site} not found in site list; selecting all sites")
-        child.sendline(site_choice)
+        # 2. select command → choose all results
+        child.sendline("select")
+        child.expect(INPUT_PROMPT)
+        child.sendline("all")
+        child.expect(REPL_PROMPT)
 
-        # 4. Output filename
-        child.expect(r"(?i)(output|save|filename).*:")
+        # 3. replicas command → select round-robin method
+        child.sendline("replicas")
+        child.expect(INPUT_PROMPT)
+        child.sendline("round-robin")
+        child.expect(REPL_PROMPT)
+
+        # 4. save command → provide output filename
+        child.sendline("save")
+        child.expect(INPUT_PROMPT)
         child.sendline(str(output_json))
+        child.expect(REPL_PROMPT)
 
-        child.expect(pexpect.EOF, timeout=120)
+        # 5. exit the REPL
+        child.sendline("exit")
+        child.expect(pexpect.EOF, timeout=30)
         child.close()
 
     except pexpect.TIMEOUT:
-        print(f"    ERROR: pexpect timed out for {das_pattern}")
+        print(f"    ERROR: timed out interacting with CLI for {das_pattern}")
         try:
             child.close(force=True)
         except Exception:
@@ -325,7 +337,7 @@ def inject_xsec(merged, xsec_map):
                     break
 
 
-def update_json(json_path, preferred_site="T3_US_FNALLPC", dry_run=False):
+def update_json(json_path, dry_run=False):
     print(f"\n{'='*60}")
     print(f"Processing: {json_path.name}")
 
@@ -350,7 +362,7 @@ def update_json(json_path, preferred_site="T3_US_FNALLPC", dry_run=False):
             tmp_path = Path(tmp.name)
 
         try:
-            ok = run_discovery(das_name, tmp_path, preferred_site, dry_run)
+            ok = run_discovery(das_name, tmp_path, dry_run)
             if ok and tmp_path.exists():
                 with open(tmp_path) as f:
                     era_data = json.load(f)
@@ -379,7 +391,7 @@ def update_json(json_path, preferred_site="T3_US_FNALLPC", dry_run=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--site", default="T3_US_FNALLPC",
-                        help="Preferred storage site for replica selection (default: T3_US_FNALLPC)")
+                        help="(unused — replicas uses round-robin; kept for future use)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print what would be done without calling the CLI")
     parser.add_argument("--only", metavar="FILENAME",
@@ -398,7 +410,7 @@ def main():
             raise SystemExit(1)
 
     for fname in files:
-        update_json(DATASETS_DIR / fname, preferred_site=args.site, dry_run=args.dry_run)
+        update_json(DATASETS_DIR / fname, dry_run=args.dry_run)
 
     print("\nDone.")
 
