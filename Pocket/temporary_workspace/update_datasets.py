@@ -283,6 +283,9 @@ def run_session(das_patterns, output_json, dry_run=False, debug=False):
         _send(child, "save", debug)
         _wait(child, P_SAVE, "save filename", debug)
         _send(child, str(output_json), debug)
+        # CLI asks whether to clear the selected samples list after saving
+        _wait(child, r"empty your selected samples.*\[y/n\].*:", "clear samples?", debug)
+        _send(child, "n", debug)
         _wait(child, REPL_PROMPT, "REPL after save", debug)
 
         _send(child, "quit", debug)
