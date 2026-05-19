@@ -187,8 +187,13 @@ def _wait(child, pattern, label, debug=False):
         print(f"  ... EXPECT [{label}]: {pattern!r}")
     child.expect(pattern)
     if debug:
+        # Show both the decoded string and raw hex so ANSI codes are visible
+        before_hex = child.before.encode("utf-8", errors="replace").hex()
+        after_hex  = child.after.encode("utf-8", errors="replace").hex()
         print(f"  <<< BEFORE: {child.before!r}")
+        print(f"  <<< BEFORE (hex): {before_hex}")
         print(f"  <<< MATCH:  {child.after!r}")
+        print(f"  <<< MATCH  (hex): {after_hex}")
 
 
 def _query_one(child, das_pattern, debug=False):
@@ -240,7 +245,11 @@ def run_session(das_patterns, output_json, dry_run=False, debug=False):
         return False
 
     import sys
-    child = pexpect.spawn(CLI_COMMAND, timeout=PEXPECT_TIMEOUT, encoding="utf-8")
+    # Force plain-text output: prompt_toolkit/rich inject ANSI codes between
+    # characters (e.g. "Qu\x1b[1mery for:") which break regex matching.
+    plain_env = {**os.environ, "TERM": "dumb", "NO_COLOR": "1", "FORCE_COLOR": "0"}
+    child = pexpect.spawn(CLI_COMMAND, timeout=PEXPECT_TIMEOUT, encoding="utf-8",
+                          env=plain_env)
     if debug:
         child.logfile_read = sys.stdout
         print(f"  [debug] spawned: {CLI_COMMAND}  (pid {child.pid})")
