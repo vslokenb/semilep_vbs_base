@@ -164,9 +164,11 @@ def derive_missing_das(existing_das, source_year, target_year):
 CLI_COMMAND = "dataset-discovery-cli"
 PEXPECT_TIMEOUT = 180  # seconds per DAS query
 
-# The REPL prompt is two lines; the second always ends with "/quit]: ".
-# Match only that unique suffix so we don't need re.DOTALL across the newline.
-REPL_PROMPT   = r"/quit\]:\s*"
+# The REPL shows "> " on its own line, then the command list on the next line.
+# Match the simple "> " prompt — it's the first thing printed and appears after
+# every command completes. The command list line is decorative and may contain
+# ANSI codes that make regex matching unreliable.
+REPL_PROMPT   = r"> "
 # Sub-prompts inside each command
 P_QUERY_FOR   = r"Query for:\s*"
 P_SELECT_IDX  = r"Select datasets indices.*\(all\):\s*"
