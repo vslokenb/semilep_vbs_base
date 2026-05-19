@@ -340,7 +340,8 @@ def select_QCD_CR(events, params, **kwargs):
         ht_mask = (events.LHE.HT <= 70.)
     else:
         ht_mask = True
-    one_lep = (events.nLeptonLoose ==1)
+    one_lep = (events.nMuonLoose ==1) #### CHANGED FOR DEBUGGING
+    veto = (events.nLeptonVeto < 2)
     if params["recoil"] == 'false':
         recoil_jet = True
         recoil_jet_pt = True
@@ -349,10 +350,10 @@ def select_QCD_CR(events, params, **kwargs):
         recoil_jet_pt = (events.LeadJetGood_recoil.pt >= params["recoil_jet_pt"]) 
     cut_njet = (events.nJetGood >= params["njet"])
     if params["met_def"] == "deepmet_response":
-        met_cut = (events.DeepMETResponseTune.pt      <  params["met_pt"])
+        met_cut = (events.DeepMETResponseTune.pt      >  params["met_pt"])
         cut_mt_w = (events.mt_w_leptonic_deepMET_responsetune_loose < 30.0)
     elif params["met_def"] == "deepmet_resolution":
-        met_cut = (events.DeepMETResolutionTune.pt      <  params["met_pt"])
+        met_cut = (events.DeepMETResolutionTune.pt      >  params["met_pt"])
         if params['mT'] == 'remove':
             cut_mt_w = (events.mt_w_leptonic_deepMET_resolutiontune_loose < 185.0)
         else:
@@ -360,7 +361,11 @@ def select_QCD_CR(events, params, **kwargs):
     else:
         met_cut = (events.PuppiMET.pt      <  params["met_pt"])
         cut_mt_w = (events.mt_w_leptonic_loose < 30.0)
-    mask = one_lep & met_cut & recoil_jet & cut_mt_w & recoil_jet_pt & cut_njet & ht_mask
+    if params["bveto"] == "true":
+        bveto = (events.nBJetTight     ==  0)
+    else:
+        bveto = True
+    mask = one_lep & met_cut & recoil_jet & cut_mt_w & recoil_jet_pt & cut_njet & ht_mask & veto & bveto
     return ak.values_astype(mask, np.bool_)
 
 qcd_enriched_cut_35 = Cut(
@@ -568,6 +573,7 @@ qcd_enriched_cut_40_deepmet_response = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -581,6 +587,7 @@ qcd_enriched_cut_45_deepmet_response = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -594,6 +601,7 @@ qcd_enriched_cut_35_deepmet_resolution = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -606,6 +614,7 @@ qcd_enriched_cut_30_deepmet_resolution = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -619,6 +628,7 @@ qcd_enriched_cut_40_deepmet_resolution = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -632,6 +642,7 @@ qcd_enriched_cut_45_deepmet_resolution = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -646,6 +657,7 @@ qcd_enriched_cut_35_deepmet_response_2j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -658,6 +670,7 @@ qcd_enriched_cut_30_deepmet_response_2j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -671,6 +684,7 @@ qcd_enriched_cut_40_deepmet_response_2j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -684,6 +698,7 @@ qcd_enriched_cut_45_deepmet_response_2j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -698,6 +713,7 @@ qcd_enriched_cut_35_deepmet_response_3j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -711,6 +727,7 @@ qcd_enriched_cut_0_deepmet_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": 'false',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -724,6 +741,7 @@ qcd_enriched_cut_30_deepmet_response_3j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -737,6 +755,7 @@ qcd_enriched_cut_40_deepmet_response_3j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -750,6 +769,7 @@ qcd_enriched_cut_45_deepmet_response_3j = Cut(
         "met_def": "deepmet_response",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -764,6 +784,7 @@ qcd_enriched_cut_35_deepmet_resolution_2j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -776,6 +797,7 @@ qcd_enriched_cut_30_deepmet_resolution_2j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -789,6 +811,7 @@ qcd_enriched_cut_40_deepmet_resolution_2j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -802,6 +825,7 @@ qcd_enriched_cut_45_deepmet_resolution_2j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -815,6 +839,7 @@ qcd_enriched_cut_20_deepmet_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 ) 
@@ -828,9 +853,52 @@ qcd_enriched_cut_35_deepmet_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )   
+
+qcd_enriched_cut_35_deepmet_resolution_3j_bveto = Cut(
+    name="qcd_enriched",
+    params={
+        "met_pt": 30.0,
+        "recoil_jet_pt": 35,
+        "njet": 3,
+        "met_def": "deepmet_resolution",
+        "mT": '',
+        "recoil": '',
+        "bveto": 'true',
+    },
+    function=select_QCD_CR,
+) 
+
+qcd_enriched_cut_40_deepmet_resolution_3j_bveto = Cut(
+    name="qcd_enriched",
+    params={
+        "met_pt": 30.0,
+        "recoil_jet_pt": 40,
+        "njet": 3,
+        "met_def": "deepmet_resolution",
+        "mT": '',
+        "recoil": '',
+        "bveto": 'true',
+    },
+    function=select_QCD_CR,
+) 
+
+qcd_enriched_cut_30_deepmet_resolution_3j_bveto = Cut(
+    name="qcd_enriched",
+    params={
+        "met_pt": 30.0,
+        "recoil_jet_pt": 30,
+        "njet": 3,
+        "met_def": "deepmet_resolution",
+        "mT": '',
+        "recoil": '',
+        "bveto": 'true',
+    },
+    function=select_QCD_CR,
+) 
 
 qcd_enriched_cut_35_deepmet20_resolution_3j = Cut(
     name="qcd_enriched",
@@ -841,6 +909,7 @@ qcd_enriched_cut_35_deepmet20_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )   
@@ -853,6 +922,7 @@ qcd_enriched_cut_30_deepmet_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -865,6 +935,7 @@ qcd_enriched_cut_30_deepmet20_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -878,6 +949,7 @@ qcd_enriched_cut_40_deepmet_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -891,6 +963,7 @@ qcd_enriched_cut_40_deepmet20_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -904,6 +977,7 @@ qcd_enriched_cut_45_deepmet_resolution_3j = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -917,6 +991,7 @@ qcd_enriched_cut_35_deepmet_resolution_3j60 = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 )
@@ -930,6 +1005,7 @@ qcd_enriched_cut_35_deepmet_resolution_3j45 = Cut(
         "met_def": "deepmet_resolution",
         "mT": '',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 ) 
@@ -943,6 +1019,7 @@ qcd_enriched_cut_35_deepmet_resolution_3j_mT = Cut(
         "met_def": "deepmet_resolution",
         "mT": 'remove',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 ) 
@@ -956,6 +1033,7 @@ qcd_enriched_cut_35_deepmet_resolution_3j60_mT = Cut(
         "met_def": "deepmet_resolution",
         "mT": 'remove',
         "recoil": '',
+        "bveto": '',
     },
     function=select_QCD_CR,
 ) 
@@ -1117,7 +1195,7 @@ whad_window_cut_mu = Cut(
 def in_whad_window_bveto_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood == 0) & (events.nMuonGood == 1)
     four_j  = (events.nJetGood >= 4)
-    b_veto = (events.nBJetLoose == 0) 
+    b_veto = (events.nBJetTight == 0) 
     no_fat = (events.nFatJetCandidate == 0)
     loose_lep_veto = (events.nLeptonVeto < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)

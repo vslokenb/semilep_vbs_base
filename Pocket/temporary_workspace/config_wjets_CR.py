@@ -316,7 +316,7 @@ cfg = Configurator(
 
             # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -362,7 +362,7 @@ cfg = Configurator(
 
 
             # # # ##### DATA #######
-            # "SingleMuon", #2017 or 2018 data
+            "SingleMuon", #2017 or 2018 data
             # "SingleElectron",
             #"EGamma",
             ],
@@ -377,8 +377,8 @@ cfg = Configurator(
         eventFlags,        # PileupID
         goldenJson,        
         nLepton_skim_cut,
-        # nJet_skim_cut,  
-        # met_skim_cut,
+        nJet_skim_cut,  
+        met_skim_cut,
         get_HLTsel(primaryDatasets=["SingleMuon", "EGamma"]),
     ],
 
@@ -398,12 +398,12 @@ cfg = Configurator(
         # # "whad_4jets_e":  [whad_window_cut_no_loose_e],
         # # "whad_4jets_looselep_e":  [whad_window_cut_no_fj0_e],
         # # "whad_4jets_looselep_fj_e": [whad_window_cut_e],  # |mjj^W - 80.4| < window
-        "boosted_e": [msd_window_cut_e],
+        # "boosted_e": [msd_window_cut_e],
         # # # "whad_peak_mu": [whad_window_cut_mu],  # |mjj^W - 80.4| < window
-        "boosted_mu": [msd_window_cut_mu],
+        # "boosted_mu": [msd_window_cut_mu],
         "resolved_mu":  [whad_window_cut_bveto_mu],
         "resolved_mu_mT30":  [whad_window_cut_bveto_mu2],
-        "resolved_e": [whad_window_cut_bveto_e],
+        # "resolved_e": [whad_window_cut_bveto_e],
     },
 
    
@@ -434,6 +434,24 @@ cfg = Configurator(
 
    
    variables={
+        # "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Nom", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
+        # "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Up", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
+        # "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Dn", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
+        
+        # "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_Nom", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
+        # "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystUp", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
+        # "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystDn", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
+        
+        # "prefire_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Nom", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
+        # "prefire_dn":  HistConf([Axis(coll="L1PreFiringWeight",field="Dn", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
+        # "prefire_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Up", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
+        
+
+        # "psweight":     HistConf([Axis(coll="events", field="PSWeight", bins=30, start=-1.0, stop=12, label="PSWeight")]),
+        # "lheweight":        HistConf([Axis(coll="events", field="LHEWeight", bins=30, start=-1.0, stop=12, label="LHEWeight")]),
+        # "LHEReweightingWeight":     HistConf([Axis(coll="events", field="LHEReweightingWeight", bins=50, start=-1.0, stop=40, label="LHEReweightingWeight")]),
+        # "LHEPdfWeight":     HistConf([Axis(coll="events", field="LHEPdfWeight", bins=50, start=-1, stop=40, label="LHEpdfweight")]),
+        # "LHEScaleWeight":       HistConf([Axis(coll="events", field="LHEScaleWeight", bins=50, start=-1, stop=40, label="(LHEScaleWeight)")]),
         "mT_lep_pt_corr" : HistConf(
             [
                Axis(coll="events", field="mt_w_leptonic", bins=30, start=0, stop=120, label=r"$m_T(W_{lep})$ [GeV]"),
@@ -457,7 +475,7 @@ cfg = Configurator(
         "mT_MET_corr" : HistConf(
             [
                 Axis(coll="events", field="mt_w_leptonic", bins=30, start=0, stop=120, label=r"$m_T(W_{lep})$ [GeV]"),
-                Axis(coll="DeepMETResolutionTune", field="pt", bins=40, start=0, stop=200, label=r"$\phi^{miss}$ [GeV]")
+                Axis(coll="DeepMETResolutionTune", field="phi", bins=50, start=-4, stop=4, label=r"$\phi^{miss}$ [GeV]")
             ] ,storage="weight", ),
         "mT_METphi_corr" : HistConf(
             [
@@ -474,34 +492,6 @@ cfg = Configurator(
                 Axis(coll="events", field="w_lep_phi", bins=32, start=-4.0, stop=4.0, label=r"$\phi^{lep_1}$ "),
                 Axis(coll="DeepMETResolutionTune", field="phi", bins=50, start=-4, stop=4, label=r"$\phi^{miss}$ [GeV]")
             ],storage="weight",  ),
-        "lep_phi_dphi_corr" : HistConf(
-            [
-                Axis(coll="events", field="w_lep_phi", bins=32, start=-2.5, stop=2.5, label=r"$\eta^{lep_1}$ "),
-                Axis(coll="events", field="lead_wlep_MET_dphi", bins=50, start=-4, stop=4, label=r"$|\Delta\phi_{l,MET}|$")
-            ],storage="weight",  ),
-        "lep_eta_dphi_corr" : HistConf(
-            [
-                Axis(coll="events", field="w_lep_eta", bins=32, start=-4.0, stop=4.0, label=r"$\phi^{lep_1}$ "),
-                Axis(coll="events", field="lead_wlep_MET_dphi", bins=50, start=-4, stop=4, label=r"$|\Delta\phi_{l,MET}|$")
-            ],storage="weight",  ),
-        # "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Nom", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
-        # "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Up", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
-        # "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="ECAL_Dn", bins=30, start=-1.0, stop=12, label="prefire_ecal")]),
-        
-        # "prefire_ecal_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_Nom", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
-        # "prefire_ecal_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystUp", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
-        # "prefire_ecal_down":  HistConf([Axis(coll="L1PreFiringWeight",field="Muon_SystDn", bins=30, start=-1.0, stop=12, label="prefire_muon")]),
-        
-        # "prefire_nom":  HistConf([Axis(coll="L1PreFiringWeight",field="Nom", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
-        # "prefire_dn":  HistConf([Axis(coll="L1PreFiringWeight",field="Dn", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
-        # "prefire_up":  HistConf([Axis(coll="L1PreFiringWeight",field="Up", bins=30, start=-1.0, stop=5, label="prefire_weight")]),
-        
-
-        # "psweight":     HistConf([Axis(coll="events", field="PSWeight", bins=30, start=-1.0, stop=12, label="PSWeight")]),
-        # "lheweight":        HistConf([Axis(coll="events", field="LHEWeight", bins=30, start=-1.0, stop=12, label="LHEWeight")]),
-        # "LHEReweightingWeight":     HistConf([Axis(coll="events", field="LHEReweightingWeight", bins=50, start=-1.0, stop=40, label="LHEReweightingWeight")]),
-        # "LHEPdfWeight":     HistConf([Axis(coll="events", field="LHEPdfWeight", bins=50, start=-1, stop=40, label="LHEpdfweight")]),
-        # "LHEScaleWeight":       HistConf([Axis(coll="events", field="LHEScaleWeight", bins=50, start=-1, stop=40, label="(LHEScaleWeight)")]),
         "nJets":      HistConf([Axis(coll="events", field="nJetGood", bins=12, start=0, stop=12, label="N(jets)")]),
         "nBJets":     HistConf([Axis(coll="events", field="nBJetGood", bins=8, start=0, stop=8, label="N(bjets)")]),
         # "nBJet_csv":    HistConf([Axis(coll="events", field="nBJet_csv", bins=8, start=0, stop=8, label="N(bjets_csv)")]),
@@ -622,8 +612,6 @@ cfg = Configurator(
         "lead_wlep_w_resolved_deta":   HistConf([Axis(coll="events", field="lead_wlep_w_resolved_deta", bins=24, start=2.0, stop=9.0, label=r"$|\Delta\eta_{lW}^{resolved}|$")]),
 
         # dphi plots
-        "muon_met_dphi":   HistConf([Axis(coll="MuonGood", field="dphi_met", bins=32, start=0, stop=4.0, label=r"$|\Delta\phi_{\mu,MET}|$")]),
-        "ele_met_dphi":   HistConf([Axis(coll="ElectronGood", field="dphi_met", bins=32, start=0, stop=4.0, label=r"$|\Delta\phi_{e,MET}|$")]),
         "lead_wlep_MET_dphi":   HistConf([Axis(coll="events", field="lead_wlep_MET_dphi", bins=32, start=-4, stop=4.0, label=r"$|\Delta\phi_{l,MET}|$")]),
         "lead_wlep_wfatjet1_dphi":   HistConf([Axis(coll="events", field="lead_wlep_wfatjet1_dphi", bins=32, start=-4, stop=4.0, label=r"$|\Delta\phi_{l,AK8}|$")]),
         "lead_wlep_wjet1_dphi":   HistConf([Axis(coll="events", field="lead_wlep_wjet1_dphi", bins=32, start=-4, stop=4.0, label=r"$|\Delta\phi_{l,j_1^{had. \, V}}|$")]),

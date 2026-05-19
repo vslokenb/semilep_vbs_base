@@ -355,6 +355,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         lead_lep = ak.firsts(ev.LeptonGood)
         lead_lep_loose = ak.firsts(ev.LeptonLoose)
+        lead_mu = ak.firsts(ev.MuonGood)
+        lead_mu_loose = ak.firsts(ev.MuonLoose)
         #lead_lep_with_fakes = ak.firsts(ev.LeptonWithFakes)
         #lep_i = ak.fill_none(getattr(lead_lep, "jetIdx", None), -1)
         
@@ -546,7 +548,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["ElectronLoose","dphi_met"] =  abs(delta_phi(ev.ElectronLoose.phi,ev.DeepMETResolutionTune.phi))
         ev["MuonGood","dphi_met"] =  abs(delta_phi(ev.MuonGood.phi,ev.DeepMETResolutionTune.phi))
         ev["MuonLoose","dphi_met"] =  abs(delta_phi(ev.MuonLoose.phi,ev.DeepMETResolutionTune.phi))
-
+        ev["MuonMedium","dphi_met"] =  abs(delta_phi(ev.MuonMedium.phi,ev.DeepMETResolutionTune.phi))
+        ev["ElectronMedium","dphi_met"] =  abs(delta_phi(ev.ElectronMedium.phi,ev.DeepMETResolutionTune.phi))
+        
         
         nonvbs_mask = (ev.JetGood.idx != vbs_i) & (ev.JetGood.idx != vbs_j) #& (ev.JetGood.idx != lep_i) #see if can better clean out dR tail at 0
         ev["CentralJets"] = ev.JetGood[nonvbs_mask]
@@ -614,9 +618,12 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         # ------------- W Leptonic -------------
         #lead_lep = ak.firsts(ev.LeptonGood)
         ev["mt_w_leptonic"] = compute_MT(lead_lep, ev.DeepMETResolutionTune)
+
+        ev["mt_w_leptonic_mu"] = compute_MT(lead_mu, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_resolutiontune"] = compute_MT(lead_lep, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_responsetune"] = compute_MT(lead_lep, ev.DeepMETResponseTune)
         ev["mt_w_leptonic_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResolutionTune)
+        ev["mt_w_leptonic_loose_mu"] = compute_MT(lead_mu_loose, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_resolutiontune_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResolutionTune)
         ev["mt_w_leptonic_deepMET_responsetune_loose"] = compute_MT(lead_lep_loose, ev.DeepMETResponseTune)
         w_lep = ev.PuppiMET + lead_lep

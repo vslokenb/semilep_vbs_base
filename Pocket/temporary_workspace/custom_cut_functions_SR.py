@@ -218,10 +218,10 @@ def in_msd_window_fatjet_mu(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    W_vs_QCD_pNet_discrim = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "particleNetWithMass_WvsQCD", None)), np.nan) 
-    isNotQCD = np.where(np.isnan(W_vs_QCD_pNet_discrim), False, W_vs_QCD_pNet_discrim > 0.709)
+    # W_vs_QCD_pNet_discrim = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "particleNetWithMass_WvsQCD", None)), np.nan) 
+    # isNotQCD = np.where(np.isnan(W_vs_QCD_pNet_discrim), False, W_vs_QCD_pNet_discrim > 0.709)
 
-    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & muon_ch & j2_pt_min & b_veto & isNotQCD#& jet_dR_cut 
+    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & muon_ch & j2_pt_min & b_veto #& isNotQCD#& jet_dR_cut 
     return ak.values_astype(mask, np.bool_)
 
 

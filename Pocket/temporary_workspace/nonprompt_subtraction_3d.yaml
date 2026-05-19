@@ -42,6 +42,18 @@ ratio_pairs:
   - numerator: "muon_tight_dphi"
     denominator: "muon_loose_dphi"
     output: "muon_tighttoloose_dphi_fakerate"
+  - numerator: "electron_tight_dphi_eta
+    denominator: "electron_loose_dphi_eta
+    output: "electron_tighttoloose_dphi_eta_fakerate"
+  - numerator: "electron_tight_dphi_eta
+    denominator: "electron_medium_dphi_eta
+    output: "electron_tighttomedium_dphi_eta_fakerate"
+  - numerator: "muon_tight_dphi_eta
+    denominator: "muon_loose_dphi_eta
+    output: "muon_tighttoloose_dphi_eta_fakerate"
+  - numerator: "muon_tight_dphi_eta
+    denominator: "muon_medium_dphi_eta
+    output: "muon_tighttomedium_dphi_eta_fakerate"
 weight_pairs:
   - numerator: "electron_tight_pt_eta_dphi"
     denominator: "electron_loose_pt_eta_dphi"
@@ -49,3 +61,15 @@ weight_pairs:
   - numerator: "muon_tight_pt_eta_dphi"
     denominator: "muon_loose_pt_eta_dphi"
     output: "muon_pt_eta_dphi_weights"
+  - numerator: "electron_tight_dphi_eta"
+    denominator: "electron_loose_dphi_eta"
+    output: "electron_dphi_eta_weights"
+  - numerator: "electron_tight_dphi_eta"
+    denominator: "electron_medium_dphi_eta"
+    output: "electron_tighttomedium_dphi_eta_weights"
+  - numerator: "muon_tight_dphi_eta"
+    denominator: "muon_loose_dphi_eta"
+    output: "muon_dphi_eta_weights"
+  - numerator: "muon_tight_dphi_eta"
+    denominator: "muon_medium_dphi_eta"
+    output: "muon_tighttomedium_dphi_eta_weights"

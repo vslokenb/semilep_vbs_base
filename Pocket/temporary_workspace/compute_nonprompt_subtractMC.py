@@ -127,30 +127,30 @@ def main():
             scale = factors[dsname]
         if len(merged_acc["sumw"].keys()) == 0:
             merged_acc["sum_genweights"] = {
-                    "nonprompt_"+year: 0.0
+                    "nonpromptDOWN10_"+year: 0.0
                     }
             merged_acc["sum_signOf_genweights"] = {
-                    "nonprompt_"+year: 0.0
+                    "nonpromptDOWN10_"+year: 0.0
                     }
             for key in acc['cutflow'].keys():
                 if key in ['initial','skim']:
-                    merged_acc['cutflow'][key] = {"nonprompt_"+year: 0.0}
+                    merged_acc['cutflow'][key] = {"nonpromptDOWN10_"+year: 0.0}
                 elif key == "presel":
-                    merged_acc['cutflow'][key] = {"nonprompt_"+year:{"nominal": 0.0}}
+                    merged_acc['cutflow'][key] = {"nonpromptDOWN10_"+year:{"nominal": 0.0}}
                 else:
-                    merged_acc['cutflow'][key] = {"nonprompt_"+year: {"nonprompt": {"nominal": 0.0}}}
+                    merged_acc['cutflow'][key] = {"nonpromptDOWN10_"+year: {"nonpromptDOWN10": {"nominal": 0.0}}}
             for key in acc['sumw'].keys():
-                merged_acc['sumw'][key] = {"nonprompt_"+year: {"nonprompt": {"nominal": 0.0}}}
-                merged_acc['sumw2'][key] = {"nonprompt_"+year: {"nonprompt": {"nominal": 0.0}}}
+                merged_acc['sumw'][key] = {"nonpromptDOWN10_"+year: {"nonpromptDOWN10": {"nominal": 0.0}}}
+                merged_acc['sumw2'][key] = {"nonpromptDOWN10_"+year: {"nonpromptDOWN10": {"nominal": 0.0}}}
             merged_acc['datasets_metadata']['by_datataking_period'] = {
                     year: {
-                        "nonprompt": {"nonprompt_"+year} 
+                        "nonpromptDOWN10": {"nonpromptDOWN10_"+year} 
                         }
                     }
             merged_acc['datasets_metadata']['by_dataset'] = {
-                    "nonprompt_"+year: {
+                    "nonpromptDOWN10_"+year: {
                         'das_names': "none",
-                        'sample': "nonprompt",
+                        'sample': "nonpromptDOWN10",
                         'year': year,
                         'isMC': 'True',
                         'xsec': '1.0',
@@ -168,34 +168,34 @@ def main():
             if hname not in merged_acc['variables'].keys():
                 # print("scaled_hist",scaled_hist)
                 merged_acc['variables'][hname] = {
-                        "nonprompt": {
-                            "nonprompt_"+year: deepcopy(scaled_hist)[slicing_variations]
+                        "nonpromptDOWN10": {
+                            "nonpromptDOWN10_"+year: deepcopy(scaled_hist)[slicing_variations]
                             }
                         }
             else:
-                merged_acc['variables'][hname]['nonprompt']['nonprompt_'+year].values()[...] += scaled_hist[slicing_variations].values()[...]
-                merged_acc['variables'][hname]['nonprompt']['nonprompt_'+year].variances()[...] += scaled_hist[slicing_variations].variances()[...]
+                merged_acc['variables'][hname]['nonpromptDOWN10']['nonpromptDOWN10_'+year].values()[...] += scaled_hist[slicing_variations].values()[...]
+                merged_acc['variables'][hname]['nonpromptDOWN10']['nonpromptDOWN10_'+year].variances()[...] += scaled_hist[slicing_variations].variances()[...]
         if len(acc['sum_genweights'].keys()) > 0:
-            merged_acc['sum_genweights']["nonprompt_"+year] += acc['sum_genweights'][dsname_era]*scale
-            merged_acc['sum_signOf_genweights']["nonprompt_"+year] += acc['sum_signOf_genweights'][dsname_era]*scale
+            merged_acc['sum_genweights']["nonpromptDOWN10_"+year] += acc['sum_genweights'][dsname_era]*scale
+            merged_acc['sum_signOf_genweights']["nonpromptDOWN10_"+year] += acc['sum_signOf_genweights'][dsname_era]*scale
         else:
             sumw_base = acc['sumw']['baseline']
             sumw_base = sumw_base[list(sumw_base.keys())[0]]
             sumw_base = sumw_base[list(sumw_base.keys())[0]]
             sumw_base = sumw_base[list(sumw_base.keys())[0]]
-            merged_acc['sum_genweights']["nonprompt_"+year] += sumw_base*scale
-            merged_acc['sum_signOf_genweights']["nonprompt_"+year] += sumw_base*scale
+            merged_acc['sum_genweights']["nonpromptDOWN10_"+year] += sumw_base*scale
+            merged_acc['sum_signOf_genweights']["nonpromptDOWN10_"+year] += sumw_base*scale
         for key in merged_acc['cutflow'].keys():
             if key in ['initial','skim']:
-                merged_acc['cutflow'][key]["nonprompt_"+year] += acc['cutflow'][key][dsname_era]*scale
+                merged_acc['cutflow'][key]["nonpromptDOWN10_"+year] += acc['cutflow'][key][dsname_era]*scale
             elif key =="presel":
-                merged_acc['cutflow'][key]["nonprompt_"+year]["nominal"] += acc['cutflow'][key][dsname_era]["nominal"]*scale
+                merged_acc['cutflow'][key]["nonpromptDOWN10_"+year]["nominal"] += acc['cutflow'][key][dsname_era]["nominal"]*scale
             else:
-                merged_acc['cutflow'][key]["nonprompt_"+year]["nonprompt"]["nominal"] += acc['cutflow'][key][dsname_era][dsname]["nominal"]*scale
+                merged_acc['cutflow'][key]["nonpromptDOWN10_"+year]["nonpromptDOWN10"]["nominal"] += acc['cutflow'][key][dsname_era][dsname]["nominal"]*scale
         for key in merged_acc['sumw'].keys():
-            merged_acc['sumw'][key]["nonprompt_"+year]["nonprompt"]["nominal"] += acc['sumw'][key][dsname_era][dsname]["nominal"]*scale
+            merged_acc['sumw'][key]["nonpromptDOWN10_"+year]["nonpromptDOWN10"]["nominal"] += acc['sumw'][key][dsname_era][dsname]["nominal"]*scale
         for key in merged_acc['sumw2'].keys():
-            merged_acc['sumw2'][key]["nonprompt_"+year]["nonprompt"]["nominal"] += acc['sumw2'][key][dsname_era][dsname]["nominal"]*scale
+            merged_acc['sumw2'][key]["nonpromptDOWN10_"+year]["nonpromptDOWN10"]["nominal"] += acc['sumw2'][key][dsname_era][dsname]["nominal"]*scale
     # print("merged_acc['cutflow']",merged_acc['cutflow'])
     # print("merged_acc['sumw']",merged_acc['sumw'])
     # print("merged_acc['sumw2']",merged_acc['sumw2'])

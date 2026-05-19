@@ -15,63 +15,24 @@ from pocket_coffea.lib.weights import WeightWrapper, WeightData, WeightDataMulti
 from pocket_coffea.lib.scale_factors import sf_pileup_reweight
 
 
-import workflow_nonprompt, custom_cut_functions_nonprompt, reweighting_st
-from workflow_nonprompt import VBSSemileptonicProcessor
-from custom_cut_functions_nonprompt import (
+import workflow_v9, custom_cut_functions, reweighting_st
+from workflow_v9 import VBSSemileptonicProcessor
+from custom_cut_functions import (
     nLepton_skim_cut,
     nJet_skim_cut,
     met_skim_cut,
-    wjets_mu_sel,
-    wjets_e_sel,
-    qcd_enriched_cut_30,
-    qcd_enriched_cut_35,
-    qcd_enriched_cut_40,
-    qcd_enriched_cut_45,
-    qcd_enriched_cut_30_2j,
-    qcd_enriched_cut_35_2j,
-    qcd_enriched_cut_40_2j,
-    qcd_enriched_cut_45_2j,
-    qcd_enriched_cut_30_3j,
-    qcd_enriched_cut_35_3j,
-    qcd_enriched_cut_40_3j,
-    qcd_enriched_cut_45_3j,
-    qcd_enriched_cut_30_4j,
-    qcd_enriched_cut_35_4j,
-    qcd_enriched_cut_40_4j,
-    qcd_enriched_cut_45_4j,
-    qcd_enriched_cut_35_deepmet_response,
-    qcd_enriched_cut_30_deepmet_response,
-    qcd_enriched_cut_40_deepmet_response,
-    qcd_enriched_cut_45_deepmet_response,
-    qcd_enriched_cut_35_deepmet_resolution,
-    qcd_enriched_cut_30_deepmet_resolution,
-    qcd_enriched_cut_40_deepmet_resolution,
-    qcd_enriched_cut_45_deepmet_resolution,
-    qcd_enriched_cut_35_deepmet_response_2j,
-    qcd_enriched_cut_30_deepmet_response_2j,
-    qcd_enriched_cut_40_deepmet_response_2j,
-    qcd_enriched_cut_45_deepmet_response_2j,
-    qcd_enriched_cut_35_deepmet_response_3j,
-    qcd_enriched_cut_30_deepmet_response_3j,
-    qcd_enriched_cut_40_deepmet_response_3j,
-    qcd_enriched_cut_45_deepmet_response_3j,
-    qcd_enriched_cut_35_deepmet_resolution_2j,
-    qcd_enriched_cut_30_deepmet_resolution_2j,
-    qcd_enriched_cut_40_deepmet_resolution_2j,
-    qcd_enriched_cut_45_deepmet_resolution_2j,
-    qcd_enriched_cut_35_deepmet_resolution_3j,
-    qcd_enriched_cut_30_deepmet_resolution_3j,
-    qcd_enriched_cut_40_deepmet_resolution_3j,
-    qcd_enriched_cut_35_deepmet20_resolution_3j,
-    qcd_enriched_cut_30_deepmet20_resolution_3j,
-    qcd_enriched_cut_40_deepmet20_resolution_3j,
-    qcd_enriched_cut_45_deepmet_resolution_3j,
-    qcd_enriched_cut_35_deepmet_resolution_3j60,
-    qcd_enriched_cut_35_deepmet_resolution_3j45,
-    qcd_enriched_cut_35_deepmet_resolution_3j_mT,
-    qcd_enriched_cut_35_deepmet_resolution_3j60_mT,
-    qcd_enriched_cut_20_deepmet_resolution_3j,
-    qcd_enriched_cut_0_deepmet_resolution_3j,
+    qcd_enriched_mu,
+    qcd_enriched_e,
+    qcd_enriched_3j_mu,
+    qcd_enriched_3j_e,
+    qcd_enriched_sideband_mu,
+    qcd_enriched_sideband_e,
+    qcd_enriched_recoil_30_mu,  # nJetGood >= 3, recoil jet pT >= 30, muon
+    qcd_enriched_recoil_35_mu,  # nJetGood >= 3, recoil jet pT >= 35, muon
+    qcd_enriched_recoil_40_mu,  # nJetGood >= 3, recoil jet pT >= 40, muon
+    qcd_enriched_recoil_30_e ,  # nJetGood >= 3, recoil jet pT >= 30, electron
+    qcd_enriched_recoil_35_e ,  # nJetGood >= 3, recoil jet pT >= 35, electron
+    qcd_enriched_recoil_40_e ,  # nJetGood >= 3, recoil jet pT >= 40, electron
 )
 
 
@@ -107,9 +68,9 @@ from custom_cut_functions_nonprompt import (
 #             )
 
 
-cloudpickle.register_pickle_by_value(workflow_nonprompt)
+cloudpickle.register_pickle_by_value(workflow_v9)
 cloudpickle.register_pickle_by_value(reweighting_st)
-cloudpickle.register_pickle_by_value(custom_cut_functions_nonprompt)
+cloudpickle.register_pickle_by_value(custom_cut_functions)
 from reweighting_st import ratio_function
 localdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -394,7 +355,7 @@ cfg = Configurator(
             #########
             "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            # "EGamma",
+            "EGamma",
             # "Muon"
             ],
             "year": ["2018"],
@@ -418,58 +379,67 @@ cfg = Configurator(
    
     categories={
         "baseline": [passthrough],
-        "wjet_mu": [wjets_mu_sel],
-        "wjet_e": [wjets_e_sel],
-        # "qcd_enriched_30": [qcd_enriched_cut_30],
-        # "qcd_enriched_35": [qcd_enriched_cut_35],
-        # "qcd_enriched_40": [qcd_enriched_cut_40],
-        # "qcd_enriched_45": [qcd_enriched_cut_45],
-        # "qcd_enriched_30_2j": [qcd_enriched_cut_30_2j],
-        # "qcd_enriched_35_2j": [qcd_enriched_cut_35_2j],
-        # "qcd_enriched_40_2j": [qcd_enriched_cut_40_2j],
-        # "qcd_enriched_45_2j": [qcd_enriched_cut_45_2j],
-        # "qcd_enriched_30_3j": [qcd_enriched_cut_30_3j],
-        # "qcd_enriched_35_3j": [qcd_enriched_cut_35_3j],
-        # "qcd_enriched_40_3j": [qcd_enriched_cut_40_3j],
-        # "qcd_enriched_45_3j": [qcd_enriched_cut_45_3j],
-        # "qcd_enriched_30_4j": [qcd_enriched_cut_30_4j],
-        # "qcd_enriched_35_4j": [qcd_enriched_cut_35_4j],
-        # "qcd_enriched_40_4j": [qcd_enriched_cut_40_4j],
-        # "qcd_enriched_45_4j": [qcd_enriched_cut_45_4j],
-        # "qcd_enriched_30_deepmet_response": [qcd_enriched_cut_30_deepmet_response],
-        # "qcd_enriched_35_deepmet_response": [qcd_enriched_cut_35_deepmet_response],
-        # "qcd_enriched_40_deepmet_response": [qcd_enriched_cut_40_deepmet_response],
-        # "qcd_enriched_45_deepmet_response": [qcd_enriched_cut_45_deepmet_response],
-        "qcd_enriched_30_deepmet_resolution": [qcd_enriched_cut_30_deepmet_resolution],
-        "qcd_enriched_35_deepmet_resolution": [qcd_enriched_cut_35_deepmet_resolution],
-        "qcd_enriched_40_deepmet_resolution": [qcd_enriched_cut_40_deepmet_resolution],
-        "qcd_enriched_45_deepmet_resolution": [qcd_enriched_cut_45_deepmet_resolution],
-        # "qcd_enriched_30_deepmet_response_2j": [qcd_enriched_cut_30_deepmet_response_2j],
-        # "qcd_enriched_35_deepmet_response_2j": [qcd_enriched_cut_35_deepmet_response_2j],
-        # "qcd_enriched_40_deepmet_response_2j": [qcd_enriched_cut_40_deepmet_response_2j],
-        # "qcd_enriched_45_deepmet_response_2j": [qcd_enriched_cut_45_deepmet_response_2j],
-        # "qcd_enriched_30_deepmet_resolution_2j": [qcd_enriched_cut_30_deepmet_resolution_2j],
-        "qcd_enriched_35_deepmet_resolution_2j": [qcd_enriched_cut_35_deepmet_resolution_2j],
-        "qcd_enriched_40_deepmet_resolution_2j": [qcd_enriched_cut_40_deepmet_resolution_2j],
-        "qcd_enriched_45_deepmet_resolution_2j": [qcd_enriched_cut_45_deepmet_resolution_2j],
-        # "qcd_enriched_30_deepmet_response_3j": [qcd_enriched_cut_30_deepmet_response_3j],
-        # "qcd_enriched_35_deepmet_response_3j": [qcd_enriched_cut_35_deepmet_response_3j],
-        # "qcd_enriched_40_deepmet_response_3j": [qcd_enriched_cut_40_deepmet_response_3j],
-        # "qcd_enriched_45_deepmet_response_3j": [qcd_enriched_cut_45_deepmet_response_3j],
-        "qcd_enriched_30_deepmet_resolution_3j": [qcd_enriched_cut_30_deepmet_resolution_3j],
-        "qcd_enriched_35_deepmet_resolution_3j": [qcd_enriched_cut_35_deepmet_resolution_3j],
-        "qcd_enriched_40_deepmet_resolution_3j": [qcd_enriched_cut_40_deepmet_resolution_3j],
-        "qcd_enriched_45_deepmet_resolution_3j": [qcd_enriched_cut_45_deepmet_resolution_3j],
-        "qcd_enriched_35_deepmet_resolution_3j60": [qcd_enriched_cut_35_deepmet_resolution_3j60],
-        "qcd_enriched_35_deepmet_resolution_3j45": [qcd_enriched_cut_35_deepmet_resolution_3j45],
-        "qcd_enriched_35_deepmet_resolution_3j_mT": [qcd_enriched_cut_35_deepmet_resolution_3j_mT],
-        "qcd_enriched_35_deepmet_resolution_3j60_mT": [qcd_enriched_cut_35_deepmet_resolution_3j60_mT],
-        "qcd_enriched_30_deepmet20_resolution_3j": [qcd_enriched_cut_30_deepmet20_resolution_3j],
-        "qcd_enriched_35_deepmet20_resolution_3j": [qcd_enriched_cut_35_deepmet20_resolution_3j],
-        "qcd_enriched_40_deepmet20_resolution_3j": [qcd_enriched_cut_40_deepmet20_resolution_3j],
-        "qcd_enriched_20_deepmet_resolution_3j": [qcd_enriched_cut_20_deepmet_resolution_3j],
-        "qcd_enriched_0_deepmet_resolution_3j": [qcd_enriched_cut_0_deepmet_resolution_3j],
-        
+        "qcd_enriched_e": [qcd_enriched_e],
+        "qcd_enriched_mu": [qcd_enriched_mu],
+        # "qcd_enriched_3j_mu":[qcd_enriched_3j_mu],
+        # "qcd_enriched_3j_e": [qcd_enriched_3j_e],
+        # "qcd_enriched_sideband_mu": [qcd_enriched_sideband_mu],
+        # "qcd_enriched_sideband_e": [qcd_enriched_sideband_e],
+        "qcd_enriched_recoil_30_mu": [qcd_enriched_recoil_30_mu],
+        "qcd_enriched_recoil_35_mu": [qcd_enriched_recoil_35_mu],
+        "qcd_enriched_recoil_40_mu": [qcd_enriched_recoil_40_mu],
+        "qcd_enriched_recoil_30_e": [qcd_enriched_recoil_30_e],
+        "qcd_enriched_recoil_35_e": [qcd_enriched_recoil_35_e],
+        "qcd_enriched_recoil_40_e": [qcd_enriched_recoil_40_e],
+        # # "qcd_enriched_45": [qcd_enriched_cut_45],
+        # # "qcd_enriched_30_2j": [qcd_enriched_cut_30_2j],
+        # # "qcd_enriched_35_2j": [qcd_enriched_cut_35_2j],
+        # # "qcd_enriched_40_2j": [qcd_enriched_cut_40_2j],
+        # # "qcd_enriched_45_2j": [qcd_enriched_cut_45_2j],
+        # # "qcd_enriched_30_3j": [qcd_enriched_cut_30_3j],
+        # # "qcd_enriched_35_3j": [qcd_enriched_cut_35_3j],
+        # # "qcd_enriched_40_3j": [qcd_enriched_cut_40_3j],
+        # # "qcd_enriched_45_3j": [qcd_enriched_cut_45_3j],
+        # # "qcd_enriched_30_4j": [qcd_enriched_cut_30_4j],
+        # # "qcd_enriched_35_4j": [qcd_enriched_cut_35_4j],
+        # # "qcd_enriched_40_4j": [qcd_enriched_cut_40_4j],
+        # # "qcd_enriched_45_4j": [qcd_enriched_cut_45_4j],
+        # # "qcd_enriched_30_deepmet_response": [qcd_enriched_cut_30_deepmet_response],
+        # # "qcd_enriched_35_deepmet_response": [qcd_enriched_cut_35_deepmet_response],
+        # # "qcd_enriched_40_deepmet_response": [qcd_enriched_cut_40_deepmet_response],
+        # # "qcd_enriched_45_deepmet_response": [qcd_enriched_cut_45_deepmet_response],
+        # "qcd_enriched_30_deepmet_resolution": [qcd_enriched_cut_30_deepmet_resolution],
+        # "qcd_enriched_35_deepmet_resolution": [qcd_enriched_cut_35_deepmet_resolution],
+        # "qcd_enriched_40_deepmet_resolution": [qcd_enriched_cut_40_deepmet_resolution],
+        # "qcd_enriched_45_deepmet_resolution": [qcd_enriched_cut_45_deepmet_resolution],
+        # # "qcd_enriched_30_deepmet_response_2j": [qcd_enriched_cut_30_deepmet_response_2j],
+        # # "qcd_enriched_35_deepmet_response_2j": [qcd_enriched_cut_35_deepmet_response_2j],
+        # # "qcd_enriched_40_deepmet_response_2j": [qcd_enriched_cut_40_deepmet_response_2j],
+        # # "qcd_enriched_45_deepmet_response_2j": [qcd_enriched_cut_45_deepmet_response_2j],
+        # # "qcd_enriched_30_deepmet_resolution_2j": [qcd_enriched_cut_30_deepmet_resolution_2j],
+        # "qcd_enriched_35_deepmet_resolution_2j": [qcd_enriched_cut_35_deepmet_resolution_2j],
+        # "qcd_enriched_40_deepmet_resolution_2j": [qcd_enriched_cut_40_deepmet_resolution_2j],
+        # "qcd_enriched_45_deepmet_resolution_2j": [qcd_enriched_cut_45_deepmet_resolution_2j],
+        # # "qcd_enriched_30_deepmet_response_3j": [qcd_enriched_cut_30_deepmet_response_3j],
+        # # "qcd_enriched_35_deepmet_response_3j": [qcd_enriched_cut_35_deepmet_response_3j],
+        # # "qcd_enriched_40_deepmet_response_3j": [qcd_enriched_cut_40_deepmet_response_3j],
+        # # "qcd_enriched_45_deepmet_response_3j": [qcd_enriched_cut_45_deepmet_response_3j],
+        # "qcd_enriched_30_deepmet_resolution_3j": [qcd_enriched_cut_30_deepmet_resolution_3j],
+        # "qcd_enriched_35_deepmet_resolution_3j": [qcd_enriched_cut_35_deepmet_resolution_3j],
+        # "qcd_enriched_40_deepmet_resolution_3j": [qcd_enriched_cut_40_deepmet_resolution_3j],
+        # "qcd_enriched_45_deepmet_resolution_3j": [qcd_enriched_cut_45_deepmet_resolution_3j],
+        # "qcd_enriched_35_deepmet_resolution_3j60": [qcd_enriched_cut_35_deepmet_resolution_3j60],
+        # "qcd_enriched_35_deepmet_resolution_3j45": [qcd_enriched_cut_35_deepmet_resolution_3j45],
+        # "qcd_enriched_35_deepmet_resolution_3j_mT": [qcd_enriched_cut_35_deepmet_resolution_3j_mT],
+        # "qcd_enriched_35_deepmet_resolution_3j60_mT": [qcd_enriched_cut_35_deepmet_resolution_3j60_mT],
+        # "qcd_enriched_30_deepmet20_resolution_3j": [qcd_enriched_cut_30_deepmet20_resolution_3j],
+        # "qcd_enriched_35_deepmet20_resolution_3j": [qcd_enriched_cut_35_deepmet20_resolution_3j],
+        # "qcd_enriched_40_deepmet20_resolution_3j": [qcd_enriched_cut_40_deepmet20_resolution_3j],
+        # "qcd_enriched_20_deepmet_resolution_3j": [qcd_enriched_cut_20_deepmet_resolution_3j],
+        # "qcd_enriched_0_deepmet_resolution_3j": [qcd_enriched_cut_0_deepmet_resolution_3j],
+        # "qcd_enriched_cut_35_deepmet_resolution_3j_bveto": [qcd_enriched_cut_35_deepmet_resolution_3j_bveto],
+        # "qcd_enriched_cut_40_deepmet_resolution_3j_bveto": [qcd_enriched_cut_40_deepmet_resolution_3j_bveto],
+        # "qcd_enriched_cut_30_deepmet_resolution_3j_bveto": [qcd_enriched_cut_30_deepmet_resolution_3j_bveto],
     
     },
 
@@ -504,87 +474,40 @@ cfg = Configurator(
     variations={"weights": {"common": {"inclusive": ["PileupWeight","sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]}}},
 
     variables={
-        "electron_loose_pt" : HistConf(
-            [
-                Axis(coll="ElectronLoose", field="pt",bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$")
-            ] ),
-        "electron_loose_eta" : HistConf(
-            [
-                Axis(coll="ElectronLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose electrons $\eta$")
-            ] ),
-        "electron_loose_pt_eta" : HistConf(
-            [
-                Axis(coll="ElectronLoose", field="pt",bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$"),
-                Axis(coll="ElectronLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose electrons $\eta$")
-            ] ),
-        "electron_medium_pt" : HistConf(
-            [
-                Axis(coll="ElectronMedium", field="pt",bins=[35,40,45,50,55,60,70,100], label="medium electrons $p_T$")
-            ] ),
-        "electron_medium_eta" : HistConf(
-            [
-                Axis(coll="ElectronMedium", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="medium electrons $\eta$")
-            ] ),
-        "electron_medium_pt_eta" : HistConf(
-            [
-                Axis(coll="ElectronMedium", field="pt",bins=[35,40,45,50,55,60,70,100], label="medium electrons $p_T$"),
-                Axis(coll="ElectronMedium", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="medium electrons $\eta$")
-            ] ),
-        "electron_tight_pt" : HistConf(
-            [
-                Axis(coll="ElectronGood", field="pt",bins=[35,40,45,50,55,60,70,100], label="tight electrons $p_T$")
-            ] ),
-        "electron_tight_eta" : HistConf(
-            [
-                Axis(coll="ElectronGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$")
-            ] ),
-        "electron_tight_pt_eta" : HistConf(
-            [
-                Axis(coll="ElectronGood", field="pt",bins=[35,40,45,50,55,60,70,100], label="tight electrons $p_T$"),
-                Axis(coll="ElectronGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$")
-            ] ),
-        
-        "muon_loose_pt" : HistConf(
-            [
-                Axis(coll="MuonLoose", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="loose muons $p_T$")
-            ] ),
-        "muon_loose_eta" : HistConf(
-            [
-                Axis(coll="MuonLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose muons $\eta$")
-            ] ),
-        "muon_loose_pt_eta" : HistConf(
-            [
-                Axis(coll="MuonLoose", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="loose muons $p_T$"),
-                Axis(coll="MuonLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose muons $\eta$")
-            ] ),
-        "muon_medium_pt" : HistConf(
-            [
-                Axis(coll="MuonMedium", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="medium muons $p_T$")
-            ] ),
-        "muon_medium_eta" : HistConf(
-            [
-                Axis(coll="MuonMedium", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="medium muons $\eta$")
-            ] ),
-        "muon_medium_pt_eta" : HistConf(
-            [
-                Axis(coll="MuonMedium", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="medium muons $p_T$"),
-                Axis(coll="MuonMedium", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="medium muons $\eta$")
-            ] ),
-        "muon_tight_pt" : HistConf(
-            [
-                Axis(coll="MuonGood", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$")
-            ] ),
-        "muon_tight_eta" : HistConf(
-            [
-                Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$")
-            ] ),
-        "muon_tight_pt_eta" : HistConf(
-            [
-                Axis(coll="MuonGood", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$"),
-                Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$")
-            ] ),
-        "mt_w_leptonic": HistConf([Axis(coll="events", field="mt_w_leptonic",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
-        "pt_miss": HistConf([Axis(coll="DeepMETResolutionTune", field="pt",bins=20, start=0, stop=100, label=r"$pT_{miss})$ [GeV]")]),
-        
+    "mT_MET_corr": HistConf(
+        [
+            Axis(coll="events", field="mt_w_leptonic", bins=30, start=0, stop=50, label=r"$m_T(W_{lep})$ [GeV]"),
+            Axis(coll="DeepMETResolutionTune", field="pt", bins=30, start=0, stop=50, label=r"$pt^{miss}$ [GeV]"),
+        ],
+        storage="weight",
+    ),
+    "electron_loose_pt": HistConf([Axis(coll="ElectronLoose", field="pt", bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$")]),
+    "electron_loose_eta": HistConf([Axis(coll="ElectronLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose electrons $\eta$")]),
+    "electron_loose_pt_eta": HistConf([
+        Axis(coll="ElectronLoose", field="pt", bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$"),
+        Axis(coll="ElectronLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose electrons $\eta$"),
+    ]),
+    "electron_tight_pt": HistConf([Axis(coll="ElectronGood", field="pt", bins=[35,40,45,50,55,60,70,100], label="tight electrons $p_T$")]),
+    "electron_tight_eta": HistConf([Axis(coll="ElectronGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$")]),
+    "electron_tight_pt_eta": HistConf([
+        Axis(coll="ElectronGood", field="pt", bins=[35,40,45,50,55,60,70,100], label="tight electrons $p_T$"),
+        Axis(coll="ElectronGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$"),
+    ]),
+    "muon_loose_pt": HistConf([Axis(coll="MuonLoose", field="pt", bins=[26,28,30,32,35,40,45,55,100], label="loose muons $p_T$")]),
+    "muon_loose_eta": HistConf([Axis(coll="MuonLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose muons $\eta$")]),
+    "muon_loose_pt_eta": HistConf([
+        Axis(coll="MuonLoose", field="pt", bins=[26,28,30,32,35,40,45,55,100], label="loose muons $p_T$"),
+        Axis(coll="MuonLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose muons $\eta$"),
+    ]),
+    "muon_tight_pt": HistConf([Axis(coll="MuonGood", field="pt", bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$")]),
+    "muon_tight_eta": HistConf([Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$")]),
+    "muon_tight_pt_eta": HistConf([
+        Axis(coll="MuonGood", field="pt", bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$"),
+        Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$"),
+    ]),
+    "mt_w_leptonic_tight": HistConf([Axis(coll="events", field="mt_w_leptonic", bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
+    "mt_w_leptonic_loose": HistConf([Axis(coll="events", field="mt_w_leptonic_loose", bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
+    
+    "pt_miss": HistConf([Axis(coll="DeepMETResolutionTune", field="pt", bins=20, start=0, stop=100, label=r"$pT_{miss}$ [GeV]")]),
     },
 )

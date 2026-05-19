@@ -20,7 +20,7 @@ from coffea.util import load, save
 from coffea import processor
 
 # Directory containing .coffea files
-input_dir = "2018_wjet_CR_dphi_eval_v2"  # <-- Change this to your directory
+input_dir = "2018_cr"  # <-- Change this to your directory
 output_file = input_dir+"/output_merged_"+input_dir+".coffea"
 
 # Find all .coffea files in the directory

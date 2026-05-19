@@ -70,6 +70,7 @@ from custom_cut_functions_nonprompt import (
     qcd_enriched_cut_35_deepmet_resolution_3j_mT,
     qcd_enriched_cut_35_deepmet_resolution_3j60_mT,
     qcd_enriched_cut_20_deepmet_resolution_3j,
+    qcd_enriched_cut_0_deepmet_resolution_3j,
 )
 
 
@@ -299,10 +300,10 @@ cfg = Configurator(
             #########
             # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
             # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -312,9 +313,9 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             # # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -325,9 +326,9 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
-            # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
+            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            # # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
             # "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
             # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8", 
@@ -464,7 +465,9 @@ cfg = Configurator(
         "qcd_enriched_35_deepmet20_resolution_3j": [qcd_enriched_cut_35_deepmet20_resolution_3j],
         "qcd_enriched_40_deepmet20_resolution_3j": [qcd_enriched_cut_40_deepmet20_resolution_3j],
         "qcd_enriched_20_deepmet_resolution_3j": [qcd_enriched_cut_20_deepmet_resolution_3j],
-  
+        "qcd_enriched_0_deepmet_resolution_3j": [qcd_enriched_cut_0_deepmet_resolution_3j],
+        
+    
     },
 
    
@@ -495,9 +498,14 @@ cfg = Configurator(
         #              "inclusive": ["wjet_reweight"],},
         #     }    
         },
-    variations={"weights": {"common": {"inclusive": []}}},#"PileupWeight","sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]}}},
+   variations={"weights": {"common": {"inclusive": ["PileupWeight","sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_jet_puId","sf_L1prefiring", "sf_partonshower_isr", "sf_partonshower_fsr"]}}},
 
     variables={
+        "mT_MET_corr" : HistConf(
+            [
+                Axis(coll="events", field="mt_w_leptonic_deepMET_resolutiontune", bins=30, start=0, stop=50, label=r"$m_T(W_{lep})$ [GeV]"),
+                Axis(coll="DeepMETResolutionTune", field="pt", bins=30, start=0, stop=50, label=r"$pt^{miss}$ [GeV]")
+            ] ,storage="weight", ),
         "electron_loose_pt" : HistConf(
             [
                 Axis(coll="ElectronLoose", field="pt",bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$")
@@ -514,7 +522,7 @@ cfg = Configurator(
             [
                 Axis(coll="ElectronLoose", field="pt",bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$"),
                 Axis(coll="ElectronLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="loose electrons $\eta$"),
-                Axis(coll="ElectronLoose", field="dphi_met", bins=[0.,0.5,1.0,3.14], label="loose electrons $\Delta \phi$")
+                Axis(coll="ElectronLoose", field="dphi_met", bins=[0.,0.1,0.4,0.5,1.0,3.14], label="loose electrons $\Delta \phi$")
             ] ),
         "electron_tight_pt" : HistConf(
             [
@@ -532,7 +540,7 @@ cfg = Configurator(
             [
                 Axis(coll="ElectronGood", field="pt",bins=[35,40,45,50,55,60,70,100], label="tight electrons $p_T$"),
                 Axis(coll="ElectronGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$"),
-                Axis(coll="ElectronGood", field="dphi_met", bins=[0.,0.5,1.0,3.14], label="tight electrons $\Delta \phi$")
+                Axis(coll="ElectronGood", field="dphi_met",bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight electrons $\Delta \phi$")
             ] ),
         
         "muon_loose_pt" : HistConf(
@@ -545,7 +553,7 @@ cfg = Configurator(
             ] ),
         "muon_loose_dphi": HistConf(
             [
-                Axis(coll="MuonLoose", field="dphi_met", bins=[0.,0.5,1.0,3.14], label="loose muon $\Delta \phi$")
+                Axis(coll="MuonLoose", field="dphi_met", bins=[0.,0.1,0.4,0.5,1.0,3.14], label="loose muon $\Delta \phi$")
             ] ),
         "muon_loose_pt_eta_dphi" : HistConf(
             [
@@ -569,10 +577,42 @@ cfg = Configurator(
             [
                 Axis(coll="MuonGood", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$"),
                 Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$"),
-                Axis(coll="MuonGood", field="dphi_met", bins=[0.,0.5,1.0,3.14], label="tight muons $\Delta \phi$")
+                Axis(coll="MuonGood", field="dphi_met", bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight muons $\Delta \phi$")
             ] ),
         "mt_w_leptonic": HistConf([Axis(coll="events", field="mt_w_leptonic",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
-        "pt_miss": HistConf([Axis(coll="DeepMETResolutionTune", field="pt",bins=20, start=0, stop=100, label=r"$pT_{miss})$ [GeV]")]),
+        "mt_w_leptonic_mu": HistConf([Axis(coll="events", field="mt_w_leptonic_mu",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
+        "mt_w_leptonic_loose_mu": HistConf([Axis(coll="events", field="mt_w_leptonic_loose_mu",bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
         
+        "pt_miss": HistConf([Axis(coll="DeepMETResolutionTune", field="pt",bins=20, start=0, stop=100, label=r"$pT_{miss})$ [GeV]")]),
+        "electron_tight_dphi_pt" : HistConf(
+            [
+                Axis(coll="ElectronGood", field="pt",bins=[35,40,45,50,55,60,70,100], label="tight electrons $p_T$"),
+                Axis(coll="ElectronGood", field="dphi_met",bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight electrons $\Delta \phi$")
+            ] ),
+        "electron_loose_dphi_pt" : HistConf(
+            [
+                Axis(coll="ElectronLoose", field="pt",bins=[35,40,45,50,55,60,70,100], label="loose electrons $p_T$"),
+                Axis(coll="ElectronLoose", field="dphi_met",bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight electrons $\Delta \phi$")
+            ] ),
+        "electron_medium_dphi_pt" : HistConf(
+            [
+                Axis(coll="ElectronMedium", field="pt",bins=[35,40,45,50,55,60,70,100], label="medium electrons $p_T$"),
+                Axis(coll="ElectronMedium", field="dphi_met",bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight electrons $\Delta \phi$")
+            ] ),
+        "muon_loose_dphi_pt" : HistConf(
+            [
+                Axis(coll="MuonLoose", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="loose muons $p_T$"),
+                Axis(coll="MuonLoose", field="dphi_met", bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight muons $\Delta \phi$")
+            ] ),
+        "muon_medium_dphi_pt" : HistConf(
+            [
+                Axis(coll="MuonMedium", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="medium muons $p_T$"),
+               Axis(coll="MuonMedium", field="dphi_met", bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight muons $\Delta \phi$")
+            ] ),
+        "muon_tight_dphi_pt" : HistConf(
+            [
+                Axis(coll="MuonGood", field="pt",bins=[26,28,30,32,35,40,45,55,100], label="tight muons $p_T$"),
+               Axis(coll="MuonGood", field="dphi_met", bins=[0.,0.1,0.4,0.5,1.0,3.14], label="tight muons $\Delta \phi$")
+            ] ),    
     },
 )

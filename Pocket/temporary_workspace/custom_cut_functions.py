@@ -5,7 +5,7 @@ from pocket_coffea.lib.cut_definition import Cut
 
 # ---------- Skim: ≥1 leptón  (mu/e) ----------
 def nLepton_skim(events, params, **kwargs):
-    good_elec = events.Electron[events.Electron.pt > 38]
+    good_elec = events.Electron[events.Electron.pt > 35]
     good_muon = events.Muon[events.Muon.pt > 30]
    
     return (ak.num(good_elec) + ak.num(good_muon) >= 1)
@@ -29,7 +29,7 @@ met_skim_cut = Cut(name="met_skim", params={}, function=met_skim)
 def select_vbs_semileptonic(events, params, **kwargs):
     
     #pu_pv_corrections = (events.PV.npvsGood < 55) | (events.PV.npvsGood > 60) 
-    one_lep = (events.nLeptonGood ==1)
+    one_lep = (events.nLeptonGood == 1)
     
     two_j  = (events.nJetGood30    >= 2)
     met_cut = (events.DeepMETResolutionTune.pt      >  params["met_pt"]) #USE DeepMETResolutionTune NOT PF MET
@@ -44,7 +44,7 @@ def select_vbs_semileptonic(events, params, **kwargs):
 
     # veto b optional
 
-    #b_veto = (events.nBJet_csv == 0) if params.get("apply_b_veto", True) else True
+    b_veto = (events.nBJetGood == 0) if params.get("apply_b_veto", True) else True
     #b_veto_gen = (ak.num(good_bjet) == 0)
     # if params.get("require_lep_central", False):
     lep = ak.firsts(events.LeptonGood)
@@ -64,11 +64,12 @@ def select_vbs_semileptonic(events, params, **kwargs):
     #     lep_central = (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) & (lep.pt > 35.0) & j1_pt_min
     # else:
     #     lep_central = True
-    #one_loosest_lep = (ak.num(events.Muon) == 1) #& (ak.num(events.Electron) == 0)
 
-    # ht_mask = (events.LHE.HT <= 70.)
-    # w_pt_stitch = (events.gen_w_pt_by_pdg < 100)
-    mask = one_lep & met_cut & two_j & cut_mt_w #& ht_mask#& b_veto #& ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+    mask = one_lep & met_cut & two_j & cut_mt_w & b_veto & ht_mask#&  loose_lep_veto #(lep.pt > 35.0) &
     return ak.values_astype(mask, np.bool_)
 
 vbs_semileptonic_presel = Cut(
@@ -218,10 +219,7 @@ def in_msd_window_fatjet_mu(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    W_vs_QCD_pNet_discrim = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "particleNet_WvsQCD", None)), np.nan) 
-    isNotQCD = np.where(np.isnan(W_vs_QCD_pNet_discrim), False, W_vs_QCD_pNet_discrim > 0.709)
-
-    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & muon_ch & j2_pt_min & b_veto & isNotQCD#& jet_dR_cut 
+    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & muon_ch & j2_pt_min & b_veto #& jet_dR_cut 
     return ak.values_astype(mask, np.bool_)
 
 
@@ -249,7 +247,7 @@ def in_whad_window_e(events, params, **kwargs):
     within = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
     # lead_lep_dR_cut1 = (events.lead_wlep_wjet1_dR > 0.8)
     # lead_lep_dR_cut2 = (events.lead_wlep_wjet2_dR > 0.8)
-    lep = ak.firsts(events.ElectronGood38)
+    lep = ak.firsts(events.ElectronGood35)
     j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
     j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
 
@@ -297,7 +295,7 @@ def in_whad_window_bveto_e(events, params, **kwargs):
     within = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
     # lead_lep_dR_cut1 = (events.lead_wlep_wjet1_dR > 0.8)
     # lead_lep_dR_cut2 = (events.lead_wlep_wjet2_dR > 0.8)
-    lep = ak.firsts(events.ElectronGood38)
+    lep = ak.firsts(events.ElectronGood35)
     j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
     j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
 
@@ -349,7 +347,7 @@ def in_msd_window_fatjet_e(events, params, **kwargs):
     # jet1_dR_cut = (events.vbs1_fj_dR > 0.8)
     # jet2_dR_cut = (events.vbs2_fj_dR > 0.8)
 
-    lep = ak.firsts(events.ElectronGood38)
+    lep = ak.firsts(events.ElectronGood35)
     j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
     j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
 
@@ -373,11 +371,7 @@ def in_msd_window_fatjet_e(events, params, **kwargs):
     cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
     cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
 
-    W_vs_QCD_pNet_discrim = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "particleNet_WvsQCD", None)), np.nan) 
-    isNotQCD = np.where(np.isnan(W_vs_QCD_pNet_discrim), False, W_vs_QCD_pNet_discrim > 0.709)
-
-
-    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & electron_ch & j2_pt_min & b_veto & isNotQCD
+    mask = yes_fat & within & pt_cut & cut_mjj & cut_deta & lep_central & loose_lep_veto & electron_ch & j2_pt_min & b_veto
     return ak.values_astype(mask, np.bool_)
 
 
@@ -385,187 +379,342 @@ msd_window_cut_e = Cut(
     name="msd_window_e",
     params={"msd_w_window": 22.5,
             "mjj_vbs": 500.0,
-            "delta_eta_vbs": 2.5}, 
+            "delta_eta_vbs": 2.5},
     function=in_msd_window_fatjet_e,
     )
 
 
-def whad_window_no_loose_e(events, params, **kwargs):
-    electron_ch = (events.nElectronGood38 >= 1) & (events.nMuonGood30 == 0)
-    four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
-    no_fat = (events.nFatJetCandidate180 == 0)
+_SR_PARAMS = {"mjj_w_window": 20.0, "mjj_vbs": 500.0, "delta_eta_vbs": 2.5}
+_W_CR_PARAMS = {**_SR_PARAMS, "mt_w_lo": 30.0}
+_VR_PARAMS   = {**_SR_PARAMS, "mt_w_lo": 20.0, "mt_w_hi": 30.0}
+
+############################################
+##### W CONTROL REGION
+##### SR selection + inverted hadronic W mass window + mT > 30
+############################################
+
+def _sr_skeleton_mu(events, params):
+    """Shared resolved SR skeleton for mu channel (no mT, no window applied yet)."""
+    muon_ch        = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
+    four_j         = (events.nJetGood30 >= 4)
+    b_veto         = (events.nBJetGood == 0)
+    no_fat         = (events.nFatJetCandidate180 == 0)
     loose_lep_veto = (events.nLeptonLoose < 2)
-    wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
-    wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
-    wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
-    within = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
-    # lead_lep_dR_cut1 = (events.lead_wlep_wjet1_dR > 0.8)
-    # lead_lep_dR_cut2 = (events.lead_wlep_wjet2_dR > 0.8)
-    lep = ak.firsts(events.ElectronGood38)
-    j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
-    j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
+    wjj_pt  = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt",   None)), np.nan)
+    wjj_pt_cut = np.where(np.isnan(wjj_pt), False, wjj_pt < 200.)
+    wmass   = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
+    within  = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
+    j1 = ak.firsts(getattr(events.vbsjets, "jet1", None))
+    j2 = ak.firsts(getattr(events.vbsjets, "jet2", None))
+    j1_pt_min   = (j1.pt > 50)
+    j2_pt_min   = (j2.pt > 30)
+    lep_central = j1_pt_min
+    mjj_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass",      None)), np.nan)
+    deta_vbs = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+    cut_mjj  = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+    base = muon_ch & four_j & b_veto & no_fat & loose_lep_veto & wjj_pt_cut & cut_mjj & cut_deta & lep_central & j2_pt_min & ht_mask
+    return base, within
 
-    j1_eta = ak.fill_none(getattr(j1, "eta", None), np.nan)
-    j2_eta = ak.fill_none(getattr(j2, "eta", None), np.nan)
-    lep_eta = ak.fill_none(getattr(lep, "eta", None), np.nan)
+def _sr_skeleton_e(events, params):
+    """Shared resolved SR skeleton for e channel (no mT, no window applied yet)."""
+    electron_ch    = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
+    four_j         = (events.nJetGood30 >= 4)
+    b_veto         = (events.nBJetGood == 0)
+    no_fat         = (events.nFatJetCandidate180 == 0)
+    loose_lep_veto = (events.nLeptonLoose < 2)
+    wjj_pt  = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt",   None)), np.nan)
+    wjj_pt_cut = np.where(np.isnan(wjj_pt), False, wjj_pt < 200.)
+    wmass   = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
+    within  = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
+    j1 = ak.firsts(getattr(events.vbsjets, "jet1", None))
+    j2 = ak.firsts(getattr(events.vbsjets, "jet2", None))
+    j1_pt_min   = (j1.pt > 50)
+    j2_pt_min   = (j2.pt > 30)
+    lep_central = j1_pt_min
+    mjj_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass",      None)), np.nan)
+    deta_vbs = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+    cut_mjj  = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+    base = electron_ch & four_j & b_veto & no_fat & loose_lep_veto & wjj_pt_cut & cut_mjj & cut_deta & lep_central & j2_pt_min & ht_mask
+    return base, within
 
-    j1_pt_min = (j1.pt > 50)
-    j2_pt_min = (j2.pt > 30)
-
-    
-    eta_min = np.minimum(j1_eta, j2_eta)
-    eta_max = np.maximum(j1_eta, j2_eta)
-     
-    lep_central = j1_pt_min #& (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) 
-    
-    mjj_vbs   = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass", None)), np.nan)
-    deta_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
-
-    cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
-    cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
-
-    mask = four_j & within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min 
+def in_w_cr_mu(events, params, **kwargs):
+    base, within = _sr_skeleton_mu(events, params)
+    cut_mt = (events.mt_w_leptonic > params["mt_w_lo"])
+    mask = base & (~within) & cut_mt
     return ak.values_astype(mask, np.bool_)
 
-whad_window_cut_no_loose_e = Cut(
-    name="whad_window_bveto_e",
-    params={"mjj_w_window": 20.0,
-            "mjj_vbs": 500.0,
-            "delta_eta_vbs": 2.5},  
-    function=whad_window_no_loose_e,
-)
-
-def whad_window_cut_no_jet4_e(events, params, **kwargs):
-    electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
-    four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
-    no_fat = (events.nFatJetCandidate180 == 0)
-    loose_lep_veto = (events.nLeptonLoose < 2)
-    wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
-    wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
-    wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
-    within = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
-    # lead_lep_dR_cut1 = (events.lead_wlep_wjet1_dR > 0.8)
-    # lead_lep_dR_cut2 = (events.lead_wlep_wjet2_dR > 0.8)
-    lep = ak.firsts(events.ElectronGood38)
-    j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
-    j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
-
-    j1_eta = ak.fill_none(getattr(j1, "eta", None), np.nan)
-    j2_eta = ak.fill_none(getattr(j2, "eta", None), np.nan)
-    lep_eta = ak.fill_none(getattr(lep, "eta", None), np.nan)
-
-    j1_pt_min = (j1.pt > 50)
-    j2_pt_min = (j2.pt > 30)
-
-    
-    eta_min = np.minimum(j1_eta, j2_eta)
-    eta_max = np.maximum(j1_eta, j2_eta)
-     
-    lep_central = j1_pt_min #& (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) 
-    
-    mjj_vbs   = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass", None)), np.nan)
-    deta_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
-
-    cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
-    cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
-
-    mask =   cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min 
+def in_w_cr_e(events, params, **kwargs):
+    base, within = _sr_skeleton_e(events, params)
+    cut_mt = (events.mt_w_leptonic > params["mt_w_lo"])
+    mask = base & (~within) & cut_mt
     return ak.values_astype(mask, np.bool_)
 
-whad_window_cut_no_jet4_e = Cut(
-    name="whad_window_bveto_e",
-    params={"mjj_w_window": 20.0,
-            "mjj_vbs": 500.0,
-            "delta_eta_vbs": 2.5},  
-    function=whad_window_cut_no_jet4_e,
-)
+w_cr_mu = Cut(name="w_cr_mu", params=_W_CR_PARAMS, function=in_w_cr_mu)
+w_cr_e  = Cut(name="w_cr_e",  params=_W_CR_PARAMS, function=in_w_cr_e)
 
-def whad_window_cut_no_fj0_e(events, params, **kwargs):
-    electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
-    four_j  = (events.nJetGood30 >= 4)
-    b_veto = (events.nBJetGood == 0) 
-    no_fat = (events.nFatJetCandidate180 == 0)
-    loose_lep_veto = (events.nLeptonLoose < 2)
-    wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
-    wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
-    wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
-    within = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
-    # lead_lep_dR_cut1 = (events.lead_wlep_wjet1_dR > 0.8)
-    # lead_lep_dR_cut2 = (events.lead_wlep_wjet2_dR > 0.8)
-    lep = ak.firsts(events.ElectronGood38)
-    j1  = ak.firsts(getattr(events.vbsjets, "jet1", None))
-    j2  = ak.firsts(getattr(events.vbsjets, "jet2", None))
+############################################
+##### VALIDATION REGION
+##### SR selection exactly (no W mass window), mT in [20, 30]
+############################################
 
-    j1_eta = ak.fill_none(getattr(j1, "eta", None), np.nan)
-    j2_eta = ak.fill_none(getattr(j2, "eta", None), np.nan)
-    lep_eta = ak.fill_none(getattr(lep, "eta", None), np.nan)
-
-    j1_pt_min = (j1.pt > 50)
-    j2_pt_min = (j2.pt > 30)
-
-    
-    eta_min = np.minimum(j1_eta, j2_eta)
-    eta_max = np.maximum(j1_eta, j2_eta)
-     
-    lep_central = j1_pt_min #& (np.isnan(lep_eta)) & (np.isnan(eta_min)) & (np.isnan(eta_max)) & (lep_eta > eta_min) & (lep_eta < eta_max) 
-    
-    mjj_vbs   = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass", None)), np.nan)
-    deta_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
-
-    cut_mjj   = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
-    cut_deta  = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
-
-    mask =   within & wjj_pt_cut & cut_mjj & cut_deta & lep_central & electron_ch & j2_pt_min & loose_lep_veto
+def in_vr_mu(events, params, **kwargs):
+    base, _ = _sr_skeleton_mu(events, params)
+    cut_mt = (
+        (events.mt_w_leptonic > params["mt_w_lo"]) &
+        (events.mt_w_leptonic < params["mt_w_hi"])
+    )
+    mask = base & cut_mt
     return ak.values_astype(mask, np.bool_)
 
-whad_window_cut_no_fj0_e = Cut(
-    name="whad_window_bveto_e",
-    params={"mjj_w_window": 20.0,
-            "mjj_vbs": 500.0,
-            "delta_eta_vbs": 2.5},  
-    function=whad_window_cut_no_fj0_e,
-)
+def in_vr_e(events, params, **kwargs):
+    base, _ = _sr_skeleton_e(events, params)
+    cut_mt = (
+        (events.mt_w_leptonic > params["mt_w_lo"]) &
+        (events.mt_w_leptonic < params["mt_w_hi"])
+    )
+    mask = base & cut_mt
+    return ak.values_astype(mask, np.bool_)
 
-def Muon_good1(events, params, **kwargs):
-    muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1) & (events.DeepMETResolutionTune.pt > 30)
+vr_mu = Cut(name="vr_mu", params=_VR_PARAMS, function=in_vr_mu)
+vr_e  = Cut(name="vr_e",  params=_VR_PARAMS, function=in_vr_e)
 
-    return ak.values_astype(muon_ch, np.bool_)
+_BOOSTED_SR_PARAMS   = {"msd_w_window": 22.5, "mjj_vbs": 500.0, "delta_eta_vbs": 2.5}
+_BOOSTED_W_CR_PARAMS = {**_BOOSTED_SR_PARAMS, "mt_w_lo": 30.0}
+_BOOSTED_VR_PARAMS   = {**_BOOSTED_SR_PARAMS, "mt_w_lo": 20.0, "mt_w_hi": 30.0}
 
-Muon_good1 = Cut(name="Muon_good1", params={}, function=Muon_good1)
+############################################
+##### W CONTROL REGION — BOOSTED
+##### Boosted SR structure + inverted fat jet mSD window + mT > 30
+############################################
 
-def Muon_good2(events, params, **kwargs):
-    muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 2)
-   
-    return ak.values_astype(muon_ch, np.bool_)
+def _boosted_skeleton_mu(events, params):
+    """Shared boosted SR skeleton for mu channel (no mT, no mSD window applied yet)."""
+    muon_ch        = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
+    yes_fat        = (events.nFatJetCandidate == 1)
+    b_veto         = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    loose_lep_veto = (events.nLeptonLoose < 2)
+    fj1_pt  = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt",        None)), np.nan)
+    fj1_msd = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "msoftdrop", None)), np.nan)
+    pt_cut  = np.where(np.isnan(fj1_pt),  False, fj1_pt  > 200.)
+    within  = np.where(np.isnan(fj1_msd), False, np.abs(fj1_msd - 92.5) < params["msd_w_window"])
+    j1 = ak.firsts(getattr(events.vbsjets, "jet1", None))
+    j2 = ak.firsts(getattr(events.vbsjets, "jet2", None))
+    j1_pt_min   = (j1.pt > 50)
+    j2_pt_min   = (j2.pt > 30)
+    lep_central = j1_pt_min
+    mjj_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass",      None)), np.nan)
+    deta_vbs = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+    cut_mjj  = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+    base = muon_ch & yes_fat & b_veto & loose_lep_veto & pt_cut & cut_mjj & cut_deta & lep_central & j2_pt_min & ht_mask
+    return base, within
 
-Muon_good2 = Cut(name="Muon_good2", params={}, function=Muon_good2)
+def _boosted_skeleton_e(events, params):
+    """Shared boosted SR skeleton for e channel (no mT, no mSD window applied yet)."""
+    electron_ch    = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
+    yes_fat        = (events.nFatJetCandidate == 1)
+    b_veto         = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    loose_lep_veto = (events.nLeptonLoose < 2)
+    fj1_pt  = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt",        None)), np.nan)
+    fj1_msd = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "msoftdrop", None)), np.nan)
+    pt_cut  = np.where(np.isnan(fj1_pt),  False, fj1_pt  > 200.)
+    within  = np.where(np.isnan(fj1_msd), False, np.abs(fj1_msd - 92.5) < params["msd_w_window"])
+    j1 = ak.firsts(getattr(events.vbsjets, "jet1", None))
+    j2 = ak.firsts(getattr(events.vbsjets, "jet2", None))
+    j1_pt_min   = (j1.pt > 50)
+    j2_pt_min   = (j2.pt > 30)
+    lep_central = j1_pt_min
+    mjj_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass",      None)), np.nan)
+    deta_vbs = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+    cut_mjj  = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+    base = electron_ch & yes_fat & b_veto & loose_lep_veto & pt_cut & cut_mjj & cut_deta & lep_central & j2_pt_min & ht_mask
+    return base, within
 
-def Muon_good3(events, params, **kwargs):
-    muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1) #& (events.DeepMETResolutionTune.pt > 30)
+def in_w_cr_boosted_mu(events, params, **kwargs):
+    base, within = _boosted_skeleton_mu(events, params)
+    cut_mt = (events.mt_w_leptonic > params["mt_w_lo"])
+    return ak.values_astype(base & (~within) & cut_mt, np.bool_)
 
-    return ak.values_astype(muon_ch, np.bool_)
+def in_w_cr_boosted_e(events, params, **kwargs):
+    base, within = _boosted_skeleton_e(events, params)
+    cut_mt = (events.mt_w_leptonic > params["mt_w_lo"])
+    return ak.values_astype(base & (~within) & cut_mt, np.bool_)
 
-Muon_good3 = Cut(name="Muon_good3", params={}, function=Muon_good3)
+w_cr_boosted_mu = Cut(name="w_cr_boosted_mu", params=_BOOSTED_W_CR_PARAMS, function=in_w_cr_boosted_mu)
+w_cr_boosted_e  = Cut(name="w_cr_boosted_e",  params=_BOOSTED_W_CR_PARAMS, function=in_w_cr_boosted_e)
 
-def Ele_good1(events, params, **kwargs):
-    muon_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0) & (events.DeepMETResolutionTune.pt > 30)
+############################################
+##### VALIDATION REGION — BOOSTED
+##### Boosted SR structure (no mSD window), mT in [20, 30]
+############################################
 
-    return ak.values_astype(muon_ch, np.bool_)
+def in_vr_boosted_mu(events, params, **kwargs):
+    base, _ = _boosted_skeleton_mu(events, params)
+    cut_mt = (
+        (events.mt_w_leptonic > params["mt_w_lo"]) &
+        (events.mt_w_leptonic < params["mt_w_hi"])
+    )
+    return ak.values_astype(base & cut_mt, np.bool_)
 
-Ele_good1 = Cut(name="Ele_good1", params={}, function=Ele_good1)
+def in_vr_boosted_e(events, params, **kwargs):
+    base, _ = _boosted_skeleton_e(events, params)
+    cut_mt = (
+        (events.mt_w_leptonic > params["mt_w_lo"]) &
+        (events.mt_w_leptonic < params["mt_w_hi"])
+    )
+    return ak.values_astype(base & cut_mt, np.bool_)
 
-def Ele_good2(events, params, **kwargs):
-    muon_ch = (events.nElectronGood38 == 2) & (events.nMuonGood30 == 0)
-   
-    return ak.values_astype(muon_ch, np.bool_)
+vr_boosted_mu = Cut(name="vr_boosted_mu", params=_BOOSTED_VR_PARAMS, function=in_vr_boosted_mu)
+vr_boosted_e  = Cut(name="vr_boosted_e",  params=_BOOSTED_VR_PARAMS, function=in_vr_boosted_e)
 
-Ele_good2 = Cut(name="Ele_good2", params={}, function=Ele_good2)
 
-def Ele_good3(events, params, **kwargs):
-    muon_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0) #& (events.DeepMETResolutionTune.pt > 30)
+############################################
+##### QCD CONTROL REGION
+##### Resolved SR selection exactly, but:
+#####   - loose lepton (nMuonLoose/nElectronLoose) instead of tight
+#####   - mT < 20 instead of mT < 185
+##### Plus two variations:
+#####   _3j  : nJetGood30 >= 3 instead of >= 4 (resolved, no boosted)
+#####   _sideband: inverted hadronic W mass window (~within)
+############################################
 
-    return ak.values_astype(muon_ch, np.bool_)
+def _qcd_cr_common(events, params, lepton_mask, invert_window=False, njet_min=4):
+    """Shared logic for all QCD CR variants."""
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
 
-Ele_good3 = Cut(name="Ele_good3", params={}, function=Ele_good3)
+    loose_lep_veto = (events.nLeptonClean < 2)
+    n_j     = (events.nJetGood30 >= njet_min)
+    no_fat  = (events.nFatJetCandidate180 == 0)
+    met_cut = (events.DeepMETResolutionTune.pt > params["met_pt"])
+    b_veto  = (events.nBJetGood == 0)
+    cut_mt_w = (events.mt_w_leptonic_loose < params["mt_w"])
+
+    wjj_pt  = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt",   None)), np.nan)
+    wjj_pt_cut = np.where(np.isnan(wjj_pt), False, wjj_pt < 200.)
+    wmass   = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
+    within  = np.where(np.isnan(wmass), False, np.abs(wmass - 85) < params["mjj_w_window"])
+    w_window = (~within) if invert_window else True
+
+    j1 = ak.firsts(getattr(events.vbsjets, "jet1", None))
+    j2 = ak.firsts(getattr(events.vbsjets, "jet2", None))
+    j1_pt_min = (j1.pt > 50)
+    j2_pt_min = (j2.pt > 30)
+    lep_central = j1_pt_min
+
+    mjj_vbs  = ak.fill_none(ak.firsts(getattr(events.vbsjets, "mass",      None)), np.nan)
+    deta_vbs = ak.fill_none(ak.firsts(getattr(events.vbsjets, "delta_eta", None)), np.nan)
+    cut_mjj  = np.where(np.isnan(mjj_vbs),  False, mjj_vbs  > params["mjj_vbs"])
+    cut_deta = np.where(np.isnan(deta_vbs), False, deta_vbs > params["delta_eta_vbs"])
+
+    mask = (lepton_mask & loose_lep_veto & n_j & no_fat & met_cut & b_veto
+            & w_window & wjj_pt_cut & cut_mjj & cut_deta & lep_central & j2_pt_min
+            & cut_mt_w & ht_mask)
+    return ak.values_astype(mask, np.bool_)
+
+_QCD_CR_PARAMS = {
+    "met_pt": 30.0,
+    "mjj_vbs": 500.0,
+    "delta_eta_vbs": 2.5,
+    "mjj_w_window": 20.0,
+    "mt_w": 20.0,
+}
+
+# ---------- Main CR (4j, W mass window) ----------
+
+def select_QCD_CR_mu(events, params, **kwargs):
+    lep = (events.nMuonLoose >= 1) & (events.nElectronLoose == 0)
+    return _qcd_cr_common(events, params, lep)
+
+def select_QCD_CR_e(events, params, **kwargs):
+    lep = (events.nElectronLoose >= 1) & (events.nMuonLoose == 0)
+    return _qcd_cr_common(events, params, lep)
+
+qcd_enriched_mu = Cut(name="qcd_enriched_mu", params=_QCD_CR_PARAMS, function=select_QCD_CR_mu)
+qcd_enriched_e  = Cut(name="qcd_enriched_e",  params=_QCD_CR_PARAMS, function=select_QCD_CR_e)
+
+# ---------- Variation 1: 3-jet (nJetGood30 >= 3, resolved) ----------
+
+def select_QCD_CR_3j_mu(events, params, **kwargs):
+    lep = (events.nMuonLoose >= 1) & (events.nElectronLoose == 0)
+    return _qcd_cr_common(events, params, lep, njet_min=3)
+
+def select_QCD_CR_3j_e(events, params, **kwargs):
+    lep = (events.nElectronLoose >= 1) & (events.nMuonLoose == 0)
+    return _qcd_cr_common(events, params, lep, njet_min=3)
+
+qcd_enriched_3j_mu = Cut(name="qcd_enriched_3j_mu", params=_QCD_CR_PARAMS, function=select_QCD_CR_3j_mu)
+qcd_enriched_3j_e  = Cut(name="qcd_enriched_3j_e",  params=_QCD_CR_PARAMS, function=select_QCD_CR_3j_e)
+
+# ---------- Variation 2: inverted W mass window (W sideband) ----------
+
+def select_QCD_CR_sideband_mu(events, params, **kwargs):
+    lep = (events.nMuonLoose >= 1) & (events.nElectronLoose == 0)
+    return _qcd_cr_common(events, params, lep, invert_window=True)
+
+def select_QCD_CR_sideband_e(events, params, **kwargs):
+    lep = (events.nElectronLoose >= 1) & (events.nMuonLoose == 0)
+    return _qcd_cr_common(events, params, lep, invert_window=True)
+
+qcd_enriched_sideband_mu = Cut(name="qcd_enriched_sideband_mu", params=_QCD_CR_PARAMS, function=select_QCD_CR_sideband_mu)
+qcd_enriched_sideband_e  = Cut(name="qcd_enriched_sideband_e",  params=_QCD_CR_PARAMS, function=select_QCD_CR_sideband_e)
+
+
+############################################
+##### QCD CONTROL REGION — RECOIL JET METHOD
+##### Parametric function mirroring the original select_QCD_CR format.
+##### nJetGood >= 3, nJetGood_recoil >= 1, lead recoil jet pT = 30/35/40.
+############################################
+
+def select_QCD_CR_recoil(events, params, **kwargs):
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+
+    if params["lepton"] == "mu":
+        one_lep = (events.nMuonLoose == 1) & (events.nElectronLoose == 0)
+    else:
+        one_lep = (events.nElectronLoose == 1) & (events.nMuonLoose == 0)
+
+    veto         = (events.nLeptonClean < 2)
+    recoil_jet   = (events.nJetGood_recoil >= 1)
+    recoil_jet_pt = (events.LeadJetGood_recoil.pt >= params["recoil_jet_pt"])
+    cut_njet     = (events.nJetGood >= params["njet"])
+    met_cut      = (events.DeepMETResolutionTune.pt > params["met_pt"])
+    cut_mt_w     = (events.mt_w_leptonic_loose < 20.0)
+    bveto        = (events.nBJetGood == 0)
+
+    mask = one_lep & met_cut & recoil_jet & recoil_jet_pt & cut_njet & cut_mt_w & bveto & veto & ht_mask
+    return ak.values_astype(mask, np.bool_)
+
+def _recoil_params(lepton, recoil_pt):
+    return {"lepton": lepton, "njet": 3, "met_pt": 30.0, "recoil_jet_pt": recoil_pt}
+
+qcd_enriched_recoil_30_mu = Cut(name="qcd_enriched_recoil_30_mu", params=_recoil_params("mu", 30), function=select_QCD_CR_recoil)
+qcd_enriched_recoil_35_mu = Cut(name="qcd_enriched_recoil_35_mu", params=_recoil_params("mu", 35), function=select_QCD_CR_recoil)
+qcd_enriched_recoil_40_mu = Cut(name="qcd_enriched_recoil_40_mu", params=_recoil_params("mu", 40), function=select_QCD_CR_recoil)
+qcd_enriched_recoil_30_e  = Cut(name="qcd_enriched_recoil_30_e",  params=_recoil_params("e",  30), function=select_QCD_CR_recoil)
+qcd_enriched_recoil_35_e  = Cut(name="qcd_enriched_recoil_35_e",  params=_recoil_params("e",  35), function=select_QCD_CR_recoil)
+qcd_enriched_recoil_40_e  = Cut(name="qcd_enriched_recoil_40_e",  params=_recoil_params("e",  40), function=select_QCD_CR_recoil)
