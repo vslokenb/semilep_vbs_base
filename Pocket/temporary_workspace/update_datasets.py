@@ -174,46 +174,58 @@ P_SELECT_SITE = r"Select sites \[round-robin.*\].*:\s*"
 P_SAVE        = r"(?i)(save to|output file|filename).*:\s*"
 
 
-def _query_one(child, das_pattern):
+def _send(child, text, debug=False):
+    if debug:
+        print(f"  >>> SEND: {text!r}")
+    child.sendline(text)
+
+
+def _wait(child, pattern, label, debug=False):
+    if debug:
+        print(f"  ... EXPECT [{label}]: {pattern!r}")
+    child.expect(pattern)
+    if debug:
+        print(f"  <<< BEFORE: {child.before!r}")
+        print(f"  <<< MATCH:  {child.after!r}")
+
+
+def _query_one(child, das_pattern, debug=False):
     """
-    Within an already-open CLI session, accumulate one era into the CLI's
-    internal state via query → select → replicas.  Does NOT save — the caller
-    issues a single save after all eras are done.
-    Returns True if results were found, False if no datasets matched.
+    Within an already-open CLI session, accumulate one era via
+    query → select → replicas.  Does NOT save.
+    Returns True if datasets were found.
     """
     print(f"    Querying: {das_pattern}")
 
-    # ── query ─────────────────────────────────────────────────────────────────
-    child.sendline("query")
-    child.expect(P_QUERY_FOR)
-    child.sendline(das_pattern)
-    child.expect(REPL_PROMPT)
+    _send(child, "query", debug)
+    _wait(child, P_QUERY_FOR, "Query for:", debug)
+
+    _send(child, das_pattern, debug)
+    _wait(child, REPL_PROMPT, "REPL after query", debug)
 
     if re.search(r"(?i)no (dataset|result|match)", child.before):
         print(f"    WARNING: no datasets found for {das_pattern}")
         return False
 
-    # ── select ────────────────────────────────────────────────────────────────
-    child.sendline("select")
-    child.expect(P_SELECT_IDX)
-    child.sendline("all")
-    child.expect(REPL_PROMPT)
+    _send(child, "select", debug)
+    _wait(child, P_SELECT_IDX, "select indices", debug)
+    _send(child, "all", debug)
+    _wait(child, REPL_PROMPT, "REPL after select", debug)
 
-    # ── replicas ──────────────────────────────────────────────────────────────
-    child.sendline("replicas")
-    child.expect(P_SELECT_IDX)   # which datasets to fetch replicas for
-    child.sendline("all")
-    child.expect(P_SELECT_SITE)  # replica distribution method
-    child.sendline("round-robin")
-    child.expect(REPL_PROMPT)
+    _send(child, "replicas", debug)
+    _wait(child, P_SELECT_IDX, "replicas indices", debug)
+    _send(child, "all", debug)
+    _wait(child, P_SELECT_SITE, "select sites", debug)
+    _send(child, "round-robin", debug)
+    _wait(child, REPL_PROMPT, "REPL after replicas", debug)
 
     return True
 
 
-def run_session(das_patterns, output_json, dry_run=False):
+def run_session(das_patterns, output_json, dry_run=False, debug=False):
     """
     Open a single dataset-discovery-cli session, accumulate all das_patterns
-    via query→select→replicas, then issue one save to output_json, then quit.
+    via query→select→replicas, then one save, then quit.
     Returns True if output_json was written.
     """
     if dry_run:
@@ -225,17 +237,23 @@ def run_session(das_patterns, output_json, dry_run=False):
         print("ERROR: pexpect is not installed.  Run: pip install pexpect")
         return False
 
+    import sys
     child = pexpect.spawn(CLI_COMMAND, timeout=PEXPECT_TIMEOUT, encoding="utf-8")
-    # Uncomment to see raw CLI output while debugging:
-    # import sys; child.logfile_read = sys.stdout
+    if debug:
+        child.logfile_read = sys.stdout
+        print(f"  [debug] spawned: {CLI_COMMAND}  (pid {child.pid})")
 
     try:
-        child.expect(REPL_PROMPT)  # wait for initial prompt
+        if debug:
+            print(f"  ... EXPECT [initial REPL]: {REPL_PROMPT!r}")
+        child.expect(REPL_PROMPT)
+        if debug:
+            print(f"  <<< MATCH: {child.after!r}")
 
         any_ok = False
         for das_pattern in das_patterns:
             try:
-                ok = _query_one(child, das_pattern)
+                ok = _query_one(child, das_pattern, debug)
                 any_ok = any_ok or ok
             except pexpect.TIMEOUT:
                 print(f"    ERROR: timed out on {das_pattern}")
@@ -245,29 +263,33 @@ def run_session(das_patterns, output_json, dry_run=False):
                 return False
 
         if not any_ok:
-            child.sendline("quit")
+            _send(child, "quit", debug)
             child.expect(pexpect.EOF, timeout=30)
             child.close()
             return False
 
-        # ── single save after all eras are accumulated ─────────────────────
-        child.sendline("save")
-        child.expect(P_SAVE)
-        child.sendline(str(output_json))
-        child.expect(REPL_PROMPT)
+        # ── single save after all eras accumulated ─────────────────────────
+        _send(child, "save", debug)
+        _wait(child, P_SAVE, "save filename", debug)
+        _send(child, str(output_json), debug)
+        _wait(child, REPL_PROMPT, "REPL after save", debug)
 
-        child.sendline("quit")
+        _send(child, "quit", debug)
         child.expect(pexpect.EOF, timeout=30)
         child.close()
 
     except pexpect.TIMEOUT:
         print("    ERROR: timed out waiting for initial CLI prompt")
+        if debug:
+            print(f"  [debug] buffer at timeout: {child.before!r}")
         try:
             child.close(force=True)
         except Exception:
             pass
         return False
     except pexpect.EOF:
+        if debug:
+            print(f"  [debug] EOF — buffer: {child.before!r}")
         child.close()
 
     return output_json.exists()
@@ -350,7 +372,7 @@ def inject_xsec(merged, xsec_map):
                     break
 
 
-def update_json(json_path, dry_run=False):
+def update_json(json_path, dry_run=False, debug=False):
     print(f"\n{'='*60}")
     print(f"Processing: {json_path.name}")
 
@@ -374,7 +396,7 @@ def update_json(json_path, dry_run=False):
     das_patterns = [das for das, _year in das_tasks]
 
     try:
-        ok = run_session(das_patterns, tmp_path, dry_run=dry_run)
+        ok = run_session(das_patterns, tmp_path, dry_run=dry_run, debug=debug)
 
         merged: dict = {}
         if ok and tmp_path.exists():
@@ -407,6 +429,8 @@ def main():
                         help="(unused — replicas uses round-robin; kept for future use)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print what would be done without calling the CLI")
+    parser.add_argument("--debug", action="store_true",
+                        help="Print every send/expect exchange and raw CLI output")
     parser.add_argument("--only", metavar="FILENAME",
                         help="Process only this JSON filename (e.g. TTTo2L2Nu....json)")
     args = parser.parse_args()
@@ -423,7 +447,7 @@ def main():
             raise SystemExit(1)
 
     for fname in files:
-        update_json(DATASETS_DIR / fname, dry_run=args.dry_run)
+        update_json(DATASETS_DIR / fname, dry_run=args.dry_run, debug=args.debug)
 
     print("\nDone.")
 
