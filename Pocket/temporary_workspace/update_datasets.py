@@ -164,28 +164,28 @@ def derive_missing_das(existing_das, source_year, target_year):
 CLI_COMMAND = "dataset-discovery-cli"
 PEXPECT_TIMEOUT = 180  # seconds per DAS query
 
-# Broad pattern matching the REPL command prompt (e.g. "> ", ">>> ", "(base) ")
-REPL_PROMPT = r"[>\]#]\s*$"
-# Pattern for sub-prompts that ask for user input after a command
-INPUT_PROMPT = r":\s*$"
-
-
-def _wait_prompt(child, patterns, timeout=None):
-    """Wait for any of the given patterns; return the matched index."""
-    return child.expect(patterns, timeout=timeout or PEXPECT_TIMEOUT)
+# The REPL prompt is a two-line block ending with the command list and "]: "
+# e.g.  "> \n[help/.../quit]: "
+REPL_PROMPT  = r"\[help.*quit\]:\s*"
+# Sub-prompts inside each command
+P_QUERY_FOR  = r"Query for:\s*"
+P_SELECT_IDX = r"Select datasets indices.*\(all\):\s*"
+P_SELECT_SITE = r"Select sites \[round-robin.*\].*:\s*"
+P_SAVE       = r"(?i)(save to|output file|filename).*:\s*"
 
 
 def run_discovery(das_pattern, output_json, dry_run=False):
     """
-    Drive one full transaction of dataset-discovery-cli using its REPL interface:
+    Drive one full transaction of dataset-discovery-cli:
 
-        query   → <das_pattern>
-        select  → all
-        replicas            (round-robin, no further input)
-        save    → <output_json>
-        exit
+        query      → <das_pattern>
+        select     → all          (pick all returned datasets)
+        replicas   → all          (pick all datasets again for site lookup)
+                   → round-robin  (replica distribution method)
+        save       → <output_json>
+        quit
 
-    Returns True if output_json was written.
+    Returns True if output_json was written successfully.
     """
     if dry_run:
         print(f"    [dry-run] would query: {das_pattern}")
@@ -197,53 +197,58 @@ def run_discovery(das_pattern, output_json, dry_run=False):
 
     print(f"    Querying: {das_pattern}")
     child = pexpect.spawn(CLI_COMMAND, timeout=PEXPECT_TIMEOUT, encoding="utf-8")
-    # Uncomment the next line to see raw CLI output while debugging:
-    # child.logfile_read = sys.stdout
+    # Uncomment to see raw CLI output while debugging:
+    # import sys; child.logfile_read = sys.stdout
 
     try:
-        # Wait for the initial REPL prompt
+        # ── initial REPL prompt ───────────────────────────────────────────────
         child.expect(REPL_PROMPT)
 
-        # 1. query command → enter search string
+        # ── query ─────────────────────────────────────────────────────────────
         child.sendline("query")
-        child.expect(INPUT_PROMPT)
+        child.expect(P_QUERY_FOR)
         child.sendline(das_pattern)
 
-        # Check whether any datasets were found before proceeding
-        idx = child.expect([
-            REPL_PROMPT,
-            r"(?i)no (dataset|result|match)",
-            pexpect.EOF,
-            pexpect.TIMEOUT,
-        ])
-        if idx != 0:
+        # After querying, wait for the REPL prompt to return.
+        # If no datasets were found the CLI still returns to the prompt, so we
+        # check the captured output for a "no results" indicator.
+        child.expect(REPL_PROMPT)
+        if not child.before.strip():
+            # Empty output between prompt and next prompt usually means no results;
+            # the query result table would appear in child.before.
+            pass
+        before_text = child.before
+        if re.search(r"(?i)no (dataset|result|match)", before_text):
             print(f"    WARNING: no datasets found for {das_pattern}")
-            try:
-                child.close(force=True)
-            except Exception:
-                pass
+            child.sendline("quit")
+            child.expect(pexpect.EOF, timeout=10)
+            child.close()
             return False
 
-        # 2. select command → choose all results
+        # ── select (choose datasets by index) ─────────────────────────────────
         child.sendline("select")
-        child.expect(INPUT_PROMPT)
+        child.expect(P_SELECT_IDX)
         child.sendline("all")
         child.expect(REPL_PROMPT)
 
-        # 3. replicas command → select round-robin method
+        # ── replicas ──────────────────────────────────────────────────────────
         child.sendline("replicas")
-        child.expect(INPUT_PROMPT)
+        # First sub-prompt: which dataset indices to fetch replicas for
+        child.expect(P_SELECT_IDX)
+        child.sendline("all")
+        # Second sub-prompt: replica distribution method
+        child.expect(P_SELECT_SITE)
         child.sendline("round-robin")
         child.expect(REPL_PROMPT)
 
-        # 4. save command → provide output filename
+        # ── save ──────────────────────────────────────────────────────────────
         child.sendline("save")
-        child.expect(INPUT_PROMPT)
+        child.expect(P_SAVE)
         child.sendline(str(output_json))
         child.expect(REPL_PROMPT)
 
-        # 5. exit the REPL
-        child.sendline("exit")
+        # ── quit ──────────────────────────────────────────────────────────────
+        child.sendline("quit")
         child.expect(pexpect.EOF, timeout=30)
         child.close()
 
