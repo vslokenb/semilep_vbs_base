@@ -142,6 +142,48 @@ def detect_mc_year(das_name):
     return None
 
 
+def detect_year_from_das(das_name):
+    """
+    Return the pocket_coffea year string for any DAS path (MC or data).
+    MC:   matched via campaign tag in MC_CAMPAIGNS.
+    Data: matched via Run20XX era string; HIPM suffix → 2016_PreVFP,
+          plain Run2016 → 2016_PostVFP.
+    """
+    year = detect_mc_year(das_name)
+    if year:
+        return year
+    if "Run2016" in das_name:
+        return "2016_PreVFP" if "HIPM" in das_name else "2016_PostVFP"
+    if "Run2017" in das_name:
+        return "2017"
+    if "Run2018" in das_name:
+        return "2018"
+    return None
+
+
+def populate_year(discovery):
+    """
+    Set metadata['year'] for every file entry in a discovery/replicas JSON
+    by reading the year from the entry's das_names field.
+    Checks both file_entry["das_names"] and file_entry["metadata"]["das_names"].
+    """
+    for entry in discovery.values():
+        if not isinstance(entry, dict):
+            continue
+        for file_entry in entry.get("files", []):
+            if not isinstance(file_entry, dict) or "metadata" not in file_entry:
+                continue
+            metadata = file_entry["metadata"]
+            # das_names can live at the file_entry level or inside metadata
+            raw = file_entry.get("das_names") or metadata.get("das_names", [])
+            das_list = parse_das_names(raw) if isinstance(raw, str) else (raw or [])
+            for das in das_list:
+                year = detect_year_from_das(das)
+                if year:
+                    metadata["year"] = year
+                    break
+
+
 def derive_missing_das(existing_das, source_year, target_year):
     """
     Build a DAS wildcard pattern for target_year from an existing source_year path.
@@ -465,6 +507,8 @@ def update_json(json_path, dry_run=False, debug=False):
 
     inject_xsec(discovery, xsec_map)
     inject_xsec(replicas, xsec_map)
+    populate_year(discovery)
+    populate_year(replicas)
 
     # Save both files to datasets/discovery/
     discovery_dir = DATASETS_DIR / "discovery"
