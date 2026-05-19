@@ -363,27 +363,50 @@ def build_das_tasks(json_path):
     return xsec_map, tasks
 
 
-def inject_xsec(merged, xsec_map):
+def inject_xsec(discovery, xsec_map):
     """
-    Re-inject xsec into merged entries.  Matches on the 'sample' metadata field
-    since key names may have changed between the old and new JSON.
-    """
-    xsec_by_sample: dict[str, str] = {}
-    for orig_key, xsec in xsec_map.items():
-        # orig_key format is typically "SampleName_year" – strip trailing _year
-        sample = re.sub(r"_20\d{2}.*$", "", orig_key)
-        xsec_by_sample[sample] = xsec
+    Inject correct xsec values into the dataset-discovery-cli output format:
 
-    for entry in merged.values():
-        sample = entry["metadata"].get("sample", "")
-        if sample in xsec_by_sample:
-            entry["metadata"]["xsec"] = xsec_by_sample[sample]
-        elif entry["metadata"].get("xsec") in (None, "N/A"):
-            # Try partial match
+        {
+          "SampleName": {
+            "sample": "...",
+            "json_output": "...",
+            "files": [
+              { "das_names": [...], "metadata": { "xsec": 1.0, ... } },
+              ...
+            ]
+          }
+        }
+
+    Matches sample names from xsec_map (stripped of trailing _YYYY suffix)
+    against the top-level keys / "sample" fields in the discovery JSON.
+    """
+    xsec_by_sample: dict[str, float] = {}
+    for orig_key, xsec in xsec_map.items():
+        sample = re.sub(r"_20\d{2}.*$", "", orig_key)
+        try:
+            xsec_by_sample[sample] = float(xsec)
+        except (TypeError, ValueError):
+            pass
+
+    for sample_name, entry in discovery.items():
+        if not isinstance(entry, dict):
+            continue
+
+        xsec = xsec_by_sample.get(sample_name)
+        if xsec is None:
             for s, x in xsec_by_sample.items():
-                if s in sample or sample in s:
-                    entry["metadata"]["xsec"] = x
+                if s in sample_name or sample_name in s:
+                    xsec = x
                     break
+
+        if xsec is None:
+            print(f"  WARNING: no xsec found for {sample_name!r} — leaving placeholder")
+            continue
+
+        for file_entry in entry.get("files", []):
+            if isinstance(file_entry, dict) and "metadata" in file_entry:
+                file_entry["metadata"]["xsec"] = xsec
 
 
 def update_json(json_path, dry_run=False, debug=False):
@@ -409,30 +432,55 @@ def update_json(json_path, dry_run=False, debug=False):
 
     das_patterns = [das for das, _year in das_tasks]
 
+    # The CLI produces two files when saving to foo.json:
+    #   foo.json          — discovery metadata (sample info, json_output, …)
+    #   foo_replicas.json — the actual xrootd file list
+    tmp_replicas_path = tmp_path.parent / (tmp_path.stem + "_replicas.json")
+
     try:
         ok = run_session(das_patterns, tmp_path, dry_run=dry_run, debug=debug)
 
-        merged: dict = {}
-        if ok and tmp_path.exists():
-            with open(tmp_path) as f:
-                merged = json.load(f)
-            print(f"    Loaded {len(merged)} entries from session output")
+        discovery: dict = {}
+        replicas: dict = {}
+        if ok:
+            if tmp_path.exists():
+                with open(tmp_path) as f:
+                    discovery = json.load(f)
+                print(f"    Loaded {len(discovery)} sample(s) from discovery output")
+            if tmp_replicas_path.exists():
+                with open(tmp_replicas_path) as f:
+                    replicas = json.load(f)
+                print(f"    Loaded {len(replicas)} sample(s) from replicas output")
         elif not dry_run:
             print("    WARNING: session produced no output")
     finally:
-        if tmp_path.exists():
-            os.unlink(tmp_path)
+        for p in (tmp_path, tmp_replicas_path):
+            if p.exists():
+                os.unlink(p)
 
-    if dry_run or not merged:
+    if dry_run or (not discovery and not replicas):
         if not dry_run:
-            print("  No new data retrieved; original file unchanged.")
+            print("  No new data retrieved; skipping.")
         return
 
-    inject_xsec(merged, xsec_map)
+    inject_xsec(discovery, xsec_map)
+    inject_xsec(replicas, xsec_map)
 
-    with open(json_path, "w") as f:
-        json.dump(merged, f, indent=4)
-    print(f"  Saved {len(merged)} entries → {json_path.name}")
+    # Save both files to datasets/discovery/
+    discovery_dir = DATASETS_DIR / "discovery"
+    discovery_dir.mkdir(exist_ok=True)
+
+    if discovery:
+        out = discovery_dir / json_path.name
+        with open(out, "w") as f:
+            json.dump(discovery, f, indent=4)
+        print(f"  Saved → {out.relative_to(WORKSPACE)}")
+
+    if replicas:
+        out_rep = discovery_dir / (json_path.stem + "_replicas.json")
+        with open(out_rep, "w") as f:
+            json.dump(replicas, f, indent=4)
+        print(f"  Saved → {out_rep.relative_to(WORKSPACE)}")
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
