@@ -164,96 +164,104 @@ def derive_missing_das(existing_das, source_year, target_year):
 CLI_COMMAND = "dataset-discovery-cli"
 PEXPECT_TIMEOUT = 180  # seconds per DAS query
 
-# The REPL prompt is a two-line block ending with the command list and "]: "
-# e.g.  "> \n[help/.../quit]: "
-REPL_PROMPT  = r"\[help.*quit\]:\s*"
+# The REPL prompt is two lines; the second always ends with "/quit]: ".
+# Match only that unique suffix so we don't need re.DOTALL across the newline.
+REPL_PROMPT   = r"/quit\]:\s*"
 # Sub-prompts inside each command
-P_QUERY_FOR  = r"Query for:\s*"
-P_SELECT_IDX = r"Select datasets indices.*\(all\):\s*"
+P_QUERY_FOR   = r"Query for:\s*"
+P_SELECT_IDX  = r"Select datasets indices.*\(all\):\s*"
 P_SELECT_SITE = r"Select sites \[round-robin.*\].*:\s*"
-P_SAVE       = r"(?i)(save to|output file|filename).*:\s*"
+P_SAVE        = r"(?i)(save to|output file|filename).*:\s*"
 
 
-def run_discovery(das_pattern, output_json, dry_run=False):
+def _query_one(child, das_pattern):
     """
-    Drive one full transaction of dataset-discovery-cli:
+    Within an already-open CLI session, accumulate one era into the CLI's
+    internal state via query → select → replicas.  Does NOT save — the caller
+    issues a single save after all eras are done.
+    Returns True if results were found, False if no datasets matched.
+    """
+    print(f"    Querying: {das_pattern}")
 
-        query      → <das_pattern>
-        select     → all          (pick all returned datasets)
-        replicas   → all          (pick all datasets again for site lookup)
-                   → round-robin  (replica distribution method)
-        save       → <output_json>
-        quit
+    # ── query ─────────────────────────────────────────────────────────────────
+    child.sendline("query")
+    child.expect(P_QUERY_FOR)
+    child.sendline(das_pattern)
+    child.expect(REPL_PROMPT)
 
-    Returns True if output_json was written successfully.
+    if re.search(r"(?i)no (dataset|result|match)", child.before):
+        print(f"    WARNING: no datasets found for {das_pattern}")
+        return False
+
+    # ── select ────────────────────────────────────────────────────────────────
+    child.sendline("select")
+    child.expect(P_SELECT_IDX)
+    child.sendline("all")
+    child.expect(REPL_PROMPT)
+
+    # ── replicas ──────────────────────────────────────────────────────────────
+    child.sendline("replicas")
+    child.expect(P_SELECT_IDX)   # which datasets to fetch replicas for
+    child.sendline("all")
+    child.expect(P_SELECT_SITE)  # replica distribution method
+    child.sendline("round-robin")
+    child.expect(REPL_PROMPT)
+
+    return True
+
+
+def run_session(das_patterns, output_json, dry_run=False):
+    """
+    Open a single dataset-discovery-cli session, accumulate all das_patterns
+    via query→select→replicas, then issue one save to output_json, then quit.
+    Returns True if output_json was written.
     """
     if dry_run:
-        print(f"    [dry-run] would query: {das_pattern}")
+        for das in das_patterns:
+            print(f"    [dry-run] would query: {das}")
         return False
 
     if not HAS_PEXPECT:
         print("ERROR: pexpect is not installed.  Run: pip install pexpect")
         return False
 
-    print(f"    Querying: {das_pattern}")
     child = pexpect.spawn(CLI_COMMAND, timeout=PEXPECT_TIMEOUT, encoding="utf-8")
     # Uncomment to see raw CLI output while debugging:
     # import sys; child.logfile_read = sys.stdout
 
     try:
-        # ── initial REPL prompt ───────────────────────────────────────────────
-        child.expect(REPL_PROMPT)
+        child.expect(REPL_PROMPT)  # wait for initial prompt
 
-        # ── query ─────────────────────────────────────────────────────────────
-        child.sendline("query")
-        child.expect(P_QUERY_FOR)
-        child.sendline(das_pattern)
+        any_ok = False
+        for das_pattern in das_patterns:
+            try:
+                ok = _query_one(child, das_pattern)
+                any_ok = any_ok or ok
+            except pexpect.TIMEOUT:
+                print(f"    ERROR: timed out on {das_pattern}")
+            except pexpect.EOF:
+                print(f"    ERROR: CLI exited unexpectedly on {das_pattern}")
+                child.close()
+                return False
 
-        # After querying, wait for the REPL prompt to return.
-        # If no datasets were found the CLI still returns to the prompt, so we
-        # check the captured output for a "no results" indicator.
-        child.expect(REPL_PROMPT)
-        if not child.before.strip():
-            # Empty output between prompt and next prompt usually means no results;
-            # the query result table would appear in child.before.
-            pass
-        before_text = child.before
-        if re.search(r"(?i)no (dataset|result|match)", before_text):
-            print(f"    WARNING: no datasets found for {das_pattern}")
+        if not any_ok:
             child.sendline("quit")
-            child.expect(pexpect.EOF, timeout=10)
+            child.expect(pexpect.EOF, timeout=30)
             child.close()
             return False
 
-        # ── select (choose datasets by index) ─────────────────────────────────
-        child.sendline("select")
-        child.expect(P_SELECT_IDX)
-        child.sendline("all")
-        child.expect(REPL_PROMPT)
-
-        # ── replicas ──────────────────────────────────────────────────────────
-        child.sendline("replicas")
-        # First sub-prompt: which dataset indices to fetch replicas for
-        child.expect(P_SELECT_IDX)
-        child.sendline("all")
-        # Second sub-prompt: replica distribution method
-        child.expect(P_SELECT_SITE)
-        child.sendline("round-robin")
-        child.expect(REPL_PROMPT)
-
-        # ── save ──────────────────────────────────────────────────────────────
+        # ── single save after all eras are accumulated ─────────────────────
         child.sendline("save")
         child.expect(P_SAVE)
         child.sendline(str(output_json))
         child.expect(REPL_PROMPT)
 
-        # ── quit ──────────────────────────────────────────────────────────────
         child.sendline("quit")
         child.expect(pexpect.EOF, timeout=30)
         child.close()
 
     except pexpect.TIMEOUT:
-        print(f"    ERROR: timed out interacting with CLI for {das_pattern}")
+        print("    ERROR: timed out waiting for initial CLI prompt")
         try:
             child.close(force=True)
         except Exception:
@@ -350,34 +358,34 @@ def update_json(json_path, dry_run=False):
         print(f"  SKIP: file not found")
         return
 
-    xsec_map, tasks = build_das_tasks(json_path)
-    print(f"  {len(tasks)} DAS queries to run")
+    xsec_map, das_tasks = build_das_tasks(json_path)
+    print(f"  {len(das_tasks)} DAS queries to run")
     if xsec_map:
         sample0 = next(iter(xsec_map))
         print(f"  Preserved xsec from original (e.g. {sample0}: {xsec_map[sample0]})")
 
-    merged: dict = {}
+    # One temp file receives all eras in a single save at the end of the session.
+    with tempfile.NamedTemporaryFile(
+        suffix=".json", prefix="_tmp_session_",
+        dir=DATASETS_DIR, delete=False
+    ) as tmp:
+        tmp_path = Path(tmp.name)
 
-    for das_name, year in tasks:
-        # Write to a per-era temp file inside datasets/ so the CLI sees a local path
-        with tempfile.NamedTemporaryFile(
-            suffix=".json", prefix=f"_tmp_{year}_",
-            dir=DATASETS_DIR, delete=False
-        ) as tmp:
-            tmp_path = Path(tmp.name)
+    das_patterns = [das for das, _year in das_tasks]
 
-        try:
-            ok = run_discovery(das_name, tmp_path, dry_run)
-            if ok and tmp_path.exists():
-                with open(tmp_path) as f:
-                    era_data = json.load(f)
-                merged.update(era_data)
-                print(f"    Added {len(era_data)} entries for {year}")
-            elif not dry_run:
-                print(f"    WARNING: no output produced for {das_name}")
-        finally:
-            if tmp_path.exists():
-                os.unlink(tmp_path)
+    try:
+        ok = run_session(das_patterns, tmp_path, dry_run=dry_run)
+
+        merged: dict = {}
+        if ok and tmp_path.exists():
+            with open(tmp_path) as f:
+                merged = json.load(f)
+            print(f"    Loaded {len(merged)} entries from session output")
+        elif not dry_run:
+            print("    WARNING: session produced no output")
+    finally:
+        if tmp_path.exists():
+            os.unlink(tmp_path)
 
     if dry_run or not merged:
         if not dry_run:
