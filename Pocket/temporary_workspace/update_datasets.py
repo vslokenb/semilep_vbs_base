@@ -206,6 +206,10 @@ def derive_missing_das(existing_das, source_year, target_year):
 CLI_COMMAND = "dataset-discovery-cli"
 PEXPECT_TIMEOUT = 180  # seconds per DAS query
 
+BLOCKED_SITES = [
+    "T2_KR_KRISTI",
+]
+
 # The REPL shows "> " on its own line, then the command list on the next line.
 # Match the simple "> " prompt — it's the first thing printed and appears after
 # every command completes. The command list line is decorative and may contain
@@ -216,6 +220,7 @@ P_QUERY_FOR   = r"Query for:\s*"
 P_SELECT_IDX  = r"Select datasets indices.*\(all\):\s*"
 P_SELECT_SITE = r"Select sites \[round-robin.*\].*:\s*"
 P_SAVE        = r"(?i)(save to|output file|filename).*:\s*"
+P_BLOCK_SITES = r"Exclude the sites.*:\s*"
 
 
 def _send(child, text, debug=False):
@@ -302,6 +307,12 @@ def run_session(das_patterns, output_json, dry_run=False, debug=False):
         child.expect(REPL_PROMPT)
         if debug:
             print(f"  <<< MATCH: {child.after!r}")
+
+        if BLOCKED_SITES:
+            _send(child, "block-sites", debug)
+            _wait(child, P_BLOCK_SITES, "Exclude the sites:", debug)
+            _send(child, ",".join(BLOCKED_SITES), debug)
+            _wait(child, REPL_PROMPT, "REPL after block-sites", debug)
 
         any_ok = False
         for das_pattern in das_patterns:
