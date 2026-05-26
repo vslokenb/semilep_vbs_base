@@ -30,14 +30,20 @@ DATA_SAMPLES = {"SingleMuon"}
 
 # ── 2D histograms to plot ────────────────────────────────────────────────────
 HISTS_2D = [
-    "mT_lep_pt_corr",
-    "mT_lep_eta_corr",
-    "mT_lep_phi_corr",
-    "mT_lep_dphi_corr",
     "mT_MET_corr",
-    "mT_METphi_corr",
-    "lep_pt_MET_corr",
-    "lep_phi_METphi_corr",
+    # "mT_lep_eta_corr",
+    # "mT_lep_phi_corr",
+    # "mT_lep_dphi_corr",
+    # "mT_MET_corr",
+    # "mT_METphi_corr",
+    # "lep_pt_MET_corr",
+    # "lep_phi_METphi_corr",
+    # "electron_tight_phi_eta",
+    "electron_loose_phi_eta",
+    "electron_tight_phi_eta"
+    "muon_tight_phi_eta",
+    "muon_loose_phi_eta",
+
 ]
 
 # ── Helpers ──────────────────────────────────────────────────────────────────

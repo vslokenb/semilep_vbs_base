@@ -5,6 +5,7 @@ from pocket_coffea.parameters.cuts import passthrough
 from pocket_coffea.parameters.histograms import HistConf, Axis
 from pocket_coffea.lib.weights.common import common_weights
 from pocket_coffea.lib.weights.common.common import SF_L1prefiring
+from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
 from pocket_coffea.parameters import defaults
 from pocket_coffea.lib.columns_manager import ColOut
 
@@ -37,8 +38,20 @@ from custom_cut_functions import (
     # Muon_good3,
     w_cr_mu,
     w_cr_e,
+    w_cr_boosted_mu,
+    w_cr_boosted_e,
     vr_mu,
-    vr_e
+    vr_e,
+    vr_boosted_mu,
+    vr_boosted_e,
+    vr_qcd_enriched_mu,
+    vr_qcd_enriched_e,
+    vr_no_fwd_mu,
+    vr_no_fwd_e,
+    vr_loose_njet_mu,
+    vr_loose_njet_e,
+    vr_no_fwd_loose_njet_mu,
+    vr_no_fwd_loose_njet_e,
     # qcd_validate_mu,
     # qcd_validate_e,
 )
@@ -181,22 +194,22 @@ cfg = Configurator(
 
         "filter": {
             "samples": [
-                # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
-                # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
+                "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
-                "SingleMuon",
-                "EGamma",
+                # "SingleMuon",
+                # "EGamma",
             ],
             "year": ["2018"],
         },
@@ -223,6 +236,8 @@ cfg = Configurator(
         # ------------------------------------------------------------------
         "w_cr_mu": [w_cr_mu],
         "w_cr_e":  [w_cr_e],
+        "w_cr_boosted_mu": [w_cr_boosted_mu],
+        "w_cr_boosted_e": [w_cr_boosted_e],
 
         # ------------------------------------------------------------------
         # Validation region
@@ -230,19 +245,29 @@ cfg = Configurator(
         # ------------------------------------------------------------------
         "vr_mu": [vr_mu],
         "vr_e":  [vr_e],
+        "vr_boosted_mu": [vr_boosted_mu],
+        "vr_boosted_e": [vr_boosted_e],
+         "vr_qcd_enriched_mu": [vr_qcd_enriched_mu],
+         "vr_qcd_enriched_e": [vr_qcd_enriched_e],
+        "vr_no_fwd_mu": [vr_no_fwd_mu],
+        "vr_no_fwd_e": [vr_no_fwd_e],
+        "vr_loose_njet_mu": [vr_loose_njet_mu],
+        "vr_loose_njet_e": [vr_loose_njet_e],
+        "vr_no_fwd_loose_njet_mu": [vr_no_fwd_loose_njet_mu],
+        "vr_no_fwd_loose_njet_e": [vr_no_fwd_loose_njet_e],
     },
 
-    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight],
+    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger],
     weights={
         "common": {
             "inclusive": ["genWeight", "lumi", "XS",
-                          "muon_inverttight_to_fake", "electron_inverttight_to_fake"],
+                          "muon_inverttight_to_fake", "electron_inverttight_to_fake", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"],
         },
     },
     variations={
         "weights": {
             "common": {
-                "inclusive": ["muon_inverttight_to_fake", "electron_inverttight_to_fake"],
+                "inclusive": ["muon_inverttight_to_fake", "electron_inverttight_to_fake","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"],
             },
         }
     },

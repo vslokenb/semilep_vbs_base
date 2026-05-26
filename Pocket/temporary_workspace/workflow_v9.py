@@ -169,7 +169,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             ak.concatenate([ev.MuonClean, ev.ElectronClean], axis=1),
             "PtEtaPhiMCandidate",
         )
-        ev["LeptonClean"] = clean_lep[ak.argsort(clean_lep.pt, ascending=False)]
+        ev["LeptonVeto"] = clean_lep[ak.argsort(clean_lep.pt, ascending=False)]
 
         ev["LeptonGood"] = leptons[ak.argsort(leptons.pt, ascending=False)]
 
@@ -821,5 +821,5 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nMuonLoose"]     = ak.num(ev.MuonLoose)
         ev["nElectronLoose"] = ak.num(ev.ElectronLoose)
         ev["nLeptonLoose"]   = ev.nMuonLoose + ev.nElectronLoose
-        ev["nLeptonClean"]   = ak.num(ev.LeptonClean)
+        ev["nLeptonVeto"]   = ak.num(ev.LeptonVeto)
         #ev["nOtherJetsBoost"]    =ak.num(ev.CentralJetGoodBoostedFS)
