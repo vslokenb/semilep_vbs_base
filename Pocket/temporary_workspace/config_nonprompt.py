@@ -115,10 +115,10 @@ cfg = Configurator(
             
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
             #
-            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
             # XSEC STUDIES
             # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_17.json",
@@ -140,13 +140,13 @@ cfg = Configurator(
             
             # END XSEC STUDIES
 
-            f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
 
-            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17.json",
             
 
@@ -167,7 +167,7 @@ cfg = Configurator(
             #f"{localdir}/datasets/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
             #f"{localdir}/datasets/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
 
-            f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
+            # f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
             # f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.json",
             # f"{localdir}/datasets/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8.json",
             # f"{localdir}/datasets/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8.json",
@@ -229,9 +229,9 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
+            # f"{localdir}/datasets/SingleMuon.json", ## 2017B Single Muon dataset
             # f"{localdir}/datasets/SingleElectron.json", ## 2017B Single Muon dataset
-            f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
+            # f"{localdir}/datasets/EGamma.json", # 2022_postEE EGamma
             # #f"{localdir}/datasets/EGamma_G.json"
             # #f"{localdir}/datasets/Muon.json",
             # f"{localdir}/datasets/Muon_2022E.json"
@@ -240,10 +240,10 @@ cfg = Configurator(
             
             # f"{localdir}/datasets/SingleMuon_fast.json",
             # f"{localdir}/datasets/SingleElectron_fast.json",
-            f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
-            f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
             # f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_fast.json",
-            f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_fast.json",
+            # f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
@@ -253,7 +253,9 @@ cfg = Configurator(
             # f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
-            f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",  
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",  
+            f"{localdir}/datasets/skimmed.json",
+
         ],
         
         "filter": {
@@ -277,7 +279,7 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             # "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             # # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
@@ -290,8 +292,8 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
             # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
             # "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 
@@ -353,9 +355,9 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            "SingleMuon", ## 2017B Single Muon dataset
+            # "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            "EGamma",
+            # "EGamma",
             # "Muon"
             ],
             "year": ["2018"],
@@ -509,5 +511,29 @@ cfg = Configurator(
     "mt_w_leptonic_loose": HistConf([Axis(coll="events", field="mt_w_leptonic_loose", bins=20, start=0, stop=100, label=r"$m_T(W_{lep})$ [GeV]")]),
     
     "pt_miss": HistConf([Axis(coll="DeepMETResolutionTune", field="pt", bins=20, start=0, stop=100, label=r"$pT_{miss}$ [GeV]")]),
+
+    "muon_tight_phi_eta": HistConf([
+        Axis(coll="MuonGood", field="phi", bins=32, start=-3.2, stop=3.2, label="tight muons $\phi$"),
+        Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$"),
+    ]),
+
+    "muon_tight_phi_eta": HistConf([
+        Axis(coll="MuonGood", field="phi", bins=32, start=-3.2, stop=3.2, label="tight muons $\phi$"),
+        Axis(coll="MuonGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$"),
+    ]),
+
+    "muon_loose_phi_eta": HistConf([
+        Axis(coll="MuonLoose", field="phi", bins=32, start=-3.2, stop=3.2, label="tight muons $\phi$"),
+        Axis(coll="MuonLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight muons $\eta$"),
+    ]),
+    "electron_tight_phi_eta": HistConf([
+        Axis(coll="ElectronGood", field="phi", bins=32, start=-3.2, stop=3.2, label="tight electrons $\phi$"),
+        Axis(coll="ElectronGood", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$"),
+    ]),
+    
+    "electron_loose_phi_eta": HistConf([
+        Axis(coll="ElectronLoose", field="phi", bins=32, start=-3.2, stop=3.2, label="tight electrons $\phi$"),
+        Axis(coll="ElectronLoose", field="eta", bins=[-2.4,-2.15,-1.8,-1.479,-1.,-0.5,0.,0.5,1.,1.479,1.8,2.15,2.4], label="tight electrons $\eta$"),
+    ]),
     },
 )

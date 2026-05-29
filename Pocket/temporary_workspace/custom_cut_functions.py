@@ -741,9 +741,9 @@ def _ht_mask(events):
 
 def select_VR_recoil(events, params, **kwargs):
     if params["lepton"] == "mu":
-        one_lep = (events.nMuonLoose == 1) & (events.nElectronLoose == 0)
+        one_lep = (events.nMuonGood == 1) & (events.nElectronGood == 0)
     else:
-        one_lep = (events.nElectronLoose == 1) & (events.nMuonLoose == 0)
+        one_lep = (events.nElectronGood == 1) & (events.nMuonGood == 0)
     veto          = (events.nLeptonVeto < 2)
     recoil_jet    = (events.nJetGood_recoil >= 1)
     recoil_jet_pt = (events.LeadJetGood_recoil.pt >= params["recoil_jet_pt"])
@@ -751,18 +751,52 @@ def select_VR_recoil(events, params, **kwargs):
     met_cut       = (events.DeepMETResolutionTune.pt > params["met_pt"])
     bveto         = (events.nBJetGood == 0)
     cut_mt = (
-        (events.mt_w_leptonic_loose > params["mt_w_lo"]) &
-        (events.mt_w_leptonic_loose < params["mt_w_hi"])
+        (events.mt_w_leptonic > params["mt_w_lo"]) &
+        (events.mt_w_leptonic < params["mt_w_hi"])
     )
     mask = one_lep & met_cut & recoil_jet & recoil_jet_pt & cut_njet & cut_mt & bveto & veto & _ht_mask(events)
     return ak.values_astype(mask, np.bool_)
 
 def _recoil_vr_params(lepton):
-    return {"lepton": lepton, "njet": 3, "met_pt": 30.0, "recoil_jet_pt": 30,
+    return {"lepton": lepton, "njet": 3, "met_pt": 30.0, "recoil_jet_pt": 35,
             "mt_w_lo": 20.0, "mt_w_hi": 30.0}
 
 vr_qcd_enriched_mu = Cut(name="vr_qcd_enriched_mu", params=_recoil_vr_params("mu"), function=select_VR_recoil)
 vr_qcd_enriched_e  = Cut(name="vr_qcd_enriched_e",  params=_recoil_vr_params("e"),  function=select_VR_recoil)
+
+# ---------- 1b. Inclusive recoil — mT [0, 30], superset of QCD CR + VR recoil ----------
+
+def select_recoil_inclusive(events, params, **kwargs):
+    if "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" in events.metadata["dataset"]:
+        ht_mask = (events.LHE.HT <= 70.)
+    else:
+        ht_mask = True
+
+    if params["lepton"] == "mu":
+        one_lep = (events.nMuonGood == 1) & (events.nElectronGood == 0)
+    else:
+        one_lep = (events.nElectronGood == 1) & (events.nMuonGood == 0)
+
+    veto          = (events.nLeptonVeto < 2)
+    recoil_jet    = (events.nJetGood_recoil >= 1)
+    recoil_jet_pt = (events.LeadJetGood_recoil.pt >= params["recoil_jet_pt"])
+    cut_njet      = (events.nJetGood >= params["njet"])
+    met_cut       = (events.DeepMETResolutionTune.pt > params["met_pt"])
+    cut_mt        = (events.mt_w_leptonic < params["mt_w_hi"])
+    bveto         = (events.nBJetGood == 0)
+
+    mask = one_lep & met_cut & recoil_jet & recoil_jet_pt & cut_njet & cut_mt & bveto & veto & ht_mask
+    return ak.values_astype(mask, np.bool_)
+
+def _recoil_inclusive_params(lepton, mt_hi):
+    return {"lepton": lepton, "njet": 3, "met_pt": 30.0, "recoil_jet_pt": 35, "mt_w_hi": mt_hi}
+
+recoil_inclusive_mu = Cut(name="recoil_inclusive_mu", params=_recoil_inclusive_params("mu",30.0), function=select_recoil_inclusive)
+recoil_inclusive_e  = Cut(name="recoil_inclusive_e",  params=_recoil_inclusive_params("e",30.0),  function=select_recoil_inclusive)
+
+recoil_fullinclusive_mu = Cut(name="recoil_fullinclusive_mu", params=_recoil_inclusive_params("mu",185.0), function=select_recoil_inclusive)
+recoil_fullinclusive_e  = Cut(name="recoil_fullinclusive_e",  params=_recoil_inclusive_params("e",185.0),  function=select_recoil_inclusive)
+
 
 # ---------- 2. VR no forward jets — drop VBS mjj/deta/j1-j2pT ----------
 
