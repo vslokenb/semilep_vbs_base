@@ -167,7 +167,7 @@ def select_TT_mu(events, params, **kwargs):
     nbj = (events.nBJetTight >= params["nbjet"])
     central_j = (events.nJetGoodCentral    >= params["njet_central"])
     nj = (events.nJetGood    >= params["njet"])
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     mask = one_lep & nbj & central_j & nj & loose_lep_veto
     return ak.values_astype(mask, np.bool_)
 
@@ -216,7 +216,7 @@ def select_TT_e(events, params, **kwargs):
     nbj = (events.nBJetTight >= params["nbjet"])
     central_j = (events.nJetGoodCentral    >= params["njet_central"])
     nj = (events.nJetGood    >= params["njet"])
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     mask = one_lep & nbj & central_j & nj & loose_lep_veto
     return ak.values_astype(mask, np.bool_)
 
@@ -341,7 +341,7 @@ def select_QCD_CR(events, params, **kwargs):
     else:
         ht_mask = True
     one_lep = (events.nMuonLoose ==1) #### CHANGED FOR DEBUGGING
-    veto = (events.nLeptonVeto < 2)
+    veto = (events.nLeptonClean < 2)
     if params["recoil"] == 'false':
         recoil_jet = True
         recoil_jet_pt = True
@@ -1044,7 +1044,7 @@ def select_QCD_validate(events, params, **kwargs):
         ht_mask = True
     one_lep = (events.nLeptonGood == 1)
     cut_jet = (events.nJetGood >= params["nJetGood"])
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     if params["met_def"] == "deepmet_response":
         met_cut = (events.DeepMETResponseTune.pt      <  params["met_pt"])
     elif params["met_def"] == "deepmet_resolution":
@@ -1081,7 +1081,7 @@ def select_QCD_validate_e(events, params, **kwargs):
         ht_mask = True
     one_lep = ( (events.nElectronGood == 1) & (events.nMuonGood == 0) )
     cut_jet = (events.nJetGood >= params["nJetGood"])
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     if params["met_def"] == "deepmet_response":
         met_cut = (events.DeepMETResponseTune.pt      <  params["met_pt"])
     elif params["met_def"] == "deepmet_resolution":
@@ -1118,7 +1118,7 @@ def select_QCD_validate_mu(events, params, **kwargs):
         ht_mask = True
     one_lep = ( (events.nElectronGood == 0) & (events.nMuonGood == 1) )
     cut_jet = (events.nJetGood >= params["nJetGood"])
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     if params["met_def"] == "deepmet_response":
         met_cut = (events.DeepMETResponseTune.pt      <  params["met_pt"])
     elif params["met_def"] == "deepmet_resolution":
@@ -1153,7 +1153,7 @@ def in_whad_window_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood == 0) & (events.nMuonGood == 1)
     four_j  = (events.nJetGood >= 4)
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1197,7 +1197,7 @@ def in_whad_window_bveto_mu(events, params, **kwargs):
     four_j  = (events.nJetGood >= 4)
     b_veto = (events.nBJetTight == 0) 
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1233,7 +1233,7 @@ def out_whad_window_bveto_mu(events, params, **kwargs):
     four_j  = (events.nJetGood >= 4)
     b_veto = (events.nBJetLoose == 0) 
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1269,7 +1269,7 @@ def in_whad_window_baccept_mu(events, params, **kwargs):
     four_j  = (events.nJetGood >= 4)
     b_accept = (events.nBJetTight > 0) 
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1307,7 +1307,7 @@ def in_msd_window_fatjet_bveto_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood == 0) & (events.nMuonGood == 1)
     #yes_fat = (events.nFatJetCentral >= 1)
     b_veto = (events.nBJetLoose == 0) 
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "pt", None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "msoftdrop", None)), np.nan)
@@ -1347,7 +1347,7 @@ def out_msd_window_fatjet_bveto_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood == 0) & (events.nMuonGood == 1)
     #yes_fat = (events.nFatJetCentral >= 1)
     b_veto = (events.nBJetLoose == 0) 
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "pt", None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "msoftdrop", None)), np.nan)
@@ -1387,7 +1387,7 @@ def in_msd_window_fatjet_baccept_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood == 0) & (events.nMuonGood == 1)
     #yes_fat = (events.nFatJetCentral >= 1)
     b_accept = (events.nBJetTight > 0) 
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "pt", None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "msoftdrop", None)), np.nan)
@@ -1433,7 +1433,7 @@ def in_whad_window_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood == 1) & (events.nMuonGood == 0)
     four_j  = (events.nJetGood >= 4)
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1468,7 +1468,7 @@ def in_whad_window_bveto_e(events, params, **kwargs):
     four_j  = (events.nJetGood >= 4)
     b_veto = (events.nBJetLoose == 0) 
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1503,7 +1503,7 @@ def out_whad_window_bveto_e(events, params, **kwargs):
     four_j  = (events.nJetGood >= 4)
     b_veto = (events.nBJetLoose == 0) 
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1539,7 +1539,7 @@ def in_whad_window_baccept_e(events, params, **kwargs):
     four_j  = (events.nJetGood >= 4)
     b_accept = (events.nBJetTight > 0) 
     no_fat = (events.nFatJetCandidate == 0)
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     wjj_pt = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "pt", None)), np.nan)
     wjj_pt_cut = np.where(np.isnan(wjj_pt),  False, wjj_pt  < 200.)
     wmass = ak.fill_none(ak.firsts(getattr(events.w_had_jets, "mass", None)), np.nan)
@@ -1574,7 +1574,7 @@ def in_msd_window_fatjet_bveto_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood == 1) & (events.nMuonGood == 0)
     #yes_fat = (events.nFatJetCentral >= 1)
     b_veto = (events.nBJetLoose == 0) 
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "pt", None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "msoftdrop", None)), np.nan)
@@ -1614,7 +1614,7 @@ def out_msd_window_fatjet_bveto_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood == 1) & (events.nMuonGood == 0)
     #yes_fat = (events.nFatJetCentral >= 1)
     b_veto = (events.nBJetLoose == 0) 
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "pt", None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "msoftdrop", None)), np.nan)
@@ -1654,7 +1654,7 @@ def in_msd_window_fatjet_baccept_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood == 1) & (events.nMuonGood == 0)
     #yes_fat = (events.nFatJetCentral >= 1)
     b_accept = (events.nBJetTight > 0) 
-    loose_lep_veto = (events.nLeptonVeto < 2)
+    loose_lep_veto = (events.nLeptonClean < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "pt", None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.w_fatjet, "msoftdrop", None)), np.nan)

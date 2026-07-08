@@ -33,6 +33,23 @@ from custom_cut_functions import (
     qcd_enriched_recoil_30_e ,  # nJetGood >= 3, recoil jet pT >= 30, electron
     qcd_enriched_recoil_35_e ,  # nJetGood >= 3, recoil jet pT >= 35, electron
     qcd_enriched_recoil_40_e ,  # nJetGood >= 3, recoil jet pT >= 40, electron
+    qcd_enriched_recoil_lowjet_30_mu,
+    qcd_enriched_recoil_lowjet_35_mu,
+    qcd_enriched_recoil_lowjet_40_mu,
+    qcd_enriched_recoil_lowjet_30_e,
+    qcd_enriched_recoil_lowjet_35_e,
+    qcd_enriched_recoil_lowjet_40_e,
+    qcd_enriched_mu_up,
+    qcd_enriched_mu_down,
+    qcd_enriched_e_up,
+    qcd_enriched_e_down,
+    qcd_enriched_boosted_mu_up,
+    qcd_enriched_boosted_mu_down,
+    qcd_enriched_boosted_e_up,
+    qcd_enriched_boosted_e_down,
+    qcd_enriched_boosted_mu,
+    qcd_enriched_boosted_e,
+    # hem_filter
 )
 
 
@@ -254,7 +271,8 @@ cfg = Configurator(
             # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",  
-            f"{localdir}/datasets/skimmed.json",
+            # f"{localdir}/datasets/skimmed.json",
+            f"{localdir}/datasets/skimmed_rescale.json",
 
         ],
         
@@ -264,16 +282,16 @@ cfg = Configurator(
             #########
             ## RUN 2 BKG
             #########
-            # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
 
-            # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
 
             # "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
@@ -281,7 +299,7 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
             "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             # # #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -355,9 +373,9 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            # "SingleMuon", ## 2017B Single Muon dataset
+            "SingleMuon", ## 2017B Single Muon dataset
             # "SingleElectron",
-            # "EGamma",
+            "EGamma",
             # "Muon"
             ],
             "year": ["2018"],
@@ -383,6 +401,17 @@ cfg = Configurator(
         "baseline": [passthrough],
         "qcd_enriched_e": [qcd_enriched_e],
         "qcd_enriched_mu": [qcd_enriched_mu],
+        "qcd_enriched_mu_up": [qcd_enriched_mu_up],
+        "qcd_enriched_mu_down": [qcd_enriched_mu_down],
+        "qcd_enriched_e_up": [qcd_enriched_e_up],
+        "qcd_enriched_e_down": [qcd_enriched_e_down],
+
+        "qcd_enriched_boosted_e": [qcd_enriched_boosted_e],
+        "qcd_enriched_boosted_mu": [qcd_enriched_boosted_mu],
+        "qcd_enriched_boosted_mu_up": [qcd_enriched_boosted_mu_up],
+        "qcd_enriched_boosted_mu_down": [qcd_enriched_boosted_mu_down],
+        "qcd_enriched_boosted_e_up": [qcd_enriched_boosted_e_up],
+        "qcd_enriched_boosted_e_down": [qcd_enriched_boosted_e_down],
         # "qcd_enriched_3j_mu":[qcd_enriched_3j_mu],
         # "qcd_enriched_3j_e": [qcd_enriched_3j_e],
         # "qcd_enriched_sideband_mu": [qcd_enriched_sideband_mu],
@@ -393,6 +422,13 @@ cfg = Configurator(
         "qcd_enriched_recoil_30_e": [qcd_enriched_recoil_30_e],
         "qcd_enriched_recoil_35_e": [qcd_enriched_recoil_35_e],
         "qcd_enriched_recoil_40_e": [qcd_enriched_recoil_40_e],
+
+        "qcd_enriched_recoil_lowjet_30_mu": [qcd_enriched_recoil_lowjet_30_mu],
+        "qcd_enriched_recoil_lowjet_35_mu": [qcd_enriched_recoil_lowjet_35_mu],
+        "qcd_enriched_recoil_lowjet_40_mu": [qcd_enriched_recoil_lowjet_40_mu],
+        "qcd_enriched_recoil_lowjet_30_e": [qcd_enriched_recoil_lowjet_30_e],
+        "qcd_enriched_recoil_lowjet_35_e": [qcd_enriched_recoil_lowjet_35_e],
+        "qcd_enriched_recoil_lowjet_40_e": [qcd_enriched_recoil_lowjet_40_e],
         # # "qcd_enriched_45": [qcd_enriched_cut_45],
         # # "qcd_enriched_30_2j": [qcd_enriched_cut_30_2j],
         # # "qcd_enriched_35_2j": [qcd_enriched_cut_35_2j],

@@ -46,6 +46,29 @@ def convert_boost_hist_to_root(h, name):
     return hist_dict
 
 
+def iter_histograms(obj, prefix=""):
+    """
+    Recursively walk a coffea accumulator and yield (name, Histogram) pairs.
+
+    Handles both the flat top-level layout ({hname: Histogram}) and the
+    nested 'variables' layout ({hname: {sample: {dataset_era: Histogram}}}).
+    Container keys are joined with '_' to build a unique name; the literal
+    'variables' key is dropped from the prefix to keep names clean.
+    """
+    if isinstance(obj, Histogram):
+        yield prefix, obj
+        return
+    if isinstance(obj, dict):
+        for key, val in obj.items():
+            if prefix == "" and key == "variables":
+                child_prefix = ""          # don't pollute names with the container name
+            elif prefix == "":
+                child_prefix = str(key)
+            else:
+                child_prefix = f"{prefix}_{key}"
+            yield from iter_histograms(val, child_prefix)
+
+
 def coffea_to_root(infile, outfile):
     # Load coffea file
     hists = coffea.util.load(infile)
@@ -53,15 +76,16 @@ def coffea_to_root(infile, outfile):
     # Create ROOT file
     with uproot.recreate(outfile) as rootfile:
 
-        for name, hist in hists.items():
-            if isinstance(hist, Histogram):
-                # boost_histogram object → ROOT TH1/TH2/TH3
-                root_hists = convert_boost_hist_to_root(hist, name)
-                for hist_name,root_hist in root_hists.items():
-                    rootfile[hist_name] = root_hist
+        found = False
+        for name, hist in iter_histograms(hists):
+            found = True
+            # boost_histogram object → ROOT TH1/TH2/TH3
+            root_hists = convert_boost_hist_to_root(hist, name)
+            for hist_name, root_hist in root_hists.items():
+                rootfile[hist_name] = root_hist
 
-            else:
-                print(f"Skipping {name}: not a histogram")
+        if not found:
+            print("No boost_histogram objects found in", infile)
 
 
 if __name__ == "__main__":

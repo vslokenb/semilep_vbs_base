@@ -24,18 +24,11 @@ from custom_cut_functions import (
     vbs_semileptonic_presel,
     # whad_window_cut_e,
     met_skim_cut,
-    # whad_window_cut_bveto_e,
-    # msd_window_cut_e,
-    # whad_window_cut_mu,
-    # whad_window_cut_bveto_mu,
-    # whad_window_cut_bveto_mu2,
-    # msd_window_cut_mu,
-    # whad_window_cut_no_fj0_e,
-    # whad_window_cut_no_jet4_e,
-    # whad_window_cut_no_loose_e,
-    # Muon_good1,
-    # Muon_good2,
-    # Muon_good3,
+    whad_window_cut_bveto_e,
+    msd_window_cut_e,
+    whad_window_cut_mu,
+    whad_window_cut_bveto_mu,
+    msd_window_cut_mu,
     w_cr_mu,
     w_cr_e,
     w_cr_boosted_mu,
@@ -44,6 +37,8 @@ from custom_cut_functions import (
     vr_e,
     vr_boosted_mu,
     vr_boosted_e,
+    vr_boosted_no_fwd_mu,
+    vr_boosted_no_fwd_e,
     vr_qcd_enriched_mu,
     vr_qcd_enriched_e,
     vr_no_fwd_mu,
@@ -56,8 +51,30 @@ from custom_cut_functions import (
     recoil_inclusive_e,
     recoil_fullinclusive_mu,
     recoil_fullinclusive_e,
+    recoil_closure_mu,
+    recoil_closure_e,
+    w_cr_no_fwd_mu,
+    w_cr_no_fwd_e,
+    w_cr_loose_njet_mu,
+    w_cr_loose_njet_e,
+    w_cr_no_fwd_loose_njet_mu,
+    w_cr_no_fwd_loose_njet_e,
+    w_cr_sb_lo1_mu,
+    w_cr_sb_lo2_mu,
+    w_cr_sb_hi1_mu,
+    w_cr_sb_hi2_mu,
+    w_cr_sb_lo1_e,
+    w_cr_sb_lo2_e,
+    w_cr_sb_hi1_e,
+    w_cr_sb_hi2_e,
+    w_cr_incl_mu,
+    w_cr_incl_e,
     # qcd_validate_mu,
     # qcd_validate_e,
+    ttbar_cr_boosted_mu,
+    ttbar_cr_boosted_e,
+    ttbar_cr_resolved_mu,
+    ttbar_cr_resolved_e,
 )
 
 
@@ -76,10 +93,12 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/plotting.yaml",
     f"{localdir}/params/pileup.yaml",
     f"{localdir}/params/jets_calibration.yaml",
+    f"{localdir}/params/jet_scale_factors.yaml",
     f"{localdir}/params/lepton_scale_factors.yaml",
     f"{localdir}/params/classifiers.yaml",
     f"{localdir}/params/variations.yaml",
     f"{localdir}/params/fakelepton_weights_noiso_3j.yaml",
+    f"{localdir}/params/dphi_weights.yaml",
     update=True,
 )
 
@@ -99,9 +118,11 @@ wjet_reweight = WeightLambda.wrap_func(
 
 from coffea.lookup_tools import extractor
 
+fake_muon_weights         = {}
+fake_electron_weights     = {}
+fake_muon_weights_boosted     = {}
+fake_electron_weights_boosted = {}
 
-fake_muon_weights = {}
-fake_electron_weights = {}
 for y in parameters.fakeleptonweights.keys():
     ext = extractor()
     ext.add_weight_sets([
@@ -111,20 +132,50 @@ for y in parameters.fakeleptonweights.keys():
         f"electronFakeWeight {parameters.fakeleptonweights[y]['Electron']['nominal'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
         f"electronFakeWeight_up {parameters.fakeleptonweights[y]['Electron']['up'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
         f"electronFakeWeight_down {parameters.fakeleptonweights[y]['Electron']['down'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
-        ])
+        f"muonFakeWeight_boosted {parameters.fakeleptonweights[y]['Boosted_Muon']['nominal'][0]} {parameters.fakeleptonweights[y]['Boosted_Muon']['file'][0]}",
+        f"muonFakeWeight_boosted_up {parameters.fakeleptonweights[y]['Boosted_Muon']['up'][0]} {parameters.fakeleptonweights[y]['Boosted_Muon']['file'][0]}",
+        f"muonFakeWeight_boosted_down {parameters.fakeleptonweights[y]['Boosted_Muon']['down'][0]} {parameters.fakeleptonweights[y]['Boosted_Muon']['file'][0]}",
+        f"electronFakeWeight_boosted {parameters.fakeleptonweights[y]['Boosted_Electron']['nominal'][0]} {parameters.fakeleptonweights[y]['Boosted_Electron']['file'][0]}",
+        f"electronFakeWeight_boosted_up {parameters.fakeleptonweights[y]['Boosted_Electron']['up'][0]} {parameters.fakeleptonweights[y]['Boosted_Electron']['file'][0]}",
+        f"electronFakeWeight_boosted_down {parameters.fakeleptonweights[y]['Boosted_Electron']['down'][0]} {parameters.fakeleptonweights[y]['Boosted_Electron']['file'][0]}",
+    ])
     ext.finalize()
     ev = ext.make_evaluator()
+
     fake_muon_weights[y] = {
-        "nominal": ev[f"muonFakeWeight"],
-        "up":      ev[f"muonFakeWeight_up"],
-        "down":    ev[f"muonFakeWeight_down"],
+        "nominal": ev["muonFakeWeight"],
+        "up":      ev["muonFakeWeight_up"],
+        "down":    ev["muonFakeWeight_down"],
     }
     fake_electron_weights[y] = {
-        "nominal": ev[f"electronFakeWeight"],
-        "up":      ev[f"electronFakeWeight_up"],
-        "down":    ev[f"electronFakeWeight_down"],
+        "nominal": ev["electronFakeWeight"],
+        "up":      ev["electronFakeWeight_up"],
+        "down":    ev["electronFakeWeight_down"],
+    }
+    fake_muon_weights_boosted[y] = {
+        "nominal": ev["muonFakeWeight_boosted"],
+        "up":      ev["muonFakeWeight_boosted_up"],
+        "down":    ev["muonFakeWeight_boosted_down"],
+    }
+    fake_electron_weights_boosted[y] = {
+        "nominal": ev["electronFakeWeight_boosted"],
+        "up":      ev["electronFakeWeight_boosted_up"],
+        "down":    ev["electronFakeWeight_boosted_down"],
     }
 
+import correctionlib
+
+nonprompt_dphi_weights_mu = {}
+nonprompt_dphi_weights_e  = {}
+
+for y in parameters.dphi_weights.keys():
+    mu_path  = parameters.dphi_weights[y]['Muon']['file'][0]
+    mu_name  = parameters.dphi_weights[y]['Muon']['correction_name'][0]
+    e_path   = parameters.dphi_weights[y]['Electron']['file'][0]
+    e_name   = parameters.dphi_weights[y]['Electron']['correction_name'][0]
+
+    nonprompt_dphi_weights_mu[y] = correctionlib.CorrectionSet.from_file(mu_path)[mu_name]
+    nonprompt_dphi_weights_e[y]  = correctionlib.CorrectionSet.from_file(e_path)[e_name]
 
 import awkward as ak
 from pocket_coffea.lib.weights import WeightWrapper
@@ -137,19 +188,27 @@ class MuonGoodLeadWeight(WeightWrapper):
         year = events.metadata["year"]
         mu = events.MuonGoodLead
         has_mu = ~ak.is_none(mu)
-        pt  = ak.where(has_mu, mu.pt,  0.0)
+        pt  = ak.where(has_mu, mu.pt,      0.0)
         eta = ak.where(has_mu, abs(mu.eta), 0.0)
-        pt  = ak.where(has_mu, np.clip(pt,  26.0, 100.0), pt)
-        eta = ak.where(has_mu, np.clip(eta,  0,    2.4),  eta)
-        nominal = fake_muon_weights[year]["nominal"](pt, eta)
-        nominal = ak.where(has_mu, nominal, 1.0)
-        up      = ak.fill_none(ak.where(has_mu, fake_muon_weights[year]["up"](pt, eta),   1.0), 1.0)
-        down    = ak.fill_none(ak.where(has_mu, fake_muon_weights[year]["down"](pt, eta), 1.0), 1.0)
+
+        in_eta_range = (eta >= 0.0) & (eta <= 2.4)
+
+        pt = ak.where(has_mu, np.clip(pt, 26.0, 100.0), pt)
+        eta_for_lookup = np.clip(eta, 0.0, 2.4)
+
+        nominal = fake_muon_weights[year]["nominal"](pt, eta_for_lookup)
+        up      = fake_muon_weights[year]["up"](pt, eta_for_lookup)
+        down    = fake_muon_weights[year]["down"](pt, eta_for_lookup)
+
+        valid = has_mu & in_eta_range
+        nominal = ak.where(valid, nominal, 0.0)
+        up      = ak.fill_none(ak.where(valid, up,   0.0), 0.0)
+        down    = ak.fill_none(ak.where(valid, down, 0.0), 0.0)
+
         print("nominal ", nominal)
         print("up ",      up)
         print("down ",    down)
         return WeightData(self.name, nominal, up, down)
-
 
 class ElectronGoodLeadWeight(WeightWrapper):
     name = "electron_inverttight_to_fake"
@@ -159,19 +218,144 @@ class ElectronGoodLeadWeight(WeightWrapper):
         year = events.metadata["year"]
         ele = events.ElectronGoodLead
         has_ele = ~ak.is_none(ele)
-        pt  = ak.where(has_ele, ele.pt,      0.0)
+        pt  = ak.where(has_ele, ele.pt,       0.0)
         eta = ak.where(has_ele, abs(ele.eta), 0.0)
-        pt  = ak.where(has_ele, np.clip(pt,  35.0, 100.0), pt)
-        eta = ak.where(has_ele, np.clip(eta,  0,    2.4),  eta)
-        nominal = fake_electron_weights[year]["nominal"](pt, eta)
-        nominal = ak.where(has_ele, nominal, 1.0)
-        up      = ak.fill_none(ak.where(has_ele, fake_electron_weights[year]["up"](pt, eta),   1.0), 1.0)
-        down    = ak.fill_none(ak.where(has_ele, fake_electron_weights[year]["down"](pt, eta), 1.0), 1.0)
+
+        in_eta_range = (eta >= 0.0) & (eta <= 2.4)
+
+        pt = ak.where(has_ele, np.clip(pt, 35.0, 100.0), pt)
+        # clip eta only for safe table lookup (avoid out-of-domain evaluation);
+        # the actual cut is applied to the output weight below via in_eta_range
+        eta_for_lookup = np.clip(eta, 0.0, 2.4)
+
+        nominal = fake_electron_weights[year]["nominal"](pt, eta_for_lookup)
+        up      = fake_electron_weights[year]["up"](pt, eta_for_lookup)
+        down    = fake_electron_weights[year]["down"](pt, eta_for_lookup)
+
+        nominal = ak.where(has_ele, ak.where(in_eta_range, nominal, 0.0), 0.0)
+        up      = ak.fill_none(ak.where(has_ele, ak.where(in_eta_range, up,   0.0), 1.0), 0.0)
+        down    = ak.fill_none(ak.where(has_ele, ak.where(in_eta_range, down, 0.0), 1.0), 0.0)
+
         print("nominal ", nominal)
         print("up ",      up)
         print("down ",    down)
         return WeightData(self.name, nominal, up, down)
 
+
+class DPHI_SF(WeightWrapper):
+    name = "dphi_sf"
+    has_variations = True
+    isMC_only = False
+
+    def compute(self, events, *args, **kwargs):
+        year = events.metadata["year"]
+
+        mu     = events.MuonGoodLead
+        el     = events.ElectronGoodLead
+        has_mu = ~ak.is_none(mu)
+        has_el = ~ak.is_none(el)
+
+        # shared observable
+        abs_dphi_np = np.abs(
+            ak.to_numpy(
+                ak.fill_none(events.dphi.lepton1_DeepMETResolutionTune, 0.0)
+            ).astype(np.float64)
+        )
+        has_mu_np = ak.to_numpy(ak.fill_none(has_mu, False))
+        has_el_np = ak.to_numpy(ak.fill_none(has_el, False))
+
+        corr_mu = nonprompt_dphi_weights_mu[year]
+        corr_e  = nonprompt_dphi_weights_e[year]
+
+        def _eval(systematic: str) -> ak.Array:
+            vals = np.ones(len(abs_dphi_np), dtype=np.float64)
+            # muon-flavored events
+            if has_mu_np.any():
+                vals[has_mu_np] = corr_mu.evaluate(
+                    year, systematic, abs_dphi_np[has_mu_np],
+                )
+            # electron-flavored events
+            if has_el_np.any():
+                vals[has_el_np] = corr_e.evaluate(
+                    year, systematic, abs_dphi_np[has_el_np],
+                )
+            # fall back to 1.0 where neither flavor present
+            has_lep = has_mu | has_el
+            return ak.where(has_lep, ak.Array(vals), 1.0)
+
+        nominal = _eval("nominal")
+        up      = ak.fill_none(_eval("up"),   1.0)
+        down    = ak.fill_none(_eval("down"), 1.0)
+
+        print("nominal ", nominal)
+        print("up ",      up)
+        print("down ",    down)
+
+        return WeightData(self.name, nominal, up, down)
+
+class MuonGoodLeadWeightBoosted(WeightWrapper):
+    name = "muon_inverttight_to_fake_boosted"
+    has_variations = True
+    isMC_only = False
+
+    def compute(self, events, *args, **kwargs):
+        year = events.metadata["year"]
+        mu = events.MuonGoodLead
+        has_mu = ~ak.is_none(mu)
+        pt  = ak.where(has_mu, mu.pt,      0.0)
+        eta = ak.where(has_mu, abs(mu.eta), 0.0)
+
+        in_eta_range = (eta >= 0.0) & (eta <= 2.4)
+
+        pt = ak.where(has_mu, np.clip(pt, 26.0, 100.0), pt)
+        eta_for_lookup = np.clip(eta, 0.0, 2.4)
+
+        nominal = fake_muon_weights[year]["nominal"](pt, eta_for_lookup)
+        up      = fake_muon_weights[year]["up"](pt, eta_for_lookup)
+        down    = fake_muon_weights[year]["down"](pt, eta_for_lookup)
+
+        valid = has_mu & in_eta_range
+        nominal = ak.where(valid, nominal, 0.0)
+        up      = ak.fill_none(ak.where(valid, up,   0.0), 0.0)
+        down    = ak.fill_none(ak.where(valid, down, 0.0), 0.0)
+
+        print("nominal ", nominal)
+        print("up ",      up)
+        print("down ",    down)
+        return WeightData(self.name, nominal, up, down)
+
+
+class ElectronGoodLeadWeightBoosted(WeightWrapper):
+    name = "electron_inverttight_to_fake_boosted"
+    has_variations = True
+    isMC_only = False
+
+    def compute(self, events, *args, **kwargs):
+        year = events.metadata["year"]
+        ele = events.ElectronGoodLead
+        has_ele = ~ak.is_none(ele)
+        pt  = ak.where(has_ele, ele.pt,       0.0)
+        eta = ak.where(has_ele, abs(ele.eta), 0.0)
+
+        in_eta_range = (eta >= 0.0) & (eta <= 2.4)
+
+        pt = ak.where(has_ele, np.clip(pt, 35.0, 100.0), pt)
+        # clip eta only for safe table lookup (avoid out-of-domain evaluation);
+        # the actual cut is applied to the output weight below via in_eta_range
+        eta_for_lookup = np.clip(eta, 0.0, 2.4)
+
+        nominal = fake_electron_weights[year]["nominal"](pt, eta_for_lookup)
+        up      = fake_electron_weights[year]["up"](pt, eta_for_lookup)
+        down    = fake_electron_weights[year]["down"](pt, eta_for_lookup)
+
+        nominal = ak.where(has_ele, ak.where(in_eta_range, nominal, 0.0), 0.0)
+        up      = ak.fill_none(ak.where(has_ele, ak.where(in_eta_range, up,   0.0), 1.0), 0.0)
+        down    = ak.fill_none(ak.where(has_ele, ak.where(in_eta_range, down, 0.0), 1.0), 0.0)
+
+        print("nominal ", nominal)
+        print("up ",      up)
+        print("down ",    down)
+        return WeightData(self.name, nominal, up, down)
 
 cfg = Configurator(
     parameters=parameters,
@@ -194,27 +378,68 @@ cfg = Configurator(
             # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
             # f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_fast.json",
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
-            f"{localdir}/datasets/skimmed.json",
+            # f"{localdir}/datasets/skimmed.json",
+            f"{localdir}/datasets/skimmed_rescale.json",
+            f"{localdir}/datasets/rare_skim.json",
         ],
 
         "filter": {
             "samples": [
-                "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
                 "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
                 "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
-                "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
+                # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
                 "SingleMuon",
-                "EGamma",
+                # "EGamma",
+
+                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+
+                "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+
+                "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
+                "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+                "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+                "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
+                "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+                "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+
+                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+           
+                # ###### SIGNAL #########
+                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
+                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+
             ],
             "year": ["2018"],
         },
@@ -226,6 +451,7 @@ cfg = Configurator(
         eventFlags,
         goldenJson,
         nLepton_skim_cut,
+        nJet_skim_cut,
         met_skim_cut,
         get_HLTsel(primaryDatasets=["SingleMuon", "EGamma"]),
     ],
@@ -244,6 +470,26 @@ cfg = Configurator(
         "w_cr_boosted_mu": [w_cr_boosted_mu],
         "w_cr_boosted_e": [w_cr_boosted_e],
 
+        "ttbar_cr_boosted_mu": [ttbar_cr_boosted_mu],
+        "ttbar_cr_boosted_e": [ttbar_cr_boosted_e],
+        "ttbar_cr_resolved_mu": [ttbar_cr_resolved_mu],
+        "ttbar_cr_resolved_e": [ttbar_cr_resolved_e],
+
+        # "w_cr_no_fwd_mu": [w_cr_no_fwd_mu],
+        # "w_cr_no_fwd_e": [w_cr_no_fwd_e],
+        # "w_cr_loose_njet_mu": [w_cr_loose_njet_mu],
+        # "w_cr_loose_njet_e": [w_cr_loose_njet_e],
+        # "w_cr_no_fwd_loose_njet_mu": [w_cr_no_fwd_loose_njet_mu],
+        # "w_cr_no_fwd_loose_njet_e": [w_cr_no_fwd_loose_njet_e],
+        # "w_cr_sb_lo1_mu": [w_cr_sb_lo1_mu],
+        # "w_cr_sb_lo2_mu": [w_cr_sb_lo2_mu],
+        # "w_cr_sb_hi1_mu": [w_cr_sb_hi1_mu],
+        # "w_cr_sb_hi2_mu": [w_cr_sb_hi2_mu],
+        # "w_cr_sb_lo1_e":  [w_cr_sb_lo1_e],
+        # "w_cr_sb_lo2_e":  [w_cr_sb_lo2_e],
+        # "w_cr_sb_hi1_e":  [w_cr_sb_hi1_e],
+        # "w_cr_sb_hi2_e":  [w_cr_sb_hi2_e],
+
         # ------------------------------------------------------------------
         # Validation region
         # SR structure exactly (no W mass window), mT in [20, 30]
@@ -252,33 +498,81 @@ cfg = Configurator(
         "vr_e":  [vr_e],
         "vr_boosted_mu": [vr_boosted_mu],
         "vr_boosted_e": [vr_boosted_e],
-         "vr_qcd_enriched_mu": [vr_qcd_enriched_mu],
-         "vr_qcd_enriched_e": [vr_qcd_enriched_e],
-        "vr_no_fwd_mu": [vr_no_fwd_mu],
-        "vr_no_fwd_e": [vr_no_fwd_e],
-        "vr_loose_njet_mu": [vr_loose_njet_mu],
-        "vr_loose_njet_e": [vr_loose_njet_e],
-        "vr_no_fwd_loose_njet_mu": [vr_no_fwd_loose_njet_mu],
-        "vr_no_fwd_loose_njet_e": [vr_no_fwd_loose_njet_e],
+        # "vr_boosted_no_fwd_mu": [vr_boosted_no_fwd_mu],
+        # "vr_boosted_no_fwd_e": [vr_boosted_no_fwd_e],
+        # "vr_qcd_enriched_mu": [vr_qcd_enriched_mu],
+        # "vr_qcd_enriched_e": [vr_qcd_enriched_e],
+        # "vr_no_fwd_mu": [vr_no_fwd_mu],
+        # "vr_no_fwd_e": [vr_no_fwd_e],
+        # "vr_loose_njet_mu": [vr_loose_njet_mu],
+        # "vr_loose_njet_e": [vr_loose_njet_e],
+        # "vr_no_fwd_loose_njet_mu": [vr_no_fwd_loose_njet_mu],
+        # "vr_no_fwd_loose_njet_clip e": [vr_no_fwd_loose_njet_e],
+        # "w_cr_incl_mu": [w_cr_incl_mu],
+        # "w_cr_incl_e": [w_cr_incl_e],
         "recoil_inclusive_mu": [recoil_inclusive_mu],
         "recoil_inclusive_e": [recoil_inclusive_e],
-        "recoil_fullinclusive_mu": [recoil_fullinclusive_mu],
-        "recoil_fullinclusive_e": [recoil_fullinclusive_e],
+        # "recoil_fullinclusive_mu": [recoil_fullinclusive_mu],
+        # "recoil_fullinclusive_e": [recoil_fullinclusive_e],
+        "recoil_closure_mu": [recoil_closure_mu],
+        "recoil_closure_e": [recoil_closure_e],
+
+        "boosted_e": [msd_window_cut_e],
+        "boosted_mu": [msd_window_cut_mu],
+        "resolved_mu":  [whad_window_cut_bveto_mu],
+        "resolved_e": [whad_window_cut_bveto_e],
+        
     },
 
-    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger],
+    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger]+[DPHI_SF]+[MuonGoodLeadWeightBoosted]+[ElectronGoodLeadWeightBoosted],
     weights={
         "common": {
-            "inclusive": ["genWeight", "lumi", "XS",
-                          "muon_inverttight_to_fake", "electron_inverttight_to_fake", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"],
+            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag", "sf_ctag"],
+            "bycategory": {
+                "resolved_mu":           ["muon_inverttight_to_fake"],
+                "resolved_e":            ["electron_inverttight_to_fake"],
+                "ttbar_cr_resolved_mu":  ["muon_inverttight_to_fake"],
+                "ttbar_cr_resolved_e":   ["electron_inverttight_to_fake"],
+                "w_cr_mu":               ["muon_inverttight_to_fake"],
+                "w_cr_e":                ["electron_inverttight_to_fake"],
+                "vr_mu":                 ["muon_inverttight_to_fake"],
+                "vr_e":                  ["electron_inverttight_to_fake"],
+                "boosted_mu":            ["muon_inverttight_to_fake_boosted"],
+                "boosted_e":             ["electron_inverttight_to_fake_boosted"],
+                "ttbar_cr_boosted_mu":   ["muon_inverttight_to_fake_boosted"],
+                "ttbar_cr_boosted_e":    ["electron_inverttight_to_fake_boosted"],
+                "w_cr_boosted_mu":       ["muon_inverttight_to_fake_boosted"],
+                "w_cr_boosted_e":        ["electron_inverttight_to_fake_boosted"],
+                "vr_boosted_mu":         ["muon_inverttight_to_fake_boosted"],
+                "vr_boosted_e":          ["electron_inverttight_to_fake_boosted"],
+            }
         },
     },
     variations={
         "weights": {
             "common": {
-                "inclusive": ["muon_inverttight_to_fake", "electron_inverttight_to_fake","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"],
+                "inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag", "sf_ctag"],
+                "bycategory": {
+                    "resolved_mu":           ["muon_inverttight_to_fake"],
+                    "resolved_e":            ["electron_inverttight_to_fake"],
+                    "ttbar_cr_resolved_mu":  ["muon_inverttight_to_fake"],
+                    "ttbar_cr_resolved_e":   ["electron_inverttight_to_fake"],
+                    "w_cr_mu":               ["muon_inverttight_to_fake"],
+                    "w_cr_e":                ["electron_inverttight_to_fake"],
+                    "vr_mu":                 ["muon_inverttight_to_fake"],
+                    "vr_e":                  ["electron_inverttight_to_fake"],
+                    "boosted_mu":            ["muon_inverttight_to_fake_boosted"],
+                    "boosted_e":             ["electron_inverttight_to_fake_boosted"],
+                    "ttbar_cr_boosted_mu":   ["muon_inverttight_to_fake_boosted"],
+                    "ttbar_cr_boosted_e":    ["electron_inverttight_to_fake_boosted"],
+                    "w_cr_boosted_mu":       ["muon_inverttight_to_fake_boosted"],
+                    "w_cr_boosted_e":        ["electron_inverttight_to_fake_boosted"],
+                    "vr_boosted_mu":         ["muon_inverttight_to_fake_boosted"],
+                    "vr_boosted_e":          ["electron_inverttight_to_fake_boosted"],
+                }
             },
-        }
+        },
+        "shape": {"common": {"inclusive": ['jet_calibration', 'electron_scale_and_smearing', 'muons_scale_and_resolution']}}
     },
     variables={
         "mT_lep_pt_corr": HistConf([

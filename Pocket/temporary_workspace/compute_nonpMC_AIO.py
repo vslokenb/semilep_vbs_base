@@ -21,7 +21,7 @@ def safe_divide(num, den):
 def division_variance(num,den):
     out = np.zeros_like(num)
     mask = den != 0
-    out[mask] = num[mask]/den[mask]**2 - num[mask]**2/den[mask]**3
+    out[mask] = num[mask] / den[mask]**2 
     return out
 
 
@@ -124,7 +124,7 @@ def main():
             else:
                 scale = factors[dsname]
 
-            out_key = "nonpromptDOWN10_" + year
+            out_key = "nonprompt_" + year
 
             if year not in initialized_years:
                 initialized_years.add(year)
@@ -138,21 +138,21 @@ def main():
                     elif key == "presel":
                         merged_acc['cutflow'][key][out_key] = {"nominal": 0.0}
                     else:
-                        merged_acc['cutflow'][key][out_key] = {"nonpromptDOWN10": {"nominal": 0.0}}
+                        merged_acc['cutflow'][key][out_key] = {"nonprompt": {"nominal": 0.0}}
                 for key in acc['sumw'].keys():
                     if key not in merged_acc['sumw']:
                         merged_acc['sumw'][key] = {}
                         merged_acc['sumw2'][key] = {}
-                    merged_acc['sumw'][key][out_key] = {"nonpromptDOWN10": {"nominal": 0.0}}
-                    merged_acc['sumw2'][key][out_key] = {"nonpromptDOWN10": {"nominal": 0.0}}
+                    merged_acc['sumw'][key][out_key] = {"nonprompt": {"nominal": 0.0}}
+                    merged_acc['sumw2'][key][out_key] = {"nonprompt": {"nominal": 0.0}}
                 merged_acc['datasets_metadata']['by_datataking_period'] = merged_acc['datasets_metadata'].get('by_datataking_period', {})
                 merged_acc['datasets_metadata']['by_datataking_period'][year] = {
-                        "nonpromptDOWN10": {out_key}
+                        "nonprompt": {out_key}
                         }
                 merged_acc['datasets_metadata']['by_dataset'] = merged_acc['datasets_metadata'].get('by_dataset', {})
                 merged_acc['datasets_metadata']['by_dataset'][out_key] = {
                         'das_names': "none",
-                        'sample': "nonpromptDOWN10",
+                        'sample': "nonprompt",
                         'year': year,
                         'isMC': 'True',
                         'xsec': '1.0',
@@ -169,15 +169,15 @@ def main():
                         }
                 if hname not in merged_acc['variables']:
                     merged_acc['variables'][hname] = {
-                            "nonpromptDOWN10": {
+                            "nonprompt": {
                                 out_key: deepcopy(scaled_hist)[slicing_variations]
                                 }
                             }
-                elif out_key not in merged_acc['variables'][hname]["nonpromptDOWN10"]:
-                    merged_acc['variables'][hname]["nonpromptDOWN10"][out_key] = deepcopy(scaled_hist)[slicing_variations]
+                elif out_key not in merged_acc['variables'][hname]["nonprompt"]:
+                    merged_acc['variables'][hname]["nonprompt"][out_key] = deepcopy(scaled_hist)[slicing_variations]
                 else:
-                    merged_acc['variables'][hname]['nonpromptDOWN10'][out_key].values()[...] += scaled_hist[slicing_variations].values()[...]
-                    merged_acc['variables'][hname]['nonpromptDOWN10'][out_key].variances()[...] += scaled_hist[slicing_variations].variances()[...]
+                    merged_acc['variables'][hname]['nonprompt'][out_key].values()[...] += scaled_hist[slicing_variations].values()[...]
+                    merged_acc['variables'][hname]['nonprompt'][out_key].variances()[...] += scaled_hist[slicing_variations].variances()[...]
 
             if dsname_era in acc['sum_genweights']:
                 merged_acc['sum_genweights'][out_key] += acc['sum_genweights'][dsname_era]*scale
@@ -194,11 +194,11 @@ def main():
                 elif key == "presel":
                     merged_acc['cutflow'][key][out_key]["nominal"] += acc['cutflow'][key][dsname_era]["nominal"]*scale
                 else:
-                    merged_acc['cutflow'][key][out_key]["nonpromptDOWN10"]["nominal"] += acc['cutflow'][key][dsname_era][dsname]["nominal"]*scale
+                    merged_acc['cutflow'][key][out_key]["nonprompt"]["nominal"] += acc['cutflow'][key][dsname_era][dsname]["nominal"]*scale
             for key in merged_acc['sumw'].keys():
-                merged_acc['sumw'][key][out_key]["nonpromptDOWN10"]["nominal"] += acc['sumw'][key][dsname_era][dsname]["nominal"]*scale
+                merged_acc['sumw'][key][out_key]["nonprompt"]["nominal"] += acc['sumw'][key][dsname_era][dsname]["nominal"]*scale
             for key in merged_acc['sumw2'].keys():
-                merged_acc['sumw2'][key][out_key]["nonpromptDOWN10"]["nominal"] += acc['sumw2'][key][dsname_era][dsname]["nominal"]*scale
+                merged_acc['sumw2'][key][out_key]["nonprompt"]["nominal"] += acc['sumw2'][key][dsname_era][dsname]["nominal"]*scale
 
     import collections
 

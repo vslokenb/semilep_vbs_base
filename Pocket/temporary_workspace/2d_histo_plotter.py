@@ -192,7 +192,10 @@ def plot_2d(
         return
 
     xax, yax = dense[0], dense[1]
-    values = h2d.values()
+    values = h2d.values().squeeze()   # drop any size-1 residual categorical axes
+    if values.ndim != 2:
+        print(f"  [skip] {var_name} ({kind}): values shape {values.shape} not 2D after squeeze")
+        return
 
     hep.style.use("CMS")
     fig, ax = plt.subplots(figsize=(8, 7))
@@ -270,8 +273,12 @@ def plot_2d_ratio(
         return
 
     xax, yax = dense[0], dense[1]
-    data_vals = h_data.values()
-    mc_vals   = h_mc.values()
+    data_vals = h_data.values().squeeze()
+    mc_vals   = h_mc.values().squeeze()
+    if data_vals.ndim != 2 or mc_vals.ndim != 2:
+        print(f"  [skip] {var_name} ratio: values not 2D after squeeze "
+              f"(data {data_vals.shape}, mc {mc_vals.shape})")
+        return
 
     # Ratio: NaN where MC == 0 to avoid misleading colour
     ratio = np.full_like(mc_vals, np.nan, dtype=float)

@@ -7,13 +7,14 @@ import awkward as ak
 import boost_histogram as bh
 import numpy as np
 from copy import deepcopy
+import collections
 
 
 def safe_divide(num, den):
     """Avoid division-by-zero; return 0 where den=0"""
     out = np.zeros_like(num)
     mask = den != 0
-    num[num<0] = 0 
+    num[num<0] = 0
     out[mask] = num[mask] / den[mask]
     for i in range(len(out)):
         out[i] = np.clip(out[i], 0, None)
@@ -64,7 +65,6 @@ def add_histograms(h_existing, h_new):
         return result
 
 
-
 def merge_hist_list(hist_list):
     """Sum a list of histograms with identical structure."""
     merged = deepcopy(hist_list[0])
@@ -111,8 +111,6 @@ def fold_abs_eta(hist):
     folded_vars  = (np.take(varis, pos_idx, axis=eta_idx)
                   + np.take(varis, neg_idx, axis=eta_idx))
 
-    # Preserve original axis name (may be "" or "eta" or similar)
-    old_name  = hist.axes[eta_idx].name
     new_axes  = list(hist.axes)
     new_axes[eta_idx] = bh.axis.Variable(abs_edges)
 
@@ -126,10 +124,10 @@ def fold_abs_eta(hist):
     return new_hist
 
 
-def compute_weight_hist(merged_accumulator, numerator_name, denominator_name, output_name):
-    """Compute weight histogram and store inside accumulator."""
-    num = merged_accumulator[numerator_name]
-    den = merged_accumulator[denominator_name]
+def compute_weight_hist(merged_variables, numerator_name, denominator_name, output_name):
+    """Compute weight histogram and store inside merged_variables flat dict."""
+    num = merged_variables[numerator_name]
+    den = merged_variables[denominator_name]
 
     print("num.axes", num.axes)
     if len(num.axes) == 3:
@@ -162,15 +160,21 @@ def compute_weight_hist(merged_accumulator, numerator_name, denominator_name, ou
     ratio_hist = deepcopy(num)
     ratio_hist.values()[...]    = ratio_vals
     ratio_hist.variances()[...] = ratio_vars
-    # merged_accumulator[output_name] = ratio_hist
 
     weight_hist = deepcopy(ratio_hist)
     weight_hist.values()[...] = safe_divide(ratio_hist.values()[()], 1.0 - ratio_hist.values()[()])
     weight_hist.variances()[...] = ratio_hist.variances()[()] / (1.0 - ratio_hist.values()[()]**4)
 
-    merged_accumulator[output_name] = weight_hist
+    merged_variables[output_name] = weight_hist
     print("weight_hist ", weight_hist)
     print(f"✔ Created weight histogram '{output_name}'")
+
+
+def to_defaultdict(obj):
+    """Recursively convert all dicts to defaultdict(None) for coffea compatibility."""
+    if isinstance(obj, (dict, collections.defaultdict)):
+        return collections.defaultdict(None, {k: to_defaultdict(v) for k, v in obj.items()})
+    return obj
 
 
 def main():
@@ -188,36 +192,121 @@ def main():
 
     factors = cfg.get("factors", {})
     weight_pairs = cfg.get("weight_pairs", [])
+    output_sample = cfg.get("output_sample", "merged")
 
     print("📦 Loading input coffea files...")
     accs = [util.load(f) for f in input_files]
 
-    def dataset_name_from_file(acc):
-        period = list(acc['datasets_metadata']['by_datataking_period'].keys())[0]
-        dataset = list(acc['datasets_metadata']['by_datataking_period'][period].keys())[0]
-        return dataset
+    def get_all_datasets(acc):
+        """Return list of (dsname_era, dsname, year) for every dataset in accumulator."""
+        result = []
+        for dsname_era, meta in acc['datasets_metadata']['by_dataset'].items():
+            result.append((dsname_era, meta['sample'], meta['year']))
+        return result
 
-    def dataset_name_era_from_file(acc):
-        dataset_era = list(acc['datasets_metadata']['by_dataset'].keys())[0]
-        return dataset_era
+    merged_acc = {
+        'sum_genweights': {},
+        'sum_signOf_genweights': {},
+        'sumw': {},
+        'sumw2': {},
+        'cutflow': {},
+        'variables': {},
+        'columns': {},
+        'processing_metadata': {},
+        'datasets_metadata': {}
+    }
 
-    merged_acc = {}
+    initialized_years = set()
+    # flat {hname: merged_bh_hist} accumulated across all years for weight computation
+    merged_vars_total = {}
 
     for fname, acc in zip(input_files, accs):
-        dsname = dataset_name_from_file(acc)
-        dsname_era = dataset_name_era_from_file(acc)
-        if dsname not in factors:
-            print(f"⚠ WARNING: dataset {dsname} missing in YAML 'factors'. Using factor=1.")
-            scale = 1.0
-        else:
-            scale = factors[dsname]
-        for hname, hist_dic in acc['variables'].items():
-            hist = hist_dic[dsname][dsname_era]
-            scaled_hist = scale_histogram(hist, scale)
-            if hname not in merged_acc:
-                merged_acc[hname] = deepcopy(scaled_hist)
+        all_datasets = get_all_datasets(acc)
+        print(f"\n📂 File: {fname}  ({len(all_datasets)} dataset(s))")
+        for dsname_era, dsname, year in all_datasets:
+            scale_val = factors.get(dsname, None)
+            flag = "  ← MISSING in YAML" if scale_val is None else ""
+            print(f"   • {dsname_era}  (sample={dsname}, year={year}, scale={scale_val}){flag}")
+
+        for dsname_era, dsname, year in all_datasets:
+            if dsname not in factors:
+                print(f"⚠ WARNING: dataset {dsname} missing in YAML 'factors'. Using factor=1.")
+                scale = 1.0
             else:
-                merged_acc[hname] = add_histograms(merged_acc[hname], scaled_hist)
+                scale = factors[dsname]
+
+            out_key = f"{output_sample}_{year}"
+
+            if year not in initialized_years:
+                initialized_years.add(year)
+                merged_acc["sum_genweights"][out_key] = 0.0
+                merged_acc["sum_signOf_genweights"][out_key] = 0.0
+                for key in acc['cutflow'].keys():
+                    if key not in merged_acc['cutflow']:
+                        merged_acc['cutflow'][key] = {}
+                    if key in ['initial', 'skim']:
+                        merged_acc['cutflow'][key][out_key] = 0.0
+                    elif key == "presel":
+                        merged_acc['cutflow'][key][out_key] = {"nominal": 0.0}
+                    else:
+                        merged_acc['cutflow'][key][out_key] = {output_sample: {"nominal": 0.0}}
+                for key in acc['sumw'].keys():
+                    if key not in merged_acc['sumw']:
+                        merged_acc['sumw'][key] = {}
+                        merged_acc['sumw2'][key] = {}
+                    merged_acc['sumw'][key][out_key] = {output_sample: {"nominal": 0.0}}
+                    merged_acc['sumw2'][key][out_key] = {output_sample: {"nominal": 0.0}}
+                merged_acc['datasets_metadata'].setdefault('by_datataking_period', {})[year] = {
+                    output_sample: {out_key}
+                }
+                merged_acc['datasets_metadata'].setdefault('by_dataset', {})[out_key] = {
+                    'das_names': "none",
+                    'sample': output_sample,
+                    'year': year,
+                    'isMC': 'True',
+                    'xsec': '1.0',
+                    'nevents': '0',
+                    'size': '0'
+                }
+
+            for hname, hist_dic in acc['variables'].items():
+                hist = hist_dic[dsname][dsname_era]
+                scaled_hist = scale_histogram(hist, scale)
+
+                if hname not in merged_acc['variables']:
+                    merged_acc['variables'][hname] = {output_sample: {out_key: deepcopy(scaled_hist)}}
+                elif out_key not in merged_acc['variables'][hname].get(output_sample, {}):
+                    merged_acc['variables'][hname].setdefault(output_sample, {})[out_key] = deepcopy(scaled_hist)
+                else:
+                    merged_acc['variables'][hname][output_sample][out_key] = add_histograms(
+                        merged_acc['variables'][hname][output_sample][out_key], scaled_hist
+                    )
+
+                # accumulate flat total for weight computation (all years combined)
+                if hname not in merged_vars_total:
+                    merged_vars_total[hname] = deepcopy(scaled_hist)
+                else:
+                    merged_vars_total[hname] = add_histograms(merged_vars_total[hname], scaled_hist)
+
+            if dsname_era in acc.get('sum_genweights', {}):
+                merged_acc['sum_genweights'][out_key] += acc['sum_genweights'][dsname_era] * scale
+                merged_acc['sum_signOf_genweights'][out_key] += acc['sum_signOf_genweights'][dsname_era] * scale
+            else:
+                sumw_val = acc['sumw']['baseline'][dsname_era][dsname]['nominal']
+                merged_acc['sum_genweights'][out_key] += sumw_val * scale
+                merged_acc['sum_signOf_genweights'][out_key] += sumw_val * scale
+
+            for key in merged_acc['cutflow'].keys():
+                if key in ['initial', 'skim']:
+                    merged_acc['cutflow'][key][out_key] += acc['cutflow'][key][dsname_era] * scale
+                elif key == "presel":
+                    merged_acc['cutflow'][key][out_key]["nominal"] += acc['cutflow'][key][dsname_era]["nominal"] * scale
+                else:
+                    merged_acc['cutflow'][key][out_key][output_sample]["nominal"] += acc['cutflow'][key][dsname_era][dsname]["nominal"] * scale
+            for key in merged_acc['sumw'].keys():
+                merged_acc['sumw'][key][out_key][output_sample]["nominal"] += acc['sumw'][key][dsname_era][dsname]["nominal"] * scale
+            for key in merged_acc['sumw2'].keys():
+                merged_acc['sumw2'][key][out_key][output_sample]["nominal"] += acc['sumw2'][key][dsname_era][dsname]["nominal"] * scale
 
     print("✔ Finished linear-combination merging.")
 
@@ -228,16 +317,44 @@ def main():
             print("pair denominator ", pair["denominator"])
             print("pair output ", pair["output"])
             compute_weight_hist(
-                merged_accumulator=merged_acc,
+                merged_variables=merged_vars_total,
                 numerator_name=pair["numerator"],
                 denominator_name=pair["denominator"],
                 output_name=pair["output"],
             )
+            # slot the computed weight histogram into the coffea variables structure
+            # weight is derived from all-years total, replicated per year
+            wname = pair["output"]
+            weight = merged_vars_total[wname]
+            merged_acc['variables'][wname] = {output_sample: {}}
+            for year in initialized_years:
+                out_key = f"{output_sample}_{year}"
+                merged_acc['variables'][wname][output_sample][out_key] = deepcopy(weight)
+
+    merged_acc = to_defaultdict(merged_acc)
 
     print("💾 Writing output coffea:", output_file)
     util.save(merged_acc, output_file)
 
     print("🎉 Done!")
+
+    def category_audit(merged_acc, hname):
+        if hname not in merged_acc['variables']:
+            print(f"  [category_audit] '{hname}' not found, skipping.")
+            return
+        sample_dict = merged_acc['variables'][hname].get(output_sample, {})
+        if not sample_dict:
+            return
+        out_key = next(iter(sample_dict))
+        h = sample_dict[out_key]
+        cat_axis = h.axes[0]
+        print(f"\n=== {hname} ===")
+        for ci, cname in enumerate(cat_axis):
+            total = h[ci, ...].values().sum()
+            print(f"  [{ci}] {cname:28s}  sum={total:10.1f}")
+
+    for hn in ("electron_tight_pt_eta", "muon_loose_pt_eta", "muon_tight_pt", "muon_loose_pt"):
+        category_audit(merged_acc, hn)
 
 
 if __name__ == "__main__":

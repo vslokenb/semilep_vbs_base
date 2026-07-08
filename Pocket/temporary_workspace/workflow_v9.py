@@ -84,7 +84,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             object_preselection = {
                 "Electron": {
                     "pt": 38.0,
-                    "eta": 2.5,
+                    "eta": 2.4,
                     # "iso": 0.06,
                     "id": "mvaFall17V2noIso_WPL",
                 },
@@ -101,7 +101,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             object_preselection = {
                 "Electron": {
                     "pt": 10.0,
-                    "eta": 2.5,
+                    "eta": 2.4,
                     # "iso": 0.06,
                     "id": "mvaFall17V2noIso_WPL",
                 },
@@ -235,26 +235,56 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonGoodLead"] = ak.firsts(ev.MuonGood[ak.argsort(ev.MuonGood.pt, ascending=False)])
         ev["ElectronGoodLead"] = ak.firsts(ev.ElectronGood[ak.argsort(ev.ElectronGood.pt, ascending=False)])
 
+        ##HEM HANDLING
+
+        HEM_mask_e = (
+            (ev.ElectronLoose.phi > -1.65) & (ev.ElectronLoose.phi < -0.62)
+        ) & (
+            (ev.ElectronLoose.eta > -3.05) & (ev.ElectronLoose.eta < -1.35)
+        )
+
+        HEM_mask_jet = (
+            (ev.JetGood.phi > -1.65) & (ev.JetGood.phi < -0.62)
+        ) & (
+            (ev.JetGood.eta > -3.05) & (ev.JetGood.eta < -1.35)
+        )
+        # HEM_mask_e = (ev.ElectronLoose.phi > -1.35 & ev.ElectronLoose.phi < -0.82) & (ev.ElectronLoose.eta < -1.65 & ev.ElectronLoose.eta > -3.05)
+        ev['ElectronHEM'] = ev.ElectronLoose[HEM_mask_e]
+        # HEM_mask_jet = (ev.JetGood.phi > -1.35 & ev.JetGood.phi < -0.82) & (ev.JetGood.eta < -1.65 & ev.JetGood.eta > -3.05)
+        ev['JetHEM'] = ev.JetGood[HEM_mask_jet]
+        
+        #### CLEAR RESCALING OF MC WHICH ARE EFFECTED BY HEM ISSUE IN 2018
+        if hasattr(ev, "genWeight") and "2018" in ev.metadata["dataset"]:
+            has_hem_object = (ak.num(ev.ElectronHEM) + ak.num(ev.JetHEM)) >= 1
+            ev["genWeight"] = ak.where(has_hem_object, ev.genWeight * 0.35, ev.genWeight)
+        
         # b-tagging 
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.15)
-        b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.1522) #& (ev.JetGood.pt > 20) NANO V9
-        # b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
+        ev['CentralJets']= ev.JetGood[np.abs(ev.JetGood.eta) < 2.4]
+
+        b_mask = (np.abs(ev.CentralJets.eta) < 2.4) & (ev.CentralJets.btagDeepB > 0.1522) #& (ev.JetGood.pt > 20) NANO V9
+        # b_mask = (np.abs(ev.JetGood.eta) < 2.4) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
         b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.15) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
         ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
-        ev["BJet_csv"] = ev.JetGood[b_mask]
+
+        b_mask_ak8_tight = (ev.candidate_boost.btagDeepB > 0.75) #TEST EVAL FOR AK8 BTAG
+        # ev["BJet_upart"] = ev.JetGood[b_mask]
+        ev["BJet_ak8_tight"] = ev.candidate_boost[b_mask_ak8_tight]
+
+        ev["BJet_csv"] = ev.CentralJets[b_mask]
         ev["BJetGood"] = btagging(
-            ev.JetGood[np.abs(ev.JetGood.eta) < 2.5],
+            ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4],
             self.params.btagging.working_point[self._year],
             wp=self.params.object_preselection.Jet.btag.wp,
         )
         ev["BJetTight"] = btagging(
-            ev.JetGood[np.abs(ev.JetGood.eta) < 2.5],
+            ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4],
             self.params.btagging.working_point[self._year],
             wp='H',
         )
-        #ev["BJet_genmatch"] =ev.JetGood[(np.abs(ev.JetGood.eta) < 2.5) & (np.abs(ev.JetGood.partonFlavour) == 5)]
-        ev["JetGood_tagger_check"]= ev.JetGood[(np.abs(ev.JetGood.eta) < 2.5)]
+        #ev["BJet_genmatch"] =ev.JetGood[(np.abs(ev.JetGood.eta) < 2.4) & (np.abs(ev.JetGood.partonFlavour) == 5)]
+        ev["JetGood_tagger_check"]= ev.JetGood[(np.abs(ev.JetGood.eta) < 2.4)]
 
         #blah = ev.JetGood_tagger_check[ak.argsort(ev.JetGood_tagger_check.btagDeepB, ascending=False)]
         ev['leading_bscore'] = ak.max(ev.JetGood_tagger_check.btagDeepFlavB, axis=1)
@@ -366,9 +396,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             return dR
 
         nonvbs_mask = (ev.JetGood.idx != vbs_i) & (ev.JetGood.idx != vbs_j) #& (ev.JetGood.idx != lep_i) #see if can better clean out dR tail at 0
-        ev["CentralJets"] = ev.JetGood[nonvbs_mask & (ev.JetGood.pt > 30)]
+        ev["CentralJetsGood"] = ev.JetGood[nonvbs_mask & (ev.JetGood.pt > 30) & (np.abs(ev.JetGood.eta) < 2.4)]
         
-        ev['CentralJetsGood']= ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4]
+        # ev['CentralJetsGood']= ev.JetGood[np.abs(ev.JetGood.eta) < 2.4]
       
         fj_eta = ak.fill_none(ak.firsts(ev.candidate_boost.eta), np.nan)
         fj_phi = ak.fill_none(ak.firsts(ev.candidate_boost.phi), np.nan)
@@ -815,7 +845,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nBJetTight"]     = ak.num(ev.BJetTight)
         ev["nBJet_csv"]     = ak.num(ev.BJet_csv)
         ev["nBJet_ak8"]     = ak.num(ev.BJet_ak8)
+        ev["nBJet_ak8_tight"]     = ak.num(ev.BJet_ak8_tight)
         ev["nCentralJetsGood"] = ak.num(ev.CentralJetsGood)
+        ev["nCentralJets"] = ak.num(ev.CentralJets)
         ev["nFatJetGood"] = ak.num(ev.FatJetGood)
         ev["nFatJetCentral"] = ak.num(ev.FatJetCentral) if hasattr(ev, "FatJetCentral") else 0
         ev["nMuonLoose"]     = ak.num(ev.MuonLoose)
