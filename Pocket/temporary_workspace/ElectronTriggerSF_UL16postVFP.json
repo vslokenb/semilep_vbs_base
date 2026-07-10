@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "description": null,
+  "corrections": [
+    {
+      "name": "ElectronTriggerSF",
+      "description": "Electron trigger SF from /afs/cern.ch/user/v/vslokenb/vbs_semilep/B2G-22-005_ElecTriggerSFUL16postVFP.root",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "variation",
+          "type": "string",
+          "description": "nominal / sfUp / sfDown"
+        },
+        {
+          "name": "pt",
+          "type": "real",
+          "description": "electron pT [GeV]"
+        },
+        {
+          "name": "eta",
+          "type": "real",
+          "description": "electron supercluster eta"
+        }
+      ],
+      "output": {
+        "name": "weight",
+        "type": "real",
+        "description": null
+      },
+      "generic_formulas": null,
+      "data": {
+        "nodetype": "category",
+        "input": "variation",
+        "content": [
+          {
+            "key": "nominal",
+            "value": {
+              "nodetype": "binning",
+              "input": "pt",
+              "edges": [
+                55.0,
+                75.0,
+                95.0,
+                115.0,
+                135.0,
+                155.0,
+                175.0,
+                200.0,
+                250.0,
+                300.0,
+                400.0,
+                500.0
+              ],
+              "content": [
+                0.9529920816421509,
+                0.9674574732780457,
+                0.9593667387962341,
+                0.9860575795173645,
+                0.9770790338516235,
+                0.9732115268707275,
+                0.9899146556854248,
+                0.9886435866355896,
+                0.9886235594749451,
+                0.9917819499969482,
+                0.9587896466255188
+              ],
+              "flow": "clamp"
+            }
+          },
+          {
+            "key": "sfUp",
+            "value": {
+              "nodetype": "binning",
+              "input": "pt",
+              "edges": [
+                55.0,
+                75.0,
+                95.0,
+                115.0,
+                135.0,
+                155.0,
+                175.0,
+                200.0,
+                250.0,
+                300.0,
+                400.0,
+                500.0
+              ],
+              "content": [
+                0.9768278002738953,
+                0.9917043447494507,
+                0.9844837784767151,
+                1.0101362466812134,
+                1.0013872385025024,
+                0.9987499117851257,
+                1.0140594244003296,
+                1.0123320817947388,
+                1.0139471292495728,
+                1.016893982887268,
+                1.001394271850586
+              ],
+              "flow": "clamp"
+            }
+          },
+          {
+            "key": "sfDown",
+            "value": {
+              "nodetype": "binning",
+              "input": "pt",
+              "edges": [
+                55.0,
+                75.0,
+                95.0,
+                115.0,
+                135.0,
+                155.0,
+                175.0,
+                200.0,
+                250.0,
+                300.0,
+                400.0,
+                500.0
+              ],
+              "content": [
+                0.9291157126426697,
+                0.943132221698761,
+                0.934115469455719,
+                0.9617282152175903,
+                0.9523838758468628,
+                0.9470499753952026,
+                0.9648815989494324,
+                0.9640862345695496,
+                0.9610770344734192,
+                0.9632876515388489,
+                0.9039582014083862
+              ],
+              "flow": "clamp"
+            }
+          }
+        ],
+        "default": null
+      }
+    }
+  ],
+  "compound_corrections": null
+}

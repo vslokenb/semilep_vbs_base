@@ -1,0 +1,12 @@
+dphi_weights:
+  "2018":
+    Muon:
+      file:
+        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/nonprompt_sf_lo1_mu.json
+      correction_name:
+        - nonprompt_sf
+    Electron:
+      file:
+        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/nonprompt_sf_lo1_e.json
+      correction_name:
+        - nonprompt_sf

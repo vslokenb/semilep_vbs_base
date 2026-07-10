@@ -2,19 +2,37 @@ fakeleptonweights:
  "2018":
     Muon:
       file:
-        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_weight_2018_testing.root
+        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
       nominal:
-        - muon_pt_eta_weights_qcd_enriched_0_deepmet_resolution_3j_nominal
+        - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_mu_nominal
       up:
-        - muon_pt_eta_weights_qcd_enriched_0_deepmet_resolution_3j_nominal
+        - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_mu_up_nominal
       down:
-        - muon_pt_eta_weights_qcd_enriched_0_deepmet_resolution_3j_nominal
+        - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_mu_down_nominal
     Electron:
       file:
-        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_weight_2018_testing.root
+        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
       nominal:
-        - electron_pt_eta_weights_qcd_enriched_0_deepmet_resolution_3j_nominal
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_e_nominal
       up:
-        - electron_pt_eta_weights_qcd_enriched_0_deepmet_resolution_3j_nominal
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_e_up_nominal
       down:
-        - electron_pt_eta_weights_qcd_enriched_0_deepmet_resolution_3j_nominal
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_e_down_nominal
+    Boosted_Muon:
+      file:
+        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_mu_down_nominal
+    Boosted_Electron:
+      file:
+        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_down_nominal 

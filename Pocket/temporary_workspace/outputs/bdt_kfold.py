@@ -462,7 +462,7 @@ def test_bdt(models, dtest, dtrain, channel, year, df_test, df_train,
                          label=group + " (train)", color=color,
                          linewidth=1.8, linestyle='--')
 
-    hep.cms.label("Preliminary", data=False, loc=0, fontsize=16, lumi=16.98, com=13)
+    hep.cms.label("Preliminary", data=False, loc=0, fontsize=16, lumi=59.83, com=13)
     plt.xlabel("BDT Discriminator Output", fontsize=14)
     plt.ylabel("Yields", fontsize=14)
     plt.legend(fontsize=8)
@@ -607,10 +607,10 @@ def main():
     parser.add_argument("coffea_file", help="Path to input .coffea file")
     parser.add_argument("--category",  help="Event category key (e.g. whad_withbveto_e)",
                         default="resolved_mu")
-    parser.add_argument("--year",      help="Year label for output filenames", default="2017")
+    parser.add_argument("--year",      help="Year label for output filenames", default="2018")
     parser.add_argument("--out",       help="Optional output parquet/csv file", default=None)
     parser.add_argument("--outdir",    help="Output directory", default="bdt")
-    parser.add_argument("--nfold",     type=int,   default=5,
+    parser.add_argument("--nfold",     type=int,   default=10,
                         help="Number of k-fold splits (default: 5)")
     parser.add_argument("--testsize",  type=float, default=0.2,
                         help="Fraction of data held out as test set (default: 0.2)")

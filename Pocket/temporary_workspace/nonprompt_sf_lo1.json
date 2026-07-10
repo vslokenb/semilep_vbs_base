@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "corrections": [
+    {
+      "name": "nonprompt_sf",
+      "description": "Per-bin nonprompt scale factors SF=(data-mc_other)/nonprompt evaluated per year. category=w_cr_sb_lo1_mu, ref=dphi_lepton1_DeepMETResolutionTune, sample=nonpromptDOWN10",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "year",
+          "type": "string",
+          "description": "Data-taking year (e.g. '2016', '2017', '2018')"
+        },
+        {
+          "name": "systematic",
+          "type": "string",
+          "description": "Systematic variation: nominal / up / down"
+        },
+        {
+          "name": "abs_dphi",
+          "type": "real",
+          "description": "|\u0394\u03c6(lepton, MET)|"
+        }
+      ],
+      "output": {
+        "name": "weight",
+        "type": "real",
+        "description": "Multiplicative SF for the nonprompt contribution"
+      },
+      "data": {
+        "nodetype": "category",
+        "input": "year",
+        "content": [
+          {
+            "key": "2018",
+            "value": {
+              "nodetype": "category",
+              "input": "systematic",
+              "content": [
+                {
+                  "key": "nominal",
+                  "value": {
+                    "nodetype": "binning",
+                    "input": "abs_dphi",
+                    "edges": [
+                      0.0,
+                      0.5,
+                      1.0,
+                      1.5,
+                      2.0,
+                      2.5,
+                      3.1415926536
+                    ],
+                    "content": [
+                      0.7818674891,
+                      1.0966620466,
+                      1.7355873456,
+                      2.1404145306,
+                      2.3240229026,
+                      1.7585726184
+                    ],
+                    "flow": "clamp"
+                  }
+                },
+                {
+                  "key": "up",
+                  "value": {
+                    "nodetype": "binning",
+                    "input": "abs_dphi",
+                    "edges": [
+                      0.0,
+                      0.5,
+                      1.0,
+                      1.5,
+                      2.0,
+                      2.5,
+                      3.1415926536
+                    ],
+                    "content": [
+                      0.8743277807,
+                      1.1624521649,
+                      1.8435797993,
+                      2.2807144731,
+                      2.4427487961,
+                      1.8283888081
+                    ],
+                    "flow": "clamp"
+                  }
+                },
+                {
+                  "key": "down",
+                  "value": {
+                    "nodetype": "binning",
+                    "input": "abs_dphi",
+                    "edges": [
+                      0.0,
+                      0.5,
+                      1.0,
+                      1.5,
+                      2.0,
+                      2.5,
+                      3.1415926536
+                    ],
+                    "content": [
+                      0.6894071974,
+                      1.0308719282,
+                      1.6275948919,
+                      2.0001145882,
+                      2.2052970091,
+                      1.6887564286
+                    ],
+                    "flow": "clamp"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

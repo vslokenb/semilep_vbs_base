@@ -164,7 +164,7 @@ def main():
                 hist = hist_dic[dsname][dsname_era]
                 scaled_hist = scale_histogram(hist, scale)
                 slicing_variations = {
-                        'variation': ['electron_inverttight_to_fakeDown', 'electron_inverttight_to_fakeUp', 'muon_inverttight_to_fakeDown', 'muon_inverttight_to_fakeUp','nominal'],
+                        'variation': ['electron_inverttight_to_fakeDown', 'electron_inverttight_to_fakeUp', 'muon_inverttight_to_fakeDown', 'muon_inverttight_to_fakeUp', 'electron_inverttight_to_fake_boostedDown', 'electron_inverttight_to_fake_boostedUp', 'muon_inverttight_to_fake_boostedDown', 'muon_inverttight_to_fake_boostedUp','nominal'],
                         #'cat': ["baseline","boosted_e","boosted_e_WCR","boosted_e_TTCR","resolved_e","resolved_e_WCR","resolved_e_TTCR","boosted_mu","resolved_mu","resolved_mu_WCR","resolved_mu_TTCR","boosted_mu_WCR","boosted_mu_TTCR"]
                         }
                 if hname not in merged_acc['variables']:

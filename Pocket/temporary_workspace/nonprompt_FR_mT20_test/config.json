@@ -1,0 +1,940 @@
+{
+  "datasets": {
+    "names": [
+      "SingleMuon_2016_PostVFP_EraF"
+    ],
+    "samples": [
+      "SingleMuon"
+    ],
+    "filesets": {
+      "SingleMuon_2016_PostVFP_EraF": {
+        "metadata": {
+          "das_names": "['/SingleMuon/Run2016F-UL2016_MiniAODv2_NanoAODv9-v1/NANOAOD']",
+          "sample": "SingleMuon",
+          "year": "2016_PostVFP",
+          "isMC": "False",
+          "primaryDataset": "SingleMuon",
+          "era": "F",
+          "nevents": "8024195",
+          "size": "6297247878"
+        },
+        "files": [
+          "root://cms-xrdr.sdfarm.kr:1094//xrd/store/data/Run2016F/SingleMuon/NANOAOD/UL2016_MiniAODv2_NanoAODv9-v1/130000/7F5791FE-262B-EA45-BE19-04E4F21FEE1E.root",
+          "root://cms-xrdr.sdfarm.kr:1094//xrd/store/data/Run2016F/SingleMuon/NANOAOD/UL2016_MiniAODv2_NanoAODv9-v1/130000/A6CA373A-583D-BD42-9556-0351CF148FDC.root",
+          "root://cms-xrdr.sdfarm.kr:1094//xrd/store/data/Run2016F/SingleMuon/NANOAOD/UL2016_MiniAODv2_NanoAODv9-v1/130000/FF9B5EE5-4C8E-3F41-B608-AC8DD47E51F2.root",
+          "root://cms-xrdr.sdfarm.kr:1094//xrd/store/data/Run2016F/SingleMuon/NANOAOD/UL2016_MiniAODv2_NanoAODv9-v1/70000/0B54974C-D6CA-0748-9ED9-03BB3DDD82C8.root",
+          "root://cms-xrdr.sdfarm.kr:1094//xrd/store/data/Run2016F/SingleMuon/NANOAOD/UL2016_MiniAODv2_NanoAODv9-v1/70000/15A7AA88-B1A1-384F-8AA5-13031C1A5E87.root"
+        ]
+      }
+    },
+    "subsamples": {
+      "SingleMuon": {
+        "type": "StandardSelection",
+        "categories": {
+          "SingleMuon": [
+            {
+              "name": "passthrough",
+              "params": {},
+              "collection": "events",
+              "function": {
+                "name": "passthrough_f",
+                "module": "pocket_coffea.lib.cut_functions",
+                "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+                "f_hash": 8768775509766
+              },
+              "id": "passthrough__7281292513081661054"
+            }
+          ]
+        },
+        "is_multidim": false,
+        "multidim_collection": null
+      }
+    }
+  },
+  "skim": [
+    {
+      "name": "nPVgood_1",
+      "params": {
+        "N": 1
+      },
+      "collection": "events",
+      "function": {
+        "name": "<lambda>",
+        "module": "pocket_coffea.lib.cut_functions",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+        "f_hash": 8768760616950
+      },
+      "id": "nPVgood_1__-3479749928148014110"
+    },
+    {
+      "name": "event_flags",
+      "params": {},
+      "collection": "events",
+      "function": {
+        "name": "apply_event_flags",
+        "module": "pocket_coffea.lib.cut_functions",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+        "f_hash": 8768775554052
+      },
+      "id": "event_flags__-53929344626384394"
+    },
+    {
+      "name": "golden_json_lumi",
+      "params": {},
+      "collection": "events",
+      "function": {
+        "name": "apply_golden_json",
+        "module": "pocket_coffea.lib.cut_functions",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+        "f_hash": 8768775554062
+      },
+      "id": "golden_json_lumi__5209528735226514653"
+    },
+    {
+      "name": "nLepton_skim",
+      "params": {},
+      "collection": "events",
+      "function": {
+        "name": "nLepton_skim",
+        "module": "custom_cut_functions_nonprompt",
+        "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+        "f_hash": 8768760615990
+      },
+      "id": "nLepton_skim__1398414173448518044"
+    },
+    {
+      "name": "HLT_trigger_SingleMuon_EGamma",
+      "params": {
+        "primaryDatasets": [
+          "SingleMuon",
+          "EGamma"
+        ],
+        "invert": false
+      },
+      "collection": "events",
+      "function": {
+        "name": "<lambda>",
+        "module": "pocket_coffea.lib.cut_functions",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+        "f_hash": 8768760465562
+      },
+      "id": "HLT_trigger_SingleMuon_EGamma__-7108460381522664132"
+    }
+  ],
+  "preselections": [
+    {
+      "name": "passthrough",
+      "params": {},
+      "collection": "events",
+      "function": {
+        "name": "passthrough_f",
+        "module": "pocket_coffea.lib.cut_functions",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+        "f_hash": 8768775509766
+      },
+      "id": "passthrough__7281292513081661054"
+    }
+  ],
+  "categories": {
+    "type": "StandardSelection",
+    "categories": {
+      "baseline": [
+        {
+          "name": "passthrough",
+          "params": {},
+          "collection": "events",
+          "function": {
+            "name": "passthrough_f",
+            "module": "pocket_coffea.lib.cut_functions",
+            "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/cut_functions.py",
+            "f_hash": 8768775509766
+          },
+          "id": "passthrough__7281292513081661054"
+        }
+      ],
+      "wjet_mu": [
+        {
+          "name": "wjet_mu",
+          "params": {
+            "met_def": "deepmet_resolution",
+            "met_pt": 30.0
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_wjets_mu",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616040
+          },
+          "id": "wjet_mu__3186772188050008080"
+        }
+      ],
+      "wjet_e": [
+        {
+          "name": "wjet_e",
+          "params": {
+            "met_def": "deepmet_resolution",
+            "met_pt": 30.0
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_wjets_e",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616030
+          },
+          "id": "wjet_e__5564706043752562473"
+        }
+      ],
+      "qcd_enriched_30_deepmet_resolution": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 30,
+            "njet": 0,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-7279608758528197950"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 35,
+            "njet": 0,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-6953686934625001702"
+        }
+      ],
+      "qcd_enriched_40_deepmet_resolution": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 40,
+            "njet": 0,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__1753547018612587519"
+        }
+      ],
+      "qcd_enriched_45_deepmet_resolution": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 45,
+            "njet": 0,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__595415490967124812"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution_2j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 35,
+            "njet": 2,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-4640560179547262570"
+        }
+      ],
+      "qcd_enriched_40_deepmet_resolution_2j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 40,
+            "njet": 2,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-7638207697749456046"
+        }
+      ],
+      "qcd_enriched_45_deepmet_resolution_2j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 45,
+            "njet": 2,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__7370000183319692065"
+        }
+      ],
+      "qcd_enriched_30_deepmet_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 30,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-6356914882172255267"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 35,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-6760182983849327297"
+        }
+      ],
+      "qcd_enriched_40_deepmet_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 40,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__8995769579369121988"
+        }
+      ],
+      "qcd_enriched_45_deepmet_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 45,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-4242025213327902177"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution_3j60": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 60.0,
+            "recoil_jet_pt": 35,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__4153212883713531881"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution_3j45": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 45.0,
+            "recoil_jet_pt": 35,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-8016257387971511022"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution_3j_mT": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 35,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": "remove"
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__7731656418935909709"
+        }
+      ],
+      "qcd_enriched_35_deepmet_resolution_3j60_mT": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 60.0,
+            "recoil_jet_pt": 35,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": "remove"
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__986154801086828435"
+        }
+      ],
+      "qcd_enriched_30_deepmet20_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 20.0,
+            "recoil_jet_pt": 30,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-4049293112862776124"
+        }
+      ],
+      "qcd_enriched_35_deepmet20_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 20.0,
+            "recoil_jet_pt": 35,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__7490105102973762907"
+        }
+      ],
+      "qcd_enriched_40_deepmet20_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 20.0,
+            "recoil_jet_pt": 40,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-4529913824737084037"
+        }
+      ],
+      "qcd_enriched_20_deepmet_resolution_3j": [
+        {
+          "name": "qcd_enriched",
+          "params": {
+            "met_pt": 30.0,
+            "recoil_jet_pt": 20,
+            "njet": 3,
+            "met_def": "deepmet_resolution",
+            "mT": ""
+          },
+          "collection": "events",
+          "function": {
+            "name": "select_QCD_CR",
+            "module": "custom_cut_functions_nonprompt",
+            "src_file": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/custom_cut_functions_nonprompt.py",
+            "f_hash": 8768760616130
+          },
+          "id": "qcd_enriched__-5429417493413748081"
+        }
+      ]
+    },
+    "is_multidim": false,
+    "multidim_collection": null
+  },
+  "workflow": {
+    "name": "VBSSemileptonicProcessor",
+    "workflow_options": {},
+    "srcfile": "/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/workflow_nonprompt.py"
+  },
+  "weights": {
+    "SingleMuon": {
+      "bycategory": {
+        "baseline": [],
+        "wjet_mu": [],
+        "wjet_e": [],
+        "qcd_enriched_30_deepmet_resolution": [],
+        "qcd_enriched_35_deepmet_resolution": [],
+        "qcd_enriched_40_deepmet_resolution": [],
+        "qcd_enriched_45_deepmet_resolution": [],
+        "qcd_enriched_35_deepmet_resolution_2j": [],
+        "qcd_enriched_40_deepmet_resolution_2j": [],
+        "qcd_enriched_45_deepmet_resolution_2j": [],
+        "qcd_enriched_30_deepmet_resolution_3j": [],
+        "qcd_enriched_35_deepmet_resolution_3j": [],
+        "qcd_enriched_40_deepmet_resolution_3j": [],
+        "qcd_enriched_45_deepmet_resolution_3j": [],
+        "qcd_enriched_35_deepmet_resolution_3j60": [],
+        "qcd_enriched_35_deepmet_resolution_3j45": [],
+        "qcd_enriched_35_deepmet_resolution_3j_mT": [],
+        "qcd_enriched_35_deepmet_resolution_3j60_mT": [],
+        "qcd_enriched_30_deepmet20_resolution_3j": [],
+        "qcd_enriched_35_deepmet20_resolution_3j": [],
+        "qcd_enriched_40_deepmet20_resolution_3j": [],
+        "qcd_enriched_20_deepmet_resolution_3j": []
+      },
+      "inclusive": []
+    }
+  },
+  "weights_classes": [
+    "genWeight",
+    "lumi",
+    "XS",
+    "PileupWeight"
+  ],
+  "calibrators": [
+    {
+      "name": "jet_calibration",
+      "class": {
+        "name": "CalibratorRegistry",
+        "module": "pocket_coffea.lib.calibrators.calibrator",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/calibrators/calibrator.py",
+        "f_hash": 5898667940173
+      }
+    },
+    {
+      "name": "electron_scale_and_smearing",
+      "class": {
+        "name": "CalibratorRegistry",
+        "module": "pocket_coffea.lib.calibrators.calibrator",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/calibrators/calibrator.py",
+        "f_hash": 5898667940173
+      }
+    },
+    {
+      "name": "muons_scale_and_resolution",
+      "class": {
+        "name": "CalibratorRegistry",
+        "module": "pocket_coffea.lib.calibrators.calibrator",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/calibrators/calibrator.py",
+        "f_hash": 5898667940173
+      }
+    },
+    {
+      "name": "met_type1_calibration",
+      "class": {
+        "name": "CalibratorRegistry",
+        "module": "pocket_coffea.lib.calibrators.calibrator",
+        "src_file": "/work/users/vsloken-fnal/PocketCoffea/pocket_coffea/lib/calibrators/calibrator.py",
+        "f_hash": 5898667940173
+      }
+    }
+  ],
+  "variations": {},
+  "variables": {
+    "electron_loose_pt": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_loose_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_loose_pt_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_medium_pt": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_medium_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_medium_pt_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_tight_pt": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_tight_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "electron_tight_pt_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_loose_pt": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_loose_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_loose_pt_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_medium_pt": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_medium_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_medium_pt_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_tight_pt": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_tight_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "muon_tight_pt_eta": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "mt_w_leptonic": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    },
+    "pt_miss": {
+      "axes": [],
+      "storage": "weight",
+      "autofill": true,
+      "variations": true,
+      "only_variations": null,
+      "exclude_samples": null,
+      "only_samples": null,
+      "exclude_categories": null,
+      "only_categories": null,
+      "no_weights": false,
+      "metadata_hist": false
+    }
+  },
+  "columns": {
+    "SingleMuon": {
+      "baseline": [],
+      "wjet_mu": [],
+      "wjet_e": [],
+      "qcd_enriched_30_deepmet_resolution": [],
+      "qcd_enriched_35_deepmet_resolution": [],
+      "qcd_enriched_40_deepmet_resolution": [],
+      "qcd_enriched_45_deepmet_resolution": [],
+      "qcd_enriched_35_deepmet_resolution_2j": [],
+      "qcd_enriched_40_deepmet_resolution_2j": [],
+      "qcd_enriched_45_deepmet_resolution_2j": [],
+      "qcd_enriched_30_deepmet_resolution_3j": [],
+      "qcd_enriched_35_deepmet_resolution_3j": [],
+      "qcd_enriched_40_deepmet_resolution_3j": [],
+      "qcd_enriched_45_deepmet_resolution_3j": [],
+      "qcd_enriched_35_deepmet_resolution_3j60": [],
+      "qcd_enriched_35_deepmet_resolution_3j45": [],
+      "qcd_enriched_35_deepmet_resolution_3j_mT": [],
+      "qcd_enriched_35_deepmet_resolution_3j60_mT": [],
+      "qcd_enriched_30_deepmet20_resolution_3j": [],
+      "qcd_enriched_35_deepmet20_resolution_3j": [],
+      "qcd_enriched_40_deepmet20_resolution_3j": [],
+      "qcd_enriched_20_deepmet_resolution_3j": []
+    }
+  }
+}
