@@ -1,9 +1,8 @@
-# example_config_semileptonic.py
 import os, cloudpickle
 from pocket_coffea.utils.configurator import Configurator
-from pocket_coffea.lib.cut_functions import get_HLTsel, get_nPVgood, goldenJson, eventFlags
+from pocket_coffea.lib.cut_functions import get_HLTsel, get_nPVgood, goldenJson, eventFlags, get_JetVetoMap
 from pocket_coffea.parameters.cuts import passthrough
-from pocket_coffea.parameters.histograms import *
+from pocket_coffea.parameters.histograms import HistConf, Axis
 from pocket_coffea.lib.weights.common import common_weights
 from pocket_coffea.lib.weights.common.common import SF_L1prefiring
 from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
@@ -17,51 +16,75 @@ from pocket_coffea.lib.scale_factors import sf_pileup_reweight
 
 
 import workflow_v9, custom_cut_functions, reweighting_st
-from workflow_v9 import VBSSemileptonicProcessor
 from reweighting_st import ratio_function
+from workflow_v9 import VBSSemileptonicProcessor
 from custom_cut_functions import (
     nLepton_skim_cut,
     nJet_skim_cut,
     vbs_semileptonic_presel,
-    whad_window_cut_e,
+    # whad_window_cut_e,
     met_skim_cut,
     whad_window_cut_bveto_e,
     msd_window_cut_e,
     whad_window_cut_mu,
     whad_window_cut_bveto_mu,
     msd_window_cut_mu,
-    # whad_window_cut_no_fj0_e,
-    # whad_window_cut_no_jet4_e,
-    # whad_window_cut_no_loose_e,
-    # Muon_good1,
-    # Muon_good2,
-    # Muon_good3,
-    # Ele_good1,
-    # Ele_good2,
-    # Ele_good3
+    w_cr_mu,
+    w_cr_e,
+    w_cr_boosted_mu,
+    w_cr_boosted_e,
+    vr_mu,
+    vr_e,
+    vr_boosted_mu,
+    vr_boosted_e,
+    vr_boosted_no_fwd_mu,
+    vr_boosted_no_fwd_e,
+    vr_qcd_enriched_mu,
+    vr_qcd_enriched_e,
+    vr_no_fwd_mu,
+    vr_no_fwd_e,
+    vr_loose_njet_mu,
+    vr_loose_njet_e,
+    vr_no_fwd_loose_njet_mu,
+    vr_no_fwd_loose_njet_e,
+    recoil_inclusive_mu,
+    recoil_inclusive_e,
+    recoil_fullinclusive_mu,
+    recoil_fullinclusive_e,
+    recoil_closure_mu,
+    recoil_closure_e,
+    w_cr_no_fwd_mu,
+    w_cr_no_fwd_e,
+    w_cr_loose_njet_mu,
+    w_cr_loose_njet_e,
+    w_cr_no_fwd_loose_njet_mu,
+    w_cr_no_fwd_loose_njet_e,
+    w_cr_sb_lo1_mu,
+    w_cr_sb_lo2_mu,
+    w_cr_sb_hi1_mu,
+    w_cr_sb_hi2_mu,
+    w_cr_sb_lo1_e,
+    w_cr_sb_lo2_e,
+    w_cr_sb_hi1_e,
+    w_cr_sb_hi2_e,
+    w_cr_incl_mu,
+    w_cr_incl_e, 
+    # qcd_validate_mu,
+    # qcd_validate_e,
+    ttbar_cr_boosted_mu,
+    ttbar_cr_boosted_e,
+    ttbar_cr_resolved_mu,
+    ttbar_cr_resolved_e,
 )
+
 
 cloudpickle.register_pickle_by_value(workflow_v9)
 cloudpickle.register_pickle_by_value(reweighting_st)
 cloudpickle.register_pickle_by_value(custom_cut_functions)
-
 localdir = os.path.dirname(os.path.abspath(__file__))
 
 
-default_parameters = defaults.get_default_parameters( 
-    # group_tags={"EGM": 
-    #     {   "Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15":"latest", 
-    #         "Run3-23DSep23-Summer23BPix-NanoAODv12": "latest",
-    #         "Run3-23CSep23-Summer23-NanoAODv12": "latest",
-    #         "Run3-22EFGSep23-Summer22EE-NanoAODv12": "latest",
-    #         "Run3-22CDSep23-Summer22-NanoAODv12": "latest",
-    #         "Run2-2018-UL-NanoAODv9": "latest",
-    #         "Run2-2017-UL-NanoAODv9": "latest",
-    #         "Run2-2016preVFP-UL-NanoAODv9": "latest",
-    #         "Run2-2016postVFP-UL-NanoAODv9": "latest"
-    #     }
-    # }
-)
+default_parameters = defaults.get_default_parameters()
 defaults.register_configuration_dir("config_dir", localdir + "/params")
 parameters = defaults.merge_parameters_from_files(
     default_parameters,
@@ -71,17 +94,21 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/pileup.yaml",
     f"{localdir}/params/jets_calibration.yaml",
     f"{localdir}/params/lepton_scale_factors.yaml",
+    f"{localdir}/params/jet_scale_factors.yaml",
     f"{localdir}/params/classifiers.yaml",
     f"{localdir}/params/variations.yaml",
+    f"{localdir}/params/fakelepton_weights_noiso_3j.yaml",
+    f"{localdir}/params/fj_taggers.yaml",
+    f"{localdir}/params/qgtagging.yaml",
     update=True,
 )
 
 PileupWeight = WeightLambda.wrap_func(
-    name="PileupWeight",
-    function=lambda params, metadata, events, size, shape_variations:
-        sf_pileup_reweight(params, events, metadata["year"]),
-    has_variations=True  # no list of variations it means only up and down
-    )
+   name="PileupWeight",
+   function=lambda params, metadata, events, size, shape_variations:
+       sf_pileup_reweight(params, events, metadata["year"]),
+   has_variations=True
+   )
 
 wjet_reweight = WeightLambda.wrap_func(
     name="wjet_reweight",
@@ -90,252 +117,554 @@ wjet_reweight = WeightLambda.wrap_func(
     has_variations=False
     )
 
+from coffea.lookup_tools import extractor
+
+
+fake_muon_weights = {}
+fake_electron_weights = {}
+for y in parameters.fakeleptonweights.keys():
+    ext = extractor()
+    ext.add_weight_sets([
+        f"muonFakeWeight {parameters.fakeleptonweights[y]['Muon']['nominal'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
+        f"muonFakeWeight_up {parameters.fakeleptonweights[y]['Muon']['up'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
+        f"muonFakeWeight_down {parameters.fakeleptonweights[y]['Muon']['down'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
+        f"electronFakeWeight {parameters.fakeleptonweights[y]['Electron']['nominal'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
+        f"electronFakeWeight_up {parameters.fakeleptonweights[y]['Electron']['up'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
+        f"electronFakeWeight_down {parameters.fakeleptonweights[y]['Electron']['down'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
+        ])
+    ext.finalize()
+    ev = ext.make_evaluator()
+    fake_muon_weights[y] = {
+        "nominal": ev[f"muonFakeWeight"],
+        "up":      ev[f"muonFakeWeight_up"],
+        "down":    ev[f"muonFakeWeight_down"],
+    }
+    fake_electron_weights[y] = {
+        "nominal": ev[f"electronFakeWeight"],
+        "up":      ev[f"electronFakeWeight_up"],
+        "down":    ev[f"electronFakeWeight_down"],
+    }
+
+
+import awkward as ak
+from pocket_coffea.lib.weights import WeightWrapper
+
+class MuonGoodLeadWeight(WeightWrapper):
+    name = "muon_inverttight_to_fake"
+    has_variations = True
+    isMC_only = False
+    def compute(self, events, *args, **kwargs):
+        year = events.metadata["year"]
+        mu = events.MuonGoodLead
+        has_mu = ~ak.is_none(mu)
+        pt  = ak.where(has_mu, mu.pt,  0.0)
+        eta = ak.where(has_mu, abs(mu.eta), 0.0)
+        pt  = ak.where(has_mu, np.clip(pt,  26.0, 100.0), pt)
+        eta = ak.where(has_mu, np.clip(eta,  0,    2.4),  eta)
+        nominal = fake_muon_weights[year]["nominal"](pt, eta)
+        nominal = ak.where(has_mu, nominal, 1.0)
+        up      = ak.fill_none(ak.where(has_mu, fake_muon_weights[year]["up"](pt, eta),   1.0), 1.0)
+        down    = ak.fill_none(ak.where(has_mu, fake_muon_weights[year]["down"](pt, eta), 1.0), 1.0)
+        print("nominal ", nominal)
+        print("up ",      up)
+        print("down ",    down)
+        return WeightData(self.name, nominal, up, down)
+
+
+class ElectronGoodLeadWeight(WeightWrapper):
+    name = "electron_inverttight_to_fake"
+    has_variations = True
+    isMC_only = False
+    def compute(self, events, *args, **kwargs):
+        year = events.metadata["year"]
+        ele = events.ElectronGoodLead
+        has_ele = ~ak.is_none(ele)
+        pt  = ak.where(has_ele, ele.pt,      0.0)
+        eta = ak.where(has_ele, abs(ele.eta), 0.0)
+        pt  = ak.where(has_ele, np.clip(pt,  35.0, 100.0), pt)
+        eta = ak.where(has_ele, np.clip(eta,  0,    2.4),  eta)
+        nominal = fake_electron_weights[year]["nominal"](pt, eta)
+        nominal = ak.where(has_ele, nominal, 1.0)
+        up      = ak.fill_none(ak.where(has_ele, fake_electron_weights[year]["up"](pt, eta),   1.0), 1.0)
+        down    = ak.fill_none(ak.where(has_ele, fake_electron_weights[year]["down"](pt, eta), 1.0), 1.0)
+        print("nominal ", nominal)
+        print("up ",      up)
+        print("down ",    down)
+        return WeightData(self.name, nominal, up, down)
+
+class LHEScaleWeightWrapper(WeightWrapper):
+    """LHE renormalization and factorization scale uncertainties.
+    LHEScaleWeight is already normalized as w_var/w_nominal in NanoAOD.
+    For the standard 9-member set:
+      renorm_scale: down=LHEScaleWeight[:,1], up=LHEScaleWeight[:,7]
+      fact_scale:   down=LHEScaleWeight[:,3], up=LHEScaleWeight[:,5]
+    Samples with fewer than 9 members get unit weights.
+    """
+    name = "LHEScaleWeight"
+    has_variations = True
+    isMC_only = True
+    _variations = ["renorm_scale", "fact_scale"]
+
+    def __init__(self, parameters, metadata):
+        super().__init__(parameters, metadata)
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(name=self.name, nominal=np.ones(size))
+
+        ones = np.ones(size)
+        if not hasattr(events, "LHEScaleWeight"):
+            return WeightDataMultiVariation(
+                name=self.name, nominal=ones, variations=self._variations,
+                up=[ones, ones], down=[ones, ones],
+            )
+
+        w = events.LHEScaleWeight
+        # pad so index 8 always exists; missing members -> 1.0 (no variation)
+        w = ak.fill_none(ak.pad_none(w, 9, axis=1, clip=False), 1.0)
+        n = ak.to_numpy(ak.num(events.LHEScaleWeight))
+        ok = n >= 9  # per-event guard (uniform within a sample in practice)
+
+        def member(i):
+            return np.where(ok, ak.to_numpy(w[:, i]), 1.0)
+
+        return WeightDataMultiVariation(
+            name=self.name,
+            nominal=np.ones(size),
+            variations=self._variations,
+            up=[member(7), member(5)],
+            down=[member(1), member(3)],
+        )
+
+
+class LHEPdfWeightWrapper(WeightWrapper):
+    """LHE PDF and alpha_S uncertainties from LHEPdfWeight.
+    For the standard 103-member set:
+      [1]-[100]: PDF eigenvariations (up=w[:,i], down=2-w[:,i])
+      [101]/[102]: alpha_S up/down.
+    Samples with shorter sets (101 members: no alpha_S; 33 members: fewer
+    eigenvectors) get unit weights for the missing members.
+    """
+    name = "LHEPdfWeight"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"pdf_{i}" for i in range(1, 101)] + ["alpha_S"]
+
+    def __init__(self, parameters, metadata):
+        super().__init__(parameters, metadata)
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(name=self.name, nominal=np.ones(size))
+
+        ones = np.ones(size)
+        if not hasattr(events, "LHEPdfWeight"):
+            return WeightDataMultiVariation(
+                name=self.name, nominal=ones, variations=self._variations,
+                up=[ones] * len(self._variations),
+                down=[ones] * len(self._variations),
+            )
+
+        w_raw = events.LHEPdfWeight
+        n = ak.to_numpy(ak.num(w_raw))
+        # pad so indices up to 102 always exist; padded members -> 1.0
+        w = ak.fill_none(ak.pad_none(w_raw, 103, axis=1, clip=False), 1.0)
+
+        def member(i, transform=None):
+            vals = ak.to_numpy(w[:, i])
+            if transform is not None:
+                vals = transform(vals)
+            # only trust members the sample actually has
+            return np.where(n > i, vals, 1.0)
+
+        pdf_up   = [member(i)                    for i in range(1, 101)]
+        pdf_down = [member(i, lambda v: 2 - v)   for i in range(1, 101)]
+        alphas_up   = member(101)
+        alphas_down = member(102)
+
+        return WeightDataMultiVariation(
+            name=self.name,
+            nominal=np.ones(size),
+            variations=self._variations,
+            up=pdf_up + [alphas_up],
+            down=pdf_down + [alphas_down],
+        )
+
+############################################
+##### QG TAGGING SCALE FACTOR (correctionlib)
+##### Shape SFs for qgl / btagDeepFlavQG / particleNetAK4_QvsG,
+##### one correction file per year (see params/qgtagging.yaml).
+##### Per-jet SF(QvG, flavor, |eta|, pt) multiplied over analysis jets.
+############################################
+import correctionlib
+
+# year -> CorrectionSet, loaded from params/qgtagging.yaml (all files same format)
+_qgtagging_csets = {}
+for _y in parameters.qgtagging.keys():
+    _qg_file = parameters.qgtagging[_y]["file"]
+    if not os.path.isabs(_qg_file):
+        _qg_file = f"{localdir}/{_qg_file}"
+    if os.path.exists(_qg_file):
+        _qgtagging_csets[_y] = correctionlib.CorrectionSet.from_file(_qg_file)
+
+# Full-shape SF: inputs (systematic, QvG, absflavor, abseta, pt).
+# Per discriminant bin; only |partonFlavour| 1-3 and 21 are corrected
+# (c/b/undefined get SF=1). Domain: QvG [0,1), |eta| [0,2.5), pt [30,8000).
+# Systematics: central, up/down (total), and {source}_{up,down} for
+# stat, fsr, isr, pu, jes, jer, L1prefiring, herwig, scale, PDF.
+_QG_CORR_NAME = "deepJet_fullshape"   # also available: qgl_fullshape, particleNet_fullshape
+_QG_JET_FIELD = "btagDeepFlavQG"      # jet field matching the correction
+
+# systematic sources exposed as weight variations ("total" = combined up/down)
+_QG_SOURCES = ["total", "stat", "fsr", "isr", "pu", "jes", "jer",
+               "L1prefiring", "herwig", "scale", "PDF"]
+
+
+class QGTaggingWeight(WeightWrapper):
+    name = "sf_qgtagging"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"sf_qgtagging_{s}" for s in _QG_SOURCES]
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(self.name, np.ones(size))
+
+        year = events.metadata["year"]
+        if year not in _qgtagging_csets:
+            raise KeyError(
+                f"No qgtagging correction file for year '{year}' "
+                f"(available: {list(_qgtagging_csets)}); check params/qgtagging.yaml"
+            )
+        corr = _qgtagging_csets[year][_QG_CORR_NAME]
+        jets = events.JetGood30
+
+        qvg    = ak.fill_none(getattr(jets, _QG_JET_FIELD, None), -1.0)
+        flav   = np.abs(ak.fill_none(jets.partonFlavour, 0))
+        abseta = np.abs(jets.eta)
+        pt     = jets.pt
+
+        # only light quarks (1-3) and gluons (21) are corrected
+        corrected_flav = ((flav >= 1) & (flav <= 3)) | (flav == 21)
+        in_domain = (qvg >= 0.0) & corrected_flav & (abseta < 2.5) & (pt >= 30.0)
+
+        counts   = ak.num(jets)
+        qvg_f    = np.clip(ak.to_numpy(ak.flatten(qvg)), 0.0, 0.999999)
+        flav_f   = ak.to_numpy(ak.flatten(flav)).astype(int)
+        abseta_f = np.clip(ak.to_numpy(ak.flatten(abseta)), 0.0, 2.499)
+        pt_f     = np.clip(ak.to_numpy(ak.flatten(pt)), 30.0, 7999.0)
+        dom_f    = ak.to_numpy(ak.flatten(in_domain))
+
+        def _per_event(systematic):
+            sf_f = np.ones(len(qvg_f))
+            if dom_f.any():
+                sf_f[dom_f] = corr.evaluate(
+                    systematic,
+                    qvg_f[dom_f], flav_f[dom_f], abseta_f[dom_f], pt_f[dom_f],
+                )
+            # product over jets in each event
+            return ak.to_numpy(ak.prod(ak.unflatten(sf_f, counts), axis=1))
+
+        nominal = _per_event("central")
+        ups, downs = [], []
+        for src in _QG_SOURCES:
+            if src == "total":
+                ups.append(_per_event("up"))
+                downs.append(_per_event("down"))
+            else:
+                ups.append(_per_event(f"{src}_up"))
+                downs.append(_per_event(f"{src}_down"))
+
+        return WeightDataMultiVariation(
+            name=self.name,
+            nominal=nominal,
+            variations=self._variations,
+            up=ups,
+            down=downs,
+        )
+
+
+############################################
+##### AK8 FAT-JET TAGGER SCALE FACTORS (correctionlib)
+##### Per-event SFs from the leading candidate fat jet, one file per year
+##### (see params/fj_taggers.yaml). fjtype = matched/unmatched to a gen W
+##### (dR < 0.8). Events without a candidate fat jet get SF = 1.
+#####   fj_tau21_SF            : SF(tau21), coarse bins [0, 0.45, 1.0]
+#####   fj_WvsQCD_SF_tau21cut  : SF(msoftdrop, WvsQCD), tau21 < 0.45 applied
+############################################
+
+# year -> {tagger_name: CorrectionSet}
+_fj_tagger_csets = {}
+for _y in parameters.fj_taggers.keys():
+    _fj_tagger_csets[_y] = {}
+    for _tag in parameters.fj_taggers[_y].keys():
+        _fj_file = parameters.fj_taggers[_y][_tag]["file"]
+        if not os.path.isabs(_fj_file):
+            _fj_file = f"{localdir}/{_fj_file}"
+        if os.path.exists(_fj_file):
+            _fj_tagger_csets[_y][_tag] = correctionlib.CorrectionSet.from_file(_fj_file)
+
+_FJ_SOURCES = ["stat", "pileup", "sf_btag",
+               "sf_partonshower_isr", "sf_partonshower_fsr", "JES", "JER"]
+
+
+def _fj_lead_and_match(events):
+    """Leading candidate fat jet, presence mask, and gen-W match (dR < 0.8)."""
+    fj = ak.firsts(events.candidate_boost)
+    has_fj = ~ak.is_none(fj)
+    genw = events.GenPart[np.abs(events.GenPart.pdgId) == 24]
+    dr = genw.delta_r(fj)
+    matched = ak.fill_none(ak.any(dr < 0.8, axis=1), False) & has_fj
+    return fj, ak.to_numpy(has_fj), ak.to_numpy(matched)
+
+
+def _fj_sf_multivariation(name, corr, obs_arrays, has_fj, matched):
+    """Evaluate SF per event, split matched/unmatched, all systematic sources."""
+    n = len(has_fj)
+
+    def _eval(systematic):
+        sf = np.ones(n)
+        for fjtype, sel in (("matched", has_fj & matched), ("unmatched", has_fj & ~matched)):
+            if sel.any():
+                sf[sel] = corr.evaluate(systematic, fjtype, *[a[sel] for a in obs_arrays])
+        return sf
+
+    nominal = _eval("nominal")
+    ups   = [_eval(f"{s}_up")   for s in _FJ_SOURCES]
+    downs = [_eval(f"{s}_down") for s in _FJ_SOURCES]
+    return WeightDataMultiVariation(
+        name=name,
+        nominal=nominal,
+        variations=[f"{name}_{s}" for s in _FJ_SOURCES],
+        up=ups,
+        down=downs,
+    )
+
+
+class FatJetTau21Weight(WeightWrapper):
+    name = "sf_fj_tau21"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"sf_fj_tau21_{s}" for s in _FJ_SOURCES]
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(self.name, np.ones(size))
+        year = events.metadata["year"]
+        cset = _fj_tagger_csets.get(year, {})
+        if "fj_tau21_SF" not in cset:
+            raise KeyError(f"No fj_tau21_SF file for year '{year}'; check params/fj_taggers.yaml")
+        corr = cset["fj_tau21_SF"]["fj_tau21_SF"]
+
+        fj, has_fj, matched = _fj_lead_and_match(events)
+        tau21 = np.clip(ak.to_numpy(ak.fill_none(fj.tau21, 0.0)), 0.0, 0.999)
+        return _fj_sf_multivariation(self.name, corr, [tau21], has_fj, matched)
+
+
+class FatJetWvsQCDWeight(WeightWrapper):
+    name = "sf_fj_WvsQCD"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"sf_fj_WvsQCD_{s}" for s in _FJ_SOURCES]
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(self.name, np.ones(size))
+        year = events.metadata["year"]
+        cset = _fj_tagger_csets.get(year, {})
+        if "fj_WvsQCD_SF_tau21cut" not in cset:
+            raise KeyError(f"No fj_WvsQCD_SF_tau21cut file for year '{year}'; check params/fj_taggers.yaml")
+        corr = cset["fj_WvsQCD_SF_tau21cut"]["fj_WvsQCD_SF_tau21cut"]
+
+        fj, has_fj, matched = _fj_lead_and_match(events)
+        # candidate_boost already has tau21 < 0.45 applied (SF derivation selection)
+        msd    = np.clip(ak.to_numpy(ak.fill_none(fj.msoftdrop, 40.0)), 40.0, 199.9)
+        wvsqcd = np.clip(ak.to_numpy(ak.fill_none(fj.particleNet_WvsQCD, 0.0)), 0.0, 0.999)
+        return _fj_sf_multivariation(self.name, corr, [msd, wvsqcd], has_fj, matched)
+
+
+
 cfg = Configurator(
     parameters=parameters,
     datasets={
         "jsons": [
-            f"{localdir}/datasets/skimmed_rescale.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
+            # f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
+            # f"{localdir}/datasets/SingleMuon.json",
+            # f"{localdir}/datasets/EGamma.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+            # f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_fast.json",
+            # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
             f"{localdir}/datasets/rare_skim.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-4to50_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # # f"{localdir}/datasets/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # f"{localdir}/datasets/GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8.json",
-            # f"{localdir}/datasets/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8.json",
-            # f"{localdir}/datasets/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8.json",
-            # f"{localdir}/datasets/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8.json",
-            # f"{localdir}/datasets/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.json",
-            # f"{localdir}/datasets/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8.json",
-            # # f"{localdir}/datasets/SingleMuon.json",
-            # # f"{localdir}/datasets/SingleElectron.json",
-            # # f"{localdir}/datasets/EGamma.json",
-            # # f"{localdir}/datasets/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.json",
-            # # f"{localdir}/datasets/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.json",
-            # f"{localdir}/datasets/WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-
-            # # f"{localdir}/datasets/WJetsToLNu_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_Pt-400To600_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_Pt-600ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-
-            # # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8.json",
-            # f"{localdir}/datasets/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8.json",
-            # f"{localdir}/datasets/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8.json",
-            # f"{localdir}/datasets/WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8.json",
-            # f"{localdir}/datasets/WZZ_TuneCP5_13TeV-amcatnlo-pythia8.json",
-            # f"{localdir}/datasets/WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV.json",
-            # f"{localdir}/datasets/WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8.json",
-            # f"{localdir}/datasets/ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8.json",
-            # f"{localdir}/datasets/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8.json",
-            # f"{localdir}/datasets/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8.json",
-            # f"{localdir}/datasets/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8.json",
+            f"{localdir}/datasets/skimmed_rescale.json",
         ],
+
         "filter": {
             "samples": [
-                
-            #########
-            ## RUN 2 BKG
-            #########
+                # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
-            # "WJetsToLNu_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            #"WJetsToLNu_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            #"WJetsToLNu_Pt-400To600_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            #"WJetsToLNu_Pt-600ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                # "SingleMuon",
+                # "EGamma",
 
-            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # # # "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
 
-            #"DYJetsToLL_M-4to50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-4to50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-4to50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-4to50_HT-600toInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-            # # # "DYJetsToLL_M-4to50_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
 
-            
-            #"DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
-            #"DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
+                "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
+                "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+                "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+                "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
+                "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+                "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
 
-            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # # # # # #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-
-            
-            
-            "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
-            "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-            "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-            "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
-            "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
-
-            "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-            "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-
-            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
-            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
-
-            
-
-            "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-
-            # "WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            # # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
-
-            "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
-            "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-            "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-            "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
-            "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
-            "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-            "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
-
-            "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-
-            
-            
-            
-            
+                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
            
-            # ###### SIGNAL #########
-            "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
-            "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-            "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                # # ###### SIGNAL #########
+                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
+                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
 
-
-            # # # ##### DATA #######
-            # "SingleMuon", #2017 or 2018 data
-            # "SingleElectron",
-            # "EGamma",
             ],
-            "year": ["2018"],#"2018"],
+            "year": ["2018"],
         },
     },
     workflow=VBSSemileptonicProcessor,
 
-    
     skim=[
-        get_nPVgood(1),    # nPV>0
-        eventFlags,        # PileupID
-        goldenJson,        
+        get_nPVgood(1),
+        eventFlags,
+        goldenJson,
         nLepton_skim_cut,
-        nJet_skim_cut,  
+        nJet_skim_cut,
         met_skim_cut,
         get_HLTsel(primaryDatasets=["SingleMuon", "EGamma"]),
     ],
 
-    # 2) preselections 
     preselections=[vbs_semileptonic_presel],
 
-   
     categories={
         "baseline": [passthrough],
-        # "mT_validation_mu": [Muon_good1],
-        # "mll_validation_mu": [Muon_good2],
-        # "mT_noMET_mu": [Muon_good3],
-        # "mT_validation_e": [Ele_good1],
-        # "mll_validation_e": [Ele_good2],
-        # "mT_noMET_e": [Ele_good3],
-        # # "whad_baseline_e":  [whad_window_cut_no_jet4_e],
-        # # "whad_4jets_e":  [whad_window_cut_no_loose_e],
-        # # "whad_4jets_looselep_e":  [whad_window_cut_no_fj0_e],
-        # # "whad_4jets_looselep_fj_e": [whad_window_cut_e],  # |mjj^W - 80.4| < window
+
+        # ------------------------------------------------------------------
+        # W control region
+        # SR structure + inverted hadronic W mass window + mT > 30
+        # ------------------------------------------------------------------
+        # "w_cr_mu": [w_cr_mu],
+        # "w_cr_e":  [w_cr_e],
+        # "w_cr_boosted_mu": [w_cr_boosted_mu],
+        # "w_cr_boosted_e": [w_cr_boosted_e],
+
+        # "ttbar_cr_boosted_mu": [ttbar_cr_boosted_mu],
+        # "ttbar_cr_boosted_e": [ttbar_cr_boosted_e],
+        # "ttbar_cr_resolved_mu": [ttbar_cr_resolved_mu],
+        # "ttbar_cr_resolved_e": [ttbar_cr_resolved_e],
+
+        # "w_cr_no_fwd_mu": [w_cr_no_fwd_mu],
+        # "w_cr_no_fwd_e": [w_cr_no_fwd_e],
+        # "w_cr_loose_njet_mu": [w_cr_loose_njet_mu],
+        # "w_cr_loose_njet_e": [w_cr_loose_njet_e],
+        # "w_cr_no_fwd_loose_njet_mu": [w_cr_no_fwd_loose_njet_mu],
+        # "w_cr_no_fwd_loose_njet_e": [w_cr_no_fwd_loose_njet_e],
+        # "w_cr_sb_lo1_mu": [w_cr_sb_lo1_mu],
+        # "w_cr_sb_lo2_mu": [w_cr_sb_lo2_mu],
+        # "w_cr_sb_hi1_mu": [w_cr_sb_hi1_mu],
+        # "w_cr_sb_hi2_mu": [w_cr_sb_hi2_mu],
+        # "w_cr_sb_lo1_e":  [w_cr_sb_lo1_e],
+        # "w_cr_sb_lo2_e":  [w_cr_sb_lo2_e],
+        # "w_cr_sb_hi1_e":  [w_cr_sb_hi1_e],
+        # "w_cr_sb_hi2_e":  [w_cr_sb_hi2_e],
+
+        # ------------------------------------------------------------------
+        # Validation region
+        # SR structure exactly (no W mass window), mT in [20, 30]
+        # ------------------------------------------------------------------
+        # "vr_mu": [vr_mu],
+        # "vr_e":  [vr_e],
+        # "vr_boosted_mu": [vr_boosted_mu],
+        # "vr_boosted_e": [vr_boosted_e],
+        # "vr_boosted_no_fwd_mu": [vr_boosted_no_fwd_mu],
+        # "vr_boosted_no_fwd_e": [vr_boosted_no_fwd_e],
+        # "vr_qcd_enriched_mu": [vr_qcd_enriched_mu],
+        # "vr_qcd_enriched_e": [vr_qcd_enriched_e],
+        # "vr_no_fwd_mu": [vr_no_fwd_mu],
+        # "vr_no_fwd_e": [vr_no_fwd_e],
+        # "vr_loose_njet_mu": [vr_loose_njet_mu],
+        # "vr_loose_njet_e": [vr_loose_njet_e],
+        # "vr_no_fwd_loose_njet_mu": [vr_no_fwd_loose_njet_mu],
+        # "vr_no_fwd_loose_njet_clip e": [vr_no_fwd_loose_njet_e],
+        # "w_cr_incl_mu": [w_cr_incl_mu],
+        # "w_cr_incl_e": [w_cr_incl_e],
+        # "recoil_inclusive_mu": [recoil_inclusive_mu],
+        # "recoil_inclusive_e": [recoil_inclusive_e],
+        # "recoil_fullinclusive_mu": [recoil_fullinclusive_mu],
+        # "recoil_fullinclusive_e": [recoil_fullinclusive_e],
+        # "recoil_closure_mu": [recoil_closure_mu],
+        # "recoil_closure_e": [recoil_closure_e],
+
         "boosted_e": [msd_window_cut_e],
-        # # "whad_peak_mu": [whad_window_cut_mu],  # |mjj^W - 80.4| < window
         "boosted_mu": [msd_window_cut_mu],
         "resolved_mu":  [whad_window_cut_bveto_mu],
         "resolved_e": [whad_window_cut_bveto_e],
+        
     },
 
-   
-    weights_classes=common_weights+[PileupWeight]+[SF_L1prefiring]+[wjet_reweight]+[SF_ele_trigger],
-       weights={"common": {"inclusive": ["genWeight", "lumi", "XS","PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr"]},
-        # "bysample": {
-        #        "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8": {
-        #             "inclusive": ["wjet_reweight"],},
-        #         "WJetsToLNu_13TeV-madgraphMLM-pythia8":{
-        #              "inclusive": ["wjet_reweight"],},
-        #     }    
+    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] +[SF_ele_trigger]+[FatJetTau21Weight,FatJetWvsQCDWeight,QGTaggingWeight],
+    weights={
+        "common": {
+            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr","sf_btag", "sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
         },
-        variations={"weights": {"common": {"inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger", "sf_ele_trigger","sf_L1prefiring","sf_jet_puId", "sf_partonshower_isr", "sf_partonshower_fsr"]}}}, #"pileup"
-
-   
+    },
+    variations={
+        "weights": {
+            "common": {
+                "inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr","sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
+            },
+        },
+        "shape": {"common": {"inclusive": ['jet_calibration', 'electron_scale_and_smearing', 'muons_scale_and_resolution']}}
+    
+    },
     variables={
         "nJets":          HistConf([Axis(coll="events", field="nJetGood",           bins=12, start=0,    stop=12,   label="N(jets)")]),
         "nBJets":         HistConf([Axis(coll="events", field="nBJetGood",          bins=8,  start=0,    stop=8,    label="N(bjets)")]),
@@ -535,6 +864,14 @@ cfg = Configurator(
         "jet1_phi":  HistConf([Axis(coll="jet1", field="phi",           bins=64,  start=-3.2, stop=3.2, label="jet1 phi")]),
         "jet1_pt":   HistConf([Axis(coll="jet1", field="pt",            bins=100, start=0,    stop=1000, label="jet1 pt")]),
         "jet1_qgl":  HistConf([Axis(coll="jet1", field="qgl",           bins=50,  start=0,    stop=1,   label="jet1 qgl")]),
+        
+        "jet1_btagDeepFlavQG": HistConf([Axis(coll="jet1", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet1 btagDeepFlavQG")]),
+        "jet2_btagDeepFlavQG": HistConf([Axis(coll="jet2", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet2 btagDeepFlavQG")]),
+        "jet3_btagDeepFlavQG": HistConf([Axis(coll="jet3", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet3 btagDeepFlavQG")]),
+        "jet4_btagDeepFlavQG": HistConf([Axis(coll="jet4", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet4 btagDeepFlavQG")]),
+        "jet5_btagDeepFlavQG": HistConf([Axis(coll="jet5", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet5 btagDeepFlavQG")]),
+        "jet6_btagDeepFlavQG": HistConf([Axis(coll="jet6", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet6 btagDeepFlavQG")]),
+
         "jet1_btagDeepFlavB": HistConf([Axis(coll="jet1", field="btagDeepFlavB", bins=50, start=0, stop=1, label="jet1 btagDeepFlavB")]),
         "jet2_eta":  HistConf([Axis(coll="jet2", field="eta",           bins=50,  start=-5,   stop=5,   label="jet2 eta")]),
         "jet2_phi":  HistConf([Axis(coll="jet2", field="phi",           bins=64,  start=-3.2, stop=3.2, label="jet2 phi")]),
@@ -564,14 +901,6 @@ cfg = Configurator(
         "lepton1_eta": HistConf([Axis(coll="lepton1", field="eta", bins=50,  start=-3,   stop=3,   label="lepton1 eta")]),
         "lepton1_phi": HistConf([Axis(coll="lepton1", field="phi", bins=64,  start=-3.2, stop=3.2, label="lepton1 phi")]),
         "lepton1_pt":  HistConf([Axis(coll="lepton1", field="pt",  bins=100, start=0,    stop=500, label="lepton1 pt")]),
-
-        "jet1_btagDeepFlavQG": HistConf([Axis(coll="jet1", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet1 btagDeepFlavQG")]),
-        "jet2_btagDeepFlavQG": HistConf([Axis(coll="jet2", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet2 btagDeepFlavQG")]),
-        "jet3_btagDeepFlavQG": HistConf([Axis(coll="jet3", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet3 btagDeepFlavQG")]),
-        "jet4_btagDeepFlavQG": HistConf([Axis(coll="jet4", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet4 btagDeepFlavQG")]),
-        "jet5_btagDeepFlavQG": HistConf([Axis(coll="jet5", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet5 btagDeepFlavQG")]),
-        "jet6_btagDeepFlavQG": HistConf([Axis(coll="jet6", field="btagDeepFlavQG", bins=25, start=0, stop=1, label="jet6 btagDeepFlavQG")]),
-
     },
     #THIS IS WHERE YOU ADD COLUMN VARIABLES TO SAVE FOR EVENT INFORMATION PROCESSING
     columns = {
