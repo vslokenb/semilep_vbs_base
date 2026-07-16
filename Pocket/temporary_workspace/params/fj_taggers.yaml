@@ -1,0 +1,23 @@
+fj_taggers:
+  # TODO: replace with per-year files when available; single measurement
+  # used as placeholder for all years for now
+  2016_PreVFP:
+    fj_tau21_SF:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+    fj_WvsQCD_SF_tau21cut:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+  2016_PostVFP:
+    fj_tau21_SF:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+    fj_WvsQCD_SF_tau21cut:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+  "2017":
+    fj_tau21_SF:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+    fj_WvsQCD_SF_tau21cut:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+  "2018":
+    fj_tau21_SF:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+    fj_WvsQCD_SF_tau21cut:
+      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz

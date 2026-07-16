@@ -99,6 +99,8 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/variations.yaml",
     f"{localdir}/params/fakelepton_weights_noiso_3j.yaml",
     f"{localdir}/params/dphi_weights.yaml",
+    f"{localdir}/params/qgtagging.yaml",
+    f"{localdir}/params/fj_taggers.yaml",
     update=True,
 )
 
@@ -457,6 +459,198 @@ class LHEPdfWeightWrapper(WeightWrapper):
             down=pdf_down + [alphas_down],
         )
 
+############################################
+##### QG TAGGING SCALE FACTOR (correctionlib)
+##### Shape SFs for qgl / btagDeepFlavQG / particleNetAK4_QvsG,
+##### one correction file per year (see params/qgtagging.yaml).
+##### Per-jet SF(QvG, flavor, |eta|, pt) multiplied over analysis jets.
+############################################
+import correctionlib
+
+# year -> CorrectionSet, loaded from params/qgtagging.yaml (all files same format)
+_qgtagging_csets = {}
+for _y in parameters.qgtagging.keys():
+    _qg_file = parameters.qgtagging[_y]["file"]
+    if not os.path.isabs(_qg_file):
+        _qg_file = f"{localdir}/{_qg_file}"
+    if os.path.exists(_qg_file):
+        _qgtagging_csets[_y] = correctionlib.CorrectionSet.from_file(_qg_file)
+
+# Full-shape SF: inputs (systematic, QvG, absflavor, abseta, pt).
+# Per discriminant bin; only |partonFlavour| 1-3 and 21 are corrected
+# (c/b/undefined get SF=1). Domain: QvG [0,1), |eta| [0,2.5), pt [30,8000).
+# Systematics: central, up/down (total), and {source}_{up,down} for
+# stat, fsr, isr, pu, jes, jer, L1prefiring, herwig, scale, PDF.
+_QG_CORR_NAME = "deepJet_fullshape"   # also available: qgl_fullshape, particleNet_fullshape
+_QG_JET_FIELD = "btagDeepFlavQG"      # jet field matching the correction
+
+# systematic sources exposed as weight variations ("total" = combined up/down)
+_QG_SOURCES = ["total", "stat", "fsr", "isr", "pu", "jes", "jer",
+               "L1prefiring", "herwig", "scale", "PDF"]
+
+
+class QGTaggingWeight(WeightWrapper):
+    name = "sf_qgtagging"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"sf_qgtagging_{s}" for s in _QG_SOURCES]
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(self.name, np.ones(size))
+
+        year = events.metadata["year"]
+        if year not in _qgtagging_csets:
+            raise KeyError(
+                f"No qgtagging correction file for year '{year}' "
+                f"(available: {list(_qgtagging_csets)}); check params/qgtagging.yaml"
+            )
+        corr = _qgtagging_csets[year][_QG_CORR_NAME]
+        jets = events.JetGood30
+
+        qvg    = ak.fill_none(getattr(jets, _QG_JET_FIELD, None), -1.0)
+        flav   = np.abs(ak.fill_none(jets.partonFlavour, 0))
+        abseta = np.abs(jets.eta)
+        pt     = jets.pt
+
+        # only light quarks (1-3) and gluons (21) are corrected
+        corrected_flav = ((flav >= 1) & (flav <= 3)) | (flav == 21)
+        in_domain = (qvg >= 0.0) & corrected_flav & (abseta < 2.5) & (pt >= 30.0)
+
+        counts   = ak.num(jets)
+        qvg_f    = np.clip(ak.to_numpy(ak.flatten(qvg)), 0.0, 0.999999)
+        flav_f   = ak.to_numpy(ak.flatten(flav)).astype(int)
+        abseta_f = np.clip(ak.to_numpy(ak.flatten(abseta)), 0.0, 2.499)
+        pt_f     = np.clip(ak.to_numpy(ak.flatten(pt)), 30.0, 7999.0)
+        dom_f    = ak.to_numpy(ak.flatten(in_domain))
+
+        def _per_event(systematic):
+            sf_f = np.ones(len(qvg_f))
+            if dom_f.any():
+                sf_f[dom_f] = corr.evaluate(
+                    systematic,
+                    qvg_f[dom_f], flav_f[dom_f], abseta_f[dom_f], pt_f[dom_f],
+                )
+            # product over jets in each event
+            return ak.to_numpy(ak.prod(ak.unflatten(sf_f, counts), axis=1))
+
+        nominal = _per_event("central")
+        ups, downs = [], []
+        for src in _QG_SOURCES:
+            if src == "total":
+                ups.append(_per_event("up"))
+                downs.append(_per_event("down"))
+            else:
+                ups.append(_per_event(f"{src}_up"))
+                downs.append(_per_event(f"{src}_down"))
+
+        return WeightDataMultiVariation(
+            name=self.name,
+            nominal=nominal,
+            variations=self._variations,
+            up=ups,
+            down=downs,
+        )
+
+
+############################################
+##### AK8 FAT-JET TAGGER SCALE FACTORS (correctionlib)
+##### Per-event SFs from the leading candidate fat jet, one file per year
+##### (see params/fj_taggers.yaml). fjtype = matched/unmatched to a gen W
+##### (dR < 0.8). Events without a candidate fat jet get SF = 1.
+#####   fj_tau21_SF            : SF(tau21), coarse bins [0, 0.45, 1.0]
+#####   fj_WvsQCD_SF_tau21cut  : SF(msoftdrop, WvsQCD), tau21 < 0.45 applied
+############################################
+
+# year -> {tagger_name: CorrectionSet}
+_fj_tagger_csets = {}
+for _y in parameters.fj_taggers.keys():
+    _fj_tagger_csets[_y] = {}
+    for _tag in parameters.fj_taggers[_y].keys():
+        _fj_file = parameters.fj_taggers[_y][_tag]["file"]
+        if not os.path.isabs(_fj_file):
+            _fj_file = f"{localdir}/{_fj_file}"
+        if os.path.exists(_fj_file):
+            _fj_tagger_csets[_y][_tag] = correctionlib.CorrectionSet.from_file(_fj_file)
+
+_FJ_SOURCES = ["stat", "pileup", "sf_btag",
+               "sf_partonshower_isr", "sf_partonshower_fsr", "JES", "JER"]
+
+
+def _fj_lead_and_match(events):
+    """Leading candidate fat jet, presence mask, and gen-W match (dR < 0.8)."""
+    fj = ak.firsts(events.candidate_boost)
+    has_fj = ~ak.is_none(fj)
+    genw = events.GenPart[np.abs(events.GenPart.pdgId) == 24]
+    dr = genw.delta_r(fj)
+    matched = ak.fill_none(ak.any(dr < 0.8, axis=1), False) & has_fj
+    return fj, ak.to_numpy(has_fj), ak.to_numpy(matched)
+
+
+def _fj_sf_multivariation(name, corr, obs_arrays, has_fj, matched):
+    """Evaluate SF per event, split matched/unmatched, all systematic sources."""
+    n = len(has_fj)
+
+    def _eval(systematic):
+        sf = np.ones(n)
+        for fjtype, sel in (("matched", has_fj & matched), ("unmatched", has_fj & ~matched)):
+            if sel.any():
+                sf[sel] = corr.evaluate(systematic, fjtype, *[a[sel] for a in obs_arrays])
+        return sf
+
+    nominal = _eval("nominal")
+    ups   = [_eval(f"{s}_up")   for s in _FJ_SOURCES]
+    downs = [_eval(f"{s}_down") for s in _FJ_SOURCES]
+    return WeightDataMultiVariation(
+        name=name,
+        nominal=nominal,
+        variations=[f"{name}_{s}" for s in _FJ_SOURCES],
+        up=ups,
+        down=downs,
+    )
+
+
+class FatJetTau21Weight(WeightWrapper):
+    name = "sf_fj_tau21"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"sf_fj_tau21_{s}" for s in _FJ_SOURCES]
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(self.name, np.ones(size))
+        year = events.metadata["year"]
+        cset = _fj_tagger_csets.get(year, {})
+        if "fj_tau21_SF" not in cset:
+            raise KeyError(f"No fj_tau21_SF file for year '{year}'; check params/fj_taggers.yaml")
+        corr = cset["fj_tau21_SF"]["fj_tau21_SF"]
+
+        fj, has_fj, matched = _fj_lead_and_match(events)
+        tau21 = np.clip(ak.to_numpy(ak.fill_none(fj.tau21, 0.0)), 0.0, 0.999)
+        return _fj_sf_multivariation(self.name, corr, [tau21], has_fj, matched)
+
+
+class FatJetWvsQCDWeight(WeightWrapper):
+    name = "sf_fj_WvsQCD"
+    has_variations = True
+    isMC_only = True
+    _variations = [f"sf_fj_WvsQCD_{s}" for s in _FJ_SOURCES]
+
+    def compute(self, events, size, shape_variation):
+        if shape_variation != "nominal":
+            return WeightData(self.name, np.ones(size))
+        year = events.metadata["year"]
+        cset = _fj_tagger_csets.get(year, {})
+        if "fj_WvsQCD_SF_tau21cut" not in cset:
+            raise KeyError(f"No fj_WvsQCD_SF_tau21cut file for year '{year}'; check params/fj_taggers.yaml")
+        corr = cset["fj_WvsQCD_SF_tau21cut"]["fj_WvsQCD_SF_tau21cut"]
+
+        fj, has_fj, matched = _fj_lead_and_match(events)
+        # candidate_boost already has tau21 < 0.45 applied (SF derivation selection)
+        msd    = np.clip(ak.to_numpy(ak.fill_none(fj.msoftdrop, 40.0)), 40.0, 199.9)
+        wvsqcd = np.clip(ak.to_numpy(ak.fill_none(fj.particleNet_WvsQCD, 0.0)), 0.0, 0.999)
+        return _fj_sf_multivariation(self.name, corr, [msd, wvsqcd], has_fj, matched)
+
 
 cfg = Configurator(
     parameters=parameters,
@@ -487,59 +681,59 @@ cfg = Configurator(
         "filter": {
             "samples": [
                 # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
-                # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
-                # "SingleMuon",
-                # "EGamma",
+                "SingleMuon",
+                "EGamma",
 
                 "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
-                # "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-                # "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-                # "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
-                # "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
 
-                # "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-                # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
 
                 "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
                 "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
                 "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-                # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
-                # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
-                # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+                "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
+                "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+                "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
 
-                # "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
            
                 # ###### SIGNAL #########
-                # "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
-                # "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                # "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
+                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
 
             ],
             "year": ["2018"],
@@ -625,10 +819,10 @@ cfg = Configurator(
         
     },
 
-    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger]+[DPHI_SF]+[MuonGoodLeadWeightBoosted]+[ElectronGoodLeadWeightBoosted]+ [LHEScaleWeightWrapper, LHEPdfWeightWrapper],
+    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger]+[DPHI_SF]+[MuonGoodLeadWeightBoosted]+[ElectronGoodLeadWeightBoosted]+ [LHEScaleWeightWrapper, LHEPdfWeightWrapper]+[FatJetTau21Weight,FatJetWvsQCDWeight,QGTaggingWeight],
     weights={
         "common": {
-            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag",  "LHEScaleWeight", "LHEPdfWeight"],
+            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag",  "LHEScaleWeight", "LHEPdfWeight", "sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
             "bycategory": {
                 "resolved_mu":           ["muon_inverttight_to_fake"],
                 "resolved_e":            ["electron_inverttight_to_fake"],
