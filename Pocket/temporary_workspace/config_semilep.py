@@ -97,7 +97,7 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/jet_scale_factors.yaml",
     f"{localdir}/params/classifiers.yaml",
     f"{localdir}/params/variations.yaml",
-    f"{localdir}/params/fakelepton_weights_noiso_3j.yaml",
+    # f"{localdir}/params/fakelepton_weights_noiso_3j.yaml",
     f"{localdir}/params/fj_taggers.yaml",
     f"{localdir}/params/qgtagging.yaml",
     update=True,
@@ -122,28 +122,28 @@ from coffea.lookup_tools import extractor
 
 fake_muon_weights = {}
 fake_electron_weights = {}
-for y in parameters.fakeleptonweights.keys():
-    ext = extractor()
-    ext.add_weight_sets([
-        f"muonFakeWeight {parameters.fakeleptonweights[y]['Muon']['nominal'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
-        f"muonFakeWeight_up {parameters.fakeleptonweights[y]['Muon']['up'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
-        f"muonFakeWeight_down {parameters.fakeleptonweights[y]['Muon']['down'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
-        f"electronFakeWeight {parameters.fakeleptonweights[y]['Electron']['nominal'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
-        f"electronFakeWeight_up {parameters.fakeleptonweights[y]['Electron']['up'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
-        f"electronFakeWeight_down {parameters.fakeleptonweights[y]['Electron']['down'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
-        ])
-    ext.finalize()
-    ev = ext.make_evaluator()
-    fake_muon_weights[y] = {
-        "nominal": ev[f"muonFakeWeight"],
-        "up":      ev[f"muonFakeWeight_up"],
-        "down":    ev[f"muonFakeWeight_down"],
-    }
-    fake_electron_weights[y] = {
-        "nominal": ev[f"electronFakeWeight"],
-        "up":      ev[f"electronFakeWeight_up"],
-        "down":    ev[f"electronFakeWeight_down"],
-    }
+# for y in parameters.fakeleptonweights.keys():
+#     ext = extractor()
+#     ext.add_weight_sets([
+#         f"muonFakeWeight {parameters.fakeleptonweights[y]['Muon']['nominal'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
+#         f"muonFakeWeight_up {parameters.fakeleptonweights[y]['Muon']['up'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
+#         f"muonFakeWeight_down {parameters.fakeleptonweights[y]['Muon']['down'][0]} {parameters.fakeleptonweights[y]['Muon']['file'][0]}",
+#         f"electronFakeWeight {parameters.fakeleptonweights[y]['Electron']['nominal'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
+#         f"electronFakeWeight_up {parameters.fakeleptonweights[y]['Electron']['up'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
+#         f"electronFakeWeight_down {parameters.fakeleptonweights[y]['Electron']['down'][0]} {parameters.fakeleptonweights[y]['Electron']['file'][0]}",
+#         ])
+#     ext.finalize()
+#     ev = ext.make_evaluator()
+#     fake_muon_weights[y] = {
+#         "nominal": ev[f"muonFakeWeight"],
+#         "up":      ev[f"muonFakeWeight_up"],
+#         "down":    ev[f"muonFakeWeight_down"],
+#     }
+#     fake_electron_weights[y] = {
+#         "nominal": ev[f"electronFakeWeight"],
+#         "up":      ev[f"electronFakeWeight_up"],
+#         "down":    ev[f"electronFakeWeight_down"],
+#     }
 
 
 import awkward as ak
@@ -310,6 +310,9 @@ for _y in parameters.qgtagging.keys():
 # Full-shape SF: inputs (systematic, QvG, absflavor, abseta, pt).
 # Per discriminant bin; only |partonFlavour| 1-3 and 21 are corrected
 # (c/b/undefined get SF=1). Domain: QvG [0,1), |eta| [0,2.5), pt [30,8000).
+# The deepJet QvG score is inverted (1 - score) before the lookup.
+# This is a SHAPE correction: it is renormalized per chunk so the total
+# yield is preserved (w_new = w * sf * sum(w) / sum(w * sf)).
 # Systematics: central, up/down (total), and {source}_{up,down} for
 # stat, fsr, isr, pu, jes, jer, L1prefiring, herwig, scale, PDF.
 _QG_CORR_NAME = "deepJet_fullshape"   # also available: qgl_fullshape, particleNet_fullshape
@@ -339,14 +342,20 @@ class QGTaggingWeight(WeightWrapper):
         corr = _qgtagging_csets[year][_QG_CORR_NAME]
         jets = events.JetGood30
 
-        qvg    = ak.fill_none(getattr(jets, _QG_JET_FIELD, None), -1.0)
-        flav   = np.abs(ak.fill_none(jets.partonFlavour, 0))
-        abseta = np.abs(jets.eta)
-        pt     = jets.pt
+        qvg_raw = ak.fill_none(getattr(jets, _QG_JET_FIELD, None), -1.0)
+        flav    = np.abs(ak.fill_none(jets.partonFlavour, 0))
+        abseta  = np.abs(jets.eta)
+        pt      = jets.pt
+
+        # invert the deepJet QvG score (score -> 1 - score); only flip valid
+        # scores (>= 0). Undefined (< 0) values are left as-is and fall
+        # outside the domain, so they get SF = 1.
+        valid = (qvg_raw >= 0.0)
+        qvg   = ak.where(valid, 1.0 - qvg_raw, qvg_raw)
 
         # only light quarks (1-3) and gluons (21) are corrected
         corrected_flav = ((flav >= 1) & (flav <= 3)) | (flav == 21)
-        in_domain = (qvg >= 0.0) & corrected_flav & (abseta < 2.5) & (pt >= 30.0)
+        in_domain = valid & corrected_flav & (abseta < 2.5) & (pt >= 30.0)
 
         counts   = ak.num(jets)
         qvg_f    = np.clip(ak.to_numpy(ak.flatten(qvg)), 0.0, 0.999999)
@@ -355,25 +364,42 @@ class QGTaggingWeight(WeightWrapper):
         pt_f     = np.clip(ak.to_numpy(ak.flatten(pt)), 30.0, 7999.0)
         dom_f    = ak.to_numpy(ak.flatten(in_domain))
 
-        def _per_event(systematic):
+        # per-event product of the per-jet SFs (before renormalization)
+        def _sf_product(systematic):
             sf_f = np.ones(len(qvg_f))
             if dom_f.any():
                 sf_f[dom_f] = corr.evaluate(
                     systematic,
                     qvg_f[dom_f], flav_f[dom_f], abseta_f[dom_f], pt_f[dom_f],
                 )
-            # product over jets in each event
             return ak.to_numpy(ak.prod(ak.unflatten(sf_f, counts), axis=1))
 
-        nominal = _per_event("central")
+        # This is a shape correction, not a normalization SF: renormalize so
+        # applying it does not change the total yield ->
+        #   w_new = w * sf * sum(w) / sum(w * sf)
+        # w is the generator weight (normalization proxy); the sum runs over
+        # the current chunk. The returned weight component is sf * norm (the
+        # framework multiplies genWeight/lumi/XS in separately).
+        if hasattr(events, "genWeight"):
+            w = ak.to_numpy(ak.fill_none(events.genWeight, 0.0))
+        else:
+            w = np.ones(size)
+        sum_w = np.sum(w)
+
+        def _renorm(sf_event):
+            denom = np.sum(w * sf_event)
+            norm = (sum_w / denom) if denom != 0.0 else 1.0
+            return sf_event * norm
+
+        nominal = _renorm(_sf_product("central"))
         ups, downs = [], []
         for src in _QG_SOURCES:
             if src == "total":
-                ups.append(_per_event("up"))
-                downs.append(_per_event("down"))
+                ups.append(_renorm(_sf_product("up")))
+                downs.append(_renorm(_sf_product("down")))
             else:
-                ups.append(_per_event(f"{src}_up"))
-                downs.append(_per_event(f"{src}_down"))
+                ups.append(_renorm(_sf_product(f"{src}_up")))
+                downs.append(_renorm(_sf_product(f"{src}_down")))
 
         return WeightDataMultiVariation(
             name=self.name,
@@ -382,7 +408,6 @@ class QGTaggingWeight(WeightWrapper):
             up=ups,
             down=downs,
         )
-
 
 ############################################
 ##### AK8 FAT-JET TAGGER SCALE FACTORS (correctionlib)
@@ -418,16 +443,31 @@ def _fj_lead_and_match(events):
     return fj, ak.to_numpy(has_fj), ak.to_numpy(matched)
 
 
-def _fj_sf_multivariation(name, corr, obs_arrays, has_fj, matched):
-    """Evaluate SF per event, split matched/unmatched, all systematic sources."""
+def _gen_norm_weight(events, size):
+    """Generator weight, used as the normalization proxy for shape corrections."""
+    if hasattr(events, "genWeight"):
+        return ak.to_numpy(ak.fill_none(events.genWeight, 0.0))
+    return np.ones(size)
+
+
+def _fj_sf_multivariation(name, corr, obs_arrays, has_fj, matched, w):
+    """
+    Evaluate the per-event SF (split matched/unmatched, all systematic sources)
+    and apply it as a SHAPE correction: each variation is renormalized so the
+    total yield is preserved -> w_new = w * sf * sum(w) / sum(w * sf), with w
+    the generator weight and the sum taken over the current chunk.
+    """
     n = len(has_fj)
+    sum_w = np.sum(w)
 
     def _eval(systematic):
         sf = np.ones(n)
         for fjtype, sel in (("matched", has_fj & matched), ("unmatched", has_fj & ~matched)):
             if sel.any():
                 sf[sel] = corr.evaluate(systematic, fjtype, *[a[sel] for a in obs_arrays])
-        return sf
+        denom = np.sum(w * sf)
+        norm = (sum_w / denom) if denom != 0.0 else 1.0
+        return sf * norm
 
     nominal = _eval("nominal")
     ups   = [_eval(f"{s}_up")   for s in _FJ_SOURCES]
@@ -458,7 +498,8 @@ class FatJetTau21Weight(WeightWrapper):
 
         fj, has_fj, matched = _fj_lead_and_match(events)
         tau21 = np.clip(ak.to_numpy(ak.fill_none(fj.tau21, 0.0)), 0.0, 0.999)
-        return _fj_sf_multivariation(self.name, corr, [tau21], has_fj, matched)
+        w = _gen_norm_weight(events, size)
+        return _fj_sf_multivariation(self.name, corr, [tau21], has_fj, matched, w)
 
 
 class FatJetWvsQCDWeight(WeightWrapper):
@@ -480,7 +521,8 @@ class FatJetWvsQCDWeight(WeightWrapper):
         # candidate_boost already has tau21 < 0.45 applied (SF derivation selection)
         msd    = np.clip(ak.to_numpy(ak.fill_none(fj.msoftdrop, 40.0)), 40.0, 199.9)
         wvsqcd = np.clip(ak.to_numpy(ak.fill_none(fj.particleNet_WvsQCD, 0.0)), 0.0, 0.999)
-        return _fj_sf_multivariation(self.name, corr, [msd, wvsqcd], has_fj, matched)
+        w = _gen_norm_weight(events, size)
+        return _fj_sf_multivariation(self.name, corr, [msd, wvsqcd], has_fj, matched, w)
 
 
 
@@ -515,56 +557,56 @@ cfg = Configurator(
                 "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
                 "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
                 "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
+                #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
+                #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                #"WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",
+                #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
+                #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                #"DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
                 "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
                 # "SingleMuon",
                 # "EGamma",
 
-                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
-                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
-                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
-                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                #"ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8,
+                #"ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                #"ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                #"ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                #"ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
 
-                "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
-                "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                #"ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+                #"ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
 
-                "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
-                "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-                "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
-                "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
-                "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
-                "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+                #"GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",
+                #"WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+                #"WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",
+                #"WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",
+                #"WZZ_TuneCP5_13TeV-amcatnlo-pythia8",
+                #"ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",
+                #"ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",
 
-                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
            
                 # # ###### SIGNAL #########
-                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
-                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
-                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD
+                #"WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
+                #"ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",
 
             ],
             "year": ["2018"],
