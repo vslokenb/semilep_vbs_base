@@ -554,9 +554,9 @@ cfg = Configurator(
         "filter": {
             "samples": [
                 # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",
                 #"WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",
                 #"WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",
                 #"WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",
@@ -564,7 +564,7 @@ cfg = Configurator(
                 #"WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",
                 #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
                 #"DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",
-                "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
+                # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",
                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",
 
                 # "SingleMuon",
