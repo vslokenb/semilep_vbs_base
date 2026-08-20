@@ -1,27 +1,27 @@
 classifiers:
   "2018":
     boosted_mu:
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_0_iter_142.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_1_iter_152.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_2_iter_123.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_3_iter_128.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_4_iter_223.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_5_iter_120.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_6_iter_207.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_7_iter_158.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_8_iter_178.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_mu_9_iter_196.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_0_iter_199.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_1_iter_74.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_2_iter_133.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_3_iter_108.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_4_iter_127.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_5_iter_120.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_6_iter_146.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_7_iter_171.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_8_iter_145.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_9_iter_116.json
     boosted_e:
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_0_iter_94.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_1_iter_88.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_2_iter_197.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_3_iter_91.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_4_iter_112.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_5_iter_146.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_6_iter_85.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_7_iter_139.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_8_iter_186.json
-      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_boosted_e_9_iter_92.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_0_iter_98.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_1_iter_106.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_2_iter_86.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_3_iter_46.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_4_iter_193.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_5_iter_82.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_6_iter_140.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_7_iter_82.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_8_iter_159.json
+      - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_9_iter_101.json
     resolved_mu:
       - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_resolved_mu_0_iter_381.json
       - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/bdt_qg/bdt_resolved_mu_1_iter_256.json

@@ -9,6 +9,9 @@ from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
 from pocket_coffea.parameters import defaults
 from pocket_coffea.lib.columns_manager import ColOut
 
+from pocket_coffea.lib.calibrators.legacy.legacy_calibrators import MuonsRochesterCalibrator
+from pocket_coffea.lib.calibrators.common import default_calibrators_sequence
+
 import numpy as np
 import awkward as ak
 from pocket_coffea.lib.weights import WeightWrapper, WeightData, WeightDataMultiVariation, WeightLambda
@@ -92,7 +95,7 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/triggers.yaml",
     f"{localdir}/params/plotting.yaml",
     f"{localdir}/params/pileup.yaml",
-    f"{localdir}/params/jets_calibration.yaml",
+    # f"{localdir}/params/jets_calibration.yaml",
     f"{localdir}/params/jet_scale_factors.yaml",
     f"{localdir}/params/lepton_scale_factors.yaml",
     f"{localdir}/params/classifiers.yaml",
@@ -364,10 +367,10 @@ class ElectronGoodLeadWeightBoosted(WeightWrapper):
 class LHEScaleWeightWrapper(WeightWrapper):
     """LHE renormalization and factorization scale uncertainties.
     LHEScaleWeight is already normalized as w_var/w_nominal in NanoAOD.
-    For the standard 9-member set:
-      renorm_scale: down=LHEScaleWeight[:,1], up=LHEScaleWeight[:,7]
-      fact_scale:   down=LHEScaleWeight[:,3], up=LHEScaleWeight[:,5]
-    Samples with fewer than 9 members get unit weights.
+    For the standard 8-member set:
+      renorm_scale: down=LHEScaleWeight[:,1], up=LHEScaleWeight[:,6]
+      fact_scale:   down=LHEScaleWeight[:,3], up=LHEScaleWeight[:,4]
+    Samples with fewer than 8 members get unit weights.
     """
     name = "LHEScaleWeight"
     has_variations = True
@@ -390,9 +393,9 @@ class LHEScaleWeightWrapper(WeightWrapper):
 
         w = events.LHEScaleWeight
         # pad so index 8 always exists; missing members -> 1.0 (no variation)
-        w = ak.fill_none(ak.pad_none(w, 9, axis=1, clip=False), 1.0)
+        w = ak.fill_none(ak.pad_none(w, 8, axis=1, clip=False), 1.0)
         n = ak.to_numpy(ak.num(events.LHEScaleWeight))
-        ok = n >= 9  # per-event guard (uniform within a sample in practice)
+        ok = n >= 8  # per-event guard (uniform within a sample in practice)
 
         def member(i):
             return np.where(ok, ak.to_numpy(w[:, i]), 1.0)
@@ -401,7 +404,7 @@ class LHEScaleWeightWrapper(WeightWrapper):
             name=self.name,
             nominal=np.ones(size),
             variations=self._variations,
-            up=[member(7), member(5)],
+            up=[member(6), member(4)],
             down=[member(1), member(3)],
         )
 
@@ -723,59 +726,59 @@ cfg = Configurator(
         "filter": {
             "samples": [
                 # "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8",
-                # "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
-                # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
-                # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
+                "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8",  # done
+                "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
+                "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
                 "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8",  # FAILED - retry
-                # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",  # done
+                "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",  # done
 
-                # "SingleMuon",  # done (all eras)
+                "SingleMuon",  # done (all eras)
                 # "EGamma",  # done (all eras)
 
-                # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                # "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
-                # "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
-                # "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
-                # "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
+                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
+                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
+                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
+                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
 
-                # "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
-                # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
+                "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
+                "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
 
-                # "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",  # done
-                # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                # "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",  # done
-                # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
-                # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",  # done
+                "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",  # done
+                "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
+                "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
 
-                # "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
 
-                # ###### SIGNAL #########
-                # "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD  # done
-                # "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                # "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                ##### SIGNAL #########
+                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD  # done
+                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
 
             ],
             "year": ["2018"],
@@ -860,11 +863,11 @@ cfg = Configurator(
         "resolved_e": [whad_window_cut_bveto_e],
         
     },
-
+    calibrators=default_calibrators_sequence+[MuonsRochesterCalibrator],
     weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger]+[DPHI_SF]+[MuonGoodLeadWeightBoosted]+[ElectronGoodLeadWeightBoosted]+ [LHEScaleWeightWrapper, LHEPdfWeightWrapper]+[FatJetTau21Weight,FatJetWvsQCDWeight,QGTaggingWeight],
     weights={
         "common": {
-            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
+            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger_run2","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
             "bycategory": {
                 "resolved_mu":           ["muon_inverttight_to_fake"],
                 "resolved_e":            ["electron_inverttight_to_fake"],

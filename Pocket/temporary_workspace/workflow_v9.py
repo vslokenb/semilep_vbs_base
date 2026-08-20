@@ -264,11 +264,11 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         b_mask = (np.abs(ev.CentralJets.eta) < 2.4) & (ev.CentralJets.btagDeepB > 0.1522) #& (ev.JetGood.pt > 20) NANO V9
         # b_mask = (np.abs(ev.JetGood.eta) < 2.4) & (ev.JetGood.btagUParTAK4B > 0.0246 ) #& (ev.JetGood.pt > 20) ## USING Summer24 WP
-        b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.15) #TEST EVAL FOR AK8 BTAG
+        b_mask_ak8 = (ev.candidate_boost.particleNetMD_Xbb > 0.9172) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
         ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
 
-        b_mask_ak8_tight = (ev.candidate_boost.btagDeepB > 0.75) #TEST EVAL FOR AK8 BTAG
+        b_mask_ak8_tight = (ev.candidate_boost.particleNetMD_Xbb > 0.9880) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
         ev["BJet_ak8_tight"] = ev.candidate_boost[b_mask_ak8_tight]
 

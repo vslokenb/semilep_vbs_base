@@ -342,14 +342,22 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         dR_jets_jet = ev.JetGood.metric_table(ev.candidate_boost)
         mask_jet_cleaning = ak.prod(dR_jets_jet > 0.8, axis=2) == 1
         separation = ak.fill_none(ev.JetGood.metric_table(ev.candidate_boost), np.nan)
-        b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.15) #TEST EVAL FOR AK8 BTAG
+        # b_mask_ak8 = (ev.candidate_boost.btagDeepB > 0.15) #TEST EVAL FOR AK8 BTAG
+        # # ev["BJet_upart"] = ev.JetGood[b_mask]
+        # ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
+        # #ev["separation"] = dR_jets_jet
+        # #ev["separation_after_cleaning"] = ak.fill_none(ev.JetGood[mask_jet_cleaning].metric_table(ev.candidate_boost), np.nan)
+        # b_mask_ak8_tight = (ev.candidate_boost.btagDeepB > 0.75) #TEST EVAL FOR AK8 BTAG
+        b_mask_ak8 = (ev.candidate_boost.particleNetMD_Xbb > 0.9172) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
         ev["BJet_ak8"] = ev.candidate_boost[b_mask_ak8]
-        #ev["separation"] = dR_jets_jet
-        #ev["separation_after_cleaning"] = ak.fill_none(ev.JetGood[mask_jet_cleaning].metric_table(ev.candidate_boost), np.nan)
-        b_mask_ak8_tight = (ev.candidate_boost.btagDeepB > 0.75) #TEST EVAL FOR AK8 BTAG
+
+        b_mask_ak8_tight = (ev.candidate_boost.particleNetMD_Xbb > 0.9880) #TEST EVAL FOR AK8 BTAG
         # ev["BJet_upart"] = ev.JetGood[b_mask]
         ev["BJet_ak8_tight"] = ev.candidate_boost[b_mask_ak8_tight]
+
+        # ev["BJet_upart"] = ev.JetGood[b_mask]
+        # ev["BJet_ak8_tight"] = ev.candidate_boost[b_mask_ak8_tight]
         # far_enough_from_ak8 = (separation > 0.8)
         ev["JetGood"] = ev.JetGood[mask_jet_cleaning]
         ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)

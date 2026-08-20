@@ -1,5 +1,4 @@
 qgtagging:
-  # TODO: replace with per-year full-shape files when available;
   # UL17 used as placeholder for all years for now
   2016_PreVFP:
     file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/qgtagging_2017.json.gz

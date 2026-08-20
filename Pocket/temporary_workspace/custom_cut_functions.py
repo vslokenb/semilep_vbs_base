@@ -218,7 +218,7 @@ whad_window_cut_bveto_mu = Cut(
 def in_msd_window_fatjet_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
     #yes_fat = (events.nFatJetCentral >= 1)
-    b_veto = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto = (events.nBJetGood == 0) # & (events.nBJet_ak8 == 0)
     loose_lep_veto = (events.nLeptonVeto < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt", None)), np.nan)
@@ -372,7 +372,7 @@ whad_window_cut_bveto_e = Cut(
 def in_msd_window_fatjet_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
     #yes_fat = (events.nFatJetCentral >= 1)
-    b_veto = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto = (events.nBJetGood == 0) # & (events.nBJet_ak8 == 0)
 
     loose_lep_veto = (events.nLeptonVeto < 2)
     yes_fat = (events.nFatJetCandidate == 1)
@@ -488,7 +488,7 @@ ttbar_cr_resolved_e = Cut(
 
 def in_ttbar_cr_boosted_mu(events, params, **kwargs):
     muon_ch = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
-    b_tag   = (events.nBJet_ak8_tight >= 1)
+    b_tag   = (events.nBJetTight >= 1)
     loose_lep_veto = (events.nLeptonVeto < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt", None)), np.nan)
@@ -510,7 +510,7 @@ def in_ttbar_cr_boosted_mu(events, params, **kwargs):
 
 def in_ttbar_cr_boosted_e(events, params, **kwargs):
     electron_ch = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
-    b_tag   = (events.nBJet_ak8_tight >= 1)
+    b_tag   = (events.nBJetTight >= 1)
     loose_lep_veto = (events.nLeptonVeto < 2)
     yes_fat = (events.nFatJetCandidate == 1)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt", None)), np.nan)
@@ -820,7 +820,7 @@ def _boosted_skeleton_mu(events, params):
     """Shared boosted SR skeleton for mu channel (no mT, no mSD window applied yet)."""
     muon_ch        = (events.nElectronGood38 == 0) & (events.nMuonGood30 == 1)
     yes_fat        = (events.nFatJetCandidate == 1)
-    b_veto         = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto         = (events.nBJetGood == 0) # & (events.nBJet_ak8 == 0)
     loose_lep_veto = (events.nLeptonVeto < 2)
     fj1_pt  = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt",        None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "msoftdrop", None)), np.nan)
@@ -846,7 +846,7 @@ def _boosted_skeleton_e(events, params):
     """Shared boosted SR skeleton for e channel (no mT, no mSD window applied yet)."""
     electron_ch    = (events.nElectronGood38 == 1) & (events.nMuonGood30 == 0)
     yes_fat        = (events.nFatJetCandidate == 1)
-    b_veto         = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto         = (events.nBJetGood == 0) # & (events.nBJet_ak8 == 0)
     loose_lep_veto = (events.nLeptonVeto < 2)
     fj1_pt  = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt",        None)), np.nan)
     fj1_msd = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "msoftdrop", None)), np.nan)
@@ -916,7 +916,7 @@ def _vr_boosted_no_fwd(events, lepton_ch, params):
     else:
         ht_mask = True
     yes_fat        = (events.nFatJetCandidate == 1)
-    b_veto         = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto         = (events.nBJetGood == 0) # & (events.nBJet_ak8 == 0)
     loose_lep_veto = (events.nLeptonVeto < 2)
     fj1_pt = ak.fill_none(ak.firsts(getattr(events.candidate_boost, "pt", None)), np.nan)
     pt_cut = np.where(np.isnan(fj1_pt), False, fj1_pt > 200.)
@@ -1039,7 +1039,7 @@ def _qcd_cr_boosted_common(events, params, lepton_mask):
 
     loose_lep_veto = (events.nLeptonVeto < 2)
     yes_fat = (events.nFatJetCandidate == 1)
-    b_veto  = (events.nBJetGood == 0) & (events.nBJet_ak8 == 0)
+    b_veto  = (events.nBJetGood == 0) # & (events.nBJet_ak8 == 0)
     met_cut = (events.DeepMETResolutionTune.pt > params["met_pt"])
     cut_mt_w = (events.mt_w_leptonic_loose < params["mt_w"])
 

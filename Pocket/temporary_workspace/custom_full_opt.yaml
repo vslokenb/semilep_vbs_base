@@ -1,8 +1,8 @@
 queue: workday
-mem-per-worker: 20
-scaleout: 100
-cores-per-worker: 2
-chunksize: 50000
+mem-per-worker: 24
+scaleout: 50
+cores-per-worker: 1
+chunksize: 25000
 adaptive: false
 skip-bad-files: false
 custom-setup-commands:

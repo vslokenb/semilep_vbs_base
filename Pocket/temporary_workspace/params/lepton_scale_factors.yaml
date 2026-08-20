@@ -149,6 +149,7 @@ lepton_scale_factors:
         #trigger: "2024Prompt"
 
 
+
     # The scale and smearing configuration is expected to have this structure
     scale_and_smearing:      
       apply: 
@@ -199,19 +200,19 @@ lepton_scale_factors:
     trigger_sf:
       2016_PreVFP:
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL16preVFP.json.gz
+        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL16preVFP_pocketcoffea.json.gz
         path: HLT_SF_Ele27_WPTight_Gsf
       2016_PostVFP:
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL16postVFP.json.gz
+        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL16postVFP_pocketcoffea.json.gz
         path: HLT_SF_Ele27_WPTight_Gsf
       '2017':
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL17.json.gz
+        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL17_pocketcoffea.json.gz
         path: HLT_SF_Ele35_WPTight_Gsf
       '2018':
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL18.json.gz
+        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL18_pocketcoffea.json.gz
         path: HLT_SF_Ele32_WPTight_Gsf
       2022_preEE:
         2022_preEE:
