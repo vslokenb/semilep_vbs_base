@@ -392,10 +392,15 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev['JetHEM'] = ev.JetGood[HEM_mask_jet]
         
         #### CLEAR RESCALING OF MC WHICH ARE EFFECTED BY HEM ISSUE IN 2018
+                #### CLEAR RESCALING OF MC WHICH ARE EFFECTED BY HEM ISSUE IN 2018
         if hasattr(ev, "genWeight") and "2018" in ev.metadata["dataset"]:
+            if "genWeight_preHEM" not in ev.fields:
+                ev["genWeight_preHEM"] = ev.genWeight
             has_hem_object = (ak.num(ev.ElectronHEM) + ak.num(ev.JetHEM)) >= 1
-            ev["genWeight"] = ak.where(has_hem_object, ev.genWeight * 0.35, ev.genWeight)
- 
+            ev["genWeight"] = ak.where(
+                has_hem_object, ev.genWeight_preHEM * 0.35, ev.genWeight_preHEM
+            )
+        
         # b-tagging 
         ev['CentralJets']= ev.JetGood[np.abs(ev.JetGood.eta) < 2.4]
 

@@ -9,7 +9,7 @@ from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
 from pocket_coffea.parameters import defaults
 from pocket_coffea.lib.columns_manager import ColOut
 
-from pocket_coffea.lib.calibrators.legacy.legacy_calibrators import MuonsRochesterCalibrator
+from pocket_coffea.lib.calibrators.legacy.legacy_calibrators import MuonsRochesterCalibrator, ElectronsScaleSmearingLegacyCalibrator
 from pocket_coffea.lib.calibrators.common import default_calibrators_sequence
 
 import numpy as np
@@ -311,12 +311,18 @@ for _y in parameters.qgtagging.keys():
     if os.path.exists(_qg_file):
         _qgtagging_csets[_y] = correctionlib.CorrectionSet.from_file(_qg_file)
 
+# Set POCKET_NORM_DEBUG=1 to print the renormalization constant per
+# (weight, shape variation). If `norm` differs between "nominal" and a shape
+# variation, that difference multiplies every event in that variation and shows
+# up as a flat normalization shift in every systematic's ratio panel.
+_NORM_DEBUG = bool(os.environ.get("POCKET_NORM_DEBUG"))
+
 # Full-shape SF: inputs (systematic, QvG, absflavor, abseta, pt).
 # Per discriminant bin; only |partonFlavour| 1-3 and 21 are corrected
 # (c/b/undefined get SF=1). Domain: QvG [0,1), |eta| [0,2.5), pt [30,8000).
 # The deepJet QvG score is inverted (1 - score) before the lookup.
-# This is a SHAPE correction: it is renormalized per chunk so the total
-# yield is preserved (w_new = w * sf * sum(w) / sum(w * sf)).
+# This is a SHAPE correction: it is renormalized so the total yield is
+# preserved (w_new = w * sf * sum(w) / sum(w * sf)).
 # Systematics: central, up/down (total), and {source}_{up,down} for
 # stat, fsr, isr, pu, jes, jer, L1prefiring, herwig, scale, PDF.
 _QG_CORR_NAME = "deepJet_fullshape"   # also available: qgl_fullshape, particleNet_fullshape
@@ -327,6 +333,40 @@ _QG_SOURCES = ["total", "stat", "fsr", "isr", "pu", "jes", "jer",
                "L1prefiring", "herwig", "scale", "PDF"]
 
 
+def _gen_norm_weight(events, size):
+    """Generator weight, used as the normalization proxy for shape corrections.
+
+    NOTE: the workflow replaces genWeight with np.sign(genWeight) before
+    base.process() runs, matching the `sum_signOf_genweights` normalization, so
+    this proxy is +/-1 (and 0 for genWeight == 0).
+    """
+    if hasattr(events, "genWeight"):
+        return ak.to_numpy(ak.fill_none(events.genWeight, 0.0))
+    return np.ones(size)
+
+
+def _renorm_constant(w, sf_event, sum_w, cache, key, is_nominal, tag, shape_variation):
+    """Renormalization constant for a shape SF, fixed on the nominal pass.
+
+    norm = sum(w) / sum(w * sf) is a property of the CHUNK, not of the event.
+    compute() runs after apply_preselections(), so each shape variation sees a
+    slightly different event set; recomputing norm per pass therefore gives each
+    variation a different overall normalization, which appears as a flat shift in
+    every ratio panel. Compute it once on the nominal pass and reuse it.
+
+    The fallback (key missing) keeps the weight well-defined if a variation is
+    ever evaluated before the nominal one.
+    """
+    if is_nominal or key not in cache:
+        denom = np.sum(w * sf_event)
+        cache[key] = (sum_w / denom) if denom != 0.0 else 1.0
+        if _NORM_DEBUG:
+            print(f"[{tag}] {shape_variation}: computed norm[{key}]={cache[key]:.8f}")
+    elif _NORM_DEBUG:
+        print(f"[{tag}] {shape_variation}: reused   norm[{key}]={cache[key]:.8f}")
+    return cache[key]
+
+
 class QGTaggingWeight(WeightWrapper):
     name = "sf_qgtagging"
     has_variations = True
@@ -334,9 +374,6 @@ class QGTaggingWeight(WeightWrapper):
     _variations = [f"sf_qgtagging_{s}" for s in _QG_SOURCES]
 
     def compute(self, events, size, shape_variation):
-        if shape_variation != "nominal":
-            return WeightData(self.name, np.ones(size))
-
         year = events.metadata["year"]
         if year not in _qgtagging_csets:
             raise KeyError(
@@ -378,32 +415,34 @@ class QGTaggingWeight(WeightWrapper):
                 )
             return ak.to_numpy(ak.prod(ak.unflatten(sf_f, counts), axis=1))
 
-        # This is a shape correction, not a normalization SF: renormalize so
-        # applying it does not change the total yield ->
-        #   w_new = w * sf * sum(w) / sum(w * sf)
-        # w is the generator weight (normalization proxy); the sum runs over
-        # the current chunk. The returned weight component is sf * norm (the
-        # framework multiplies genWeight/lumi/XS in separately).
-        if hasattr(events, "genWeight"):
-            w = ak.to_numpy(ak.fill_none(events.genWeight, 0.0))
-        else:
-            w = np.ones(size)
+        # w is the generator-weight normalization proxy; the framework multiplies
+        # genWeight/lumi/XS in separately. The returned component is sf * norm.
+        w = _gen_norm_weight(events, size)
         sum_w = np.sum(w)
 
-        def _renorm(sf_event):
-            denom = np.sum(w * sf_event)
-            norm = (sum_w / denom) if denom != 0.0 else 1.0
+        # Per-chunk cache, shared across this chunk's shape-variation passes.
+        # A fresh WeightsManager (and so a fresh wrapper) is built per chunk, and
+        # the nominal variation is processed first, so the nominal pass fills it.
+        if not hasattr(self, "_norm_cache"):
+            self._norm_cache = {}
+        is_nominal = (shape_variation == "nominal")
+
+        def _renorm(sf_event, key):
+            norm = _renorm_constant(w, sf_event, sum_w, self._norm_cache, key,
+                                    is_nominal, "qg", shape_variation)
             return sf_event * norm
 
-        nominal = _renorm(_sf_product("central"))
+        nominal = _renorm(_sf_product("central"), "central")
+        if not is_nominal:
+            # Nominal value still applied -- only the up/down templates are skipped.
+            return WeightData(self.name, nominal)
+
         ups, downs = [], []
         for src in _QG_SOURCES:
-            if src == "total":
-                ups.append(_renorm(_sf_product("up")))
-                downs.append(_renorm(_sf_product("down")))
-            else:
-                ups.append(_renorm(_sf_product(f"{src}_up")))
-                downs.append(_renorm(_sf_product(f"{src}_down")))
+            up_key = "up" if src == "total" else f"{src}_up"
+            dn_key = "down" if src == "total" else f"{src}_down"
+            ups.append(_renorm(_sf_product(up_key), up_key))
+            downs.append(_renorm(_sf_product(dn_key), dn_key))
 
         return WeightDataMultiVariation(
             name=self.name,
@@ -412,6 +451,7 @@ class QGTaggingWeight(WeightWrapper):
             up=ups,
             down=downs,
         )
+
 
 ############################################
 ##### AK8 FAT-JET TAGGER SCALE FACTORS (correctionlib)
@@ -447,33 +487,36 @@ def _fj_lead_and_match(events):
     return fj, ak.to_numpy(has_fj), ak.to_numpy(matched)
 
 
-def _gen_norm_weight(events, size):
-    """Generator weight, used as the normalization proxy for shape corrections."""
-    if hasattr(events, "genWeight"):
-        return ak.to_numpy(ak.fill_none(events.genWeight, 0.0))
-    return np.ones(size)
-
-
-def _fj_sf_multivariation(name, corr, obs_arrays, has_fj, matched, w):
+def _fj_sf_multivariation(name, corr, obs_arrays, has_fj, matched, w,
+                          nominal_only=False, norm_cache=None,
+                          is_nominal=True, shape_variation="nominal"):
     """
     Evaluate the per-event SF (split matched/unmatched, all systematic sources)
     and apply it as a SHAPE correction: each variation is renormalized so the
-    total yield is preserved -> w_new = w * sf * sum(w) / sum(w * sf), with w
-    the generator weight and the sum taken over the current chunk.
+    total yield is preserved -> w_new = w * sf * sum(w) / sum(w * sf).
+
+    `norm_cache` fixes the renormalization constant on the nominal pass so it is
+    not recomputed (and so does not drift) for every shape variation -- see
+    _renorm_constant.
     """
     n = len(has_fj)
     sum_w = np.sum(w)
+    if norm_cache is None:
+        norm_cache = {}
 
     def _eval(systematic):
         sf = np.ones(n)
         for fjtype, sel in (("matched", has_fj & matched), ("unmatched", has_fj & ~matched)):
             if sel.any():
                 sf[sel] = corr.evaluate(systematic, fjtype, *[a[sel] for a in obs_arrays])
-        denom = np.sum(w * sf)
-        norm = (sum_w / denom) if denom != 0.0 else 1.0
+        norm = _renorm_constant(w, sf, sum_w, norm_cache, systematic,
+                                is_nominal, name, shape_variation)
         return sf * norm
 
     nominal = _eval("nominal")
+    if nominal_only:
+        # Nominal value still applied -- only the up/down templates are skipped.
+        return WeightData(name, nominal)
     ups   = [_eval(f"{s}_up")   for s in _FJ_SOURCES]
     downs = [_eval(f"{s}_down") for s in _FJ_SOURCES]
     return WeightDataMultiVariation(
@@ -492,8 +535,6 @@ class FatJetTau21Weight(WeightWrapper):
     _variations = [f"sf_fj_tau21_{s}" for s in _FJ_SOURCES]
 
     def compute(self, events, size, shape_variation):
-        if shape_variation != "nominal":
-            return WeightData(self.name, np.ones(size))
         year = events.metadata["year"]
         cset = _fj_tagger_csets.get(year, {})
         if "fj_tau21_SF" not in cset:
@@ -503,7 +544,17 @@ class FatJetTau21Weight(WeightWrapper):
         fj, has_fj, matched = _fj_lead_and_match(events)
         tau21 = np.clip(ak.to_numpy(ak.fill_none(fj.tau21, 0.0)), 0.0, 0.999)
         w = _gen_norm_weight(events, size)
-        return _fj_sf_multivariation(self.name, corr, [tau21], has_fj, matched, w)
+
+        if not hasattr(self, "_norm_cache"):
+            self._norm_cache = {}
+        is_nominal = (shape_variation == "nominal")
+        return _fj_sf_multivariation(
+            self.name, corr, [tau21], has_fj, matched, w,
+            nominal_only=not is_nominal,
+            norm_cache=self._norm_cache,
+            is_nominal=is_nominal,
+            shape_variation=shape_variation,
+        )
 
 
 class FatJetWvsQCDWeight(WeightWrapper):
@@ -513,8 +564,6 @@ class FatJetWvsQCDWeight(WeightWrapper):
     _variations = [f"sf_fj_WvsQCD_{s}" for s in _FJ_SOURCES]
 
     def compute(self, events, size, shape_variation):
-        if shape_variation != "nominal":
-            return WeightData(self.name, np.ones(size))
         year = events.metadata["year"]
         cset = _fj_tagger_csets.get(year, {})
         if "fj_WvsQCD_SF_tau21cut" not in cset:
@@ -526,8 +575,17 @@ class FatJetWvsQCDWeight(WeightWrapper):
         msd    = np.clip(ak.to_numpy(ak.fill_none(fj.msoftdrop, 40.0)), 40.0, 199.9)
         wvsqcd = np.clip(ak.to_numpy(ak.fill_none(fj.particleNet_WvsQCD, 0.0)), 0.0, 0.999)
         w = _gen_norm_weight(events, size)
-        return _fj_sf_multivariation(self.name, corr, [msd, wvsqcd], has_fj, matched, w)
 
+        if not hasattr(self, "_norm_cache"):
+            self._norm_cache = {}
+        is_nominal = (shape_variation == "nominal")
+        return _fj_sf_multivariation(
+            self.name, corr, [msd, wvsqcd], has_fj, matched, w,
+            nominal_only=not is_nominal,
+            norm_cache=self._norm_cache,
+            is_nominal=is_nominal,
+            shape_variation=shape_variation,
+        )
 
 cfg = Configurator(
     parameters=parameters,
@@ -600,7 +658,7 @@ cfg = Configurator(
                 "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done (fixed on retry)
                 "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
 
-                ###### SIGNAL #########
+                ##### SIGNAL #########
                 "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
                 "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done (fixed on retry)
                 "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
@@ -780,7 +838,7 @@ cfg = Configurator(
             },
         },
     },
-    calibrators=default_calibrators_sequence+[MuonsRochesterCalibrator],
+    calibrators=default_calibrators_sequence+[MuonsRochesterCalibrator]+[ElectronsScaleSmearingLegacyCalibrator],
     variations={
         "weights": {
             "common": {
@@ -861,7 +919,7 @@ cfg = Configurator(
                 },
             },
         },
-        "shape": {"common": {"inclusive": ['jet_calibration', 'electron_scale_and_smearing', 'muons_rochester']}}
+        "shape": {"common": {"inclusive": ['jet_calibration', 'muons_rochester','electron_scale_smearing_legacy']}}
 
     },
     variables={
