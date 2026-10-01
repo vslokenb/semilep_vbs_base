@@ -154,16 +154,16 @@ default_jets_calibration:
       AK4PFchs:
         2016_PreVFP: 
           - JES_Regrouped_Absolute
-          - JES_Regrouped_Absolute_2016
+          - JES_Regrouped_Absolute_2016APV
           - JES_Regrouped_FlavorQCD
           - JES_Regrouped_EC2
-          - JES_Regrouped_EC2_2016
+          - JES_Regrouped_EC2_2016APV
           - JES_Regrouped_HF
-          - JES_Regrouped_HF_2016
+          - JES_Regrouped_HF_2016APV
           - JES_Regrouped_BBEC1
-          - JES_Regrouped_BBEC1_2016
+          - JES_Regrouped_BBEC1_2016APV
           - JES_Regrouped_RelativeBal
-          - JES_Regrouped_RelativeSample_2016
+          - JES_Regrouped_RelativeSample_2016APV
           - JER
         2016_PostVFP:
           - JES_Regrouped_Absolute
