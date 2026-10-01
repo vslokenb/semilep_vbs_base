@@ -935,38 +935,38 @@ cfg = Configurator(
                 "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
                 "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
 
-                "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
-                "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
+                # "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
+                # "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
 
-                "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",  # done
-                "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",  # done
-                "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
-                "WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8",
-                "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                # "GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8",  # done
+                # "WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                # "WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                # "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",  # done
+                # "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+                # "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
+                # "WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8",
+                # "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
 
-                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
 
                 #### SIGNAL #########
-                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD  # done
-                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
-                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8", #WplusTo2JWminusToLNuJJ missing in QCD  # done
+                # "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+                # "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
 
             ],
             "year": ["2018"],
@@ -995,11 +995,11 @@ cfg = Configurator(
         # ------------------------------------------------------------------
         "w_cr_mu": [w_cr_mu],
         "w_cr_e":  [w_cr_e],
-        "w_cr_boosted_mu": [w_cr_boosted_mu],
-        "w_cr_boosted_e": [w_cr_boosted_e],
+        # "w_cr_boosted_mu": [w_cr_boosted_mu],
+        # "w_cr_boosted_e": [w_cr_boosted_e],
 
-        "ttbar_cr_boosted_mu": [ttbar_cr_boosted_mu],
-        "ttbar_cr_boosted_e": [ttbar_cr_boosted_e],
+        # "ttbar_cr_boosted_mu": [ttbar_cr_boosted_mu],
+        # "ttbar_cr_boosted_e": [ttbar_cr_boosted_e],
         "ttbar_cr_resolved_mu": [ttbar_cr_resolved_mu],
         "ttbar_cr_resolved_e": [ttbar_cr_resolved_e],
 
@@ -1022,10 +1022,10 @@ cfg = Configurator(
         # Validation region
         # SR structure exactly (no W mass window), mT in [20, 30]
         # ------------------------------------------------------------------
-        "vr_mu": [vr_mu],
-        "vr_e":  [vr_e],
-        "vr_boosted_mu": [vr_boosted_mu],
-        "vr_boosted_e": [vr_boosted_e],
+        # "vr_mu": [vr_mu],
+        # "vr_e":  [vr_e],
+        # "vr_boosted_mu": [vr_boosted_mu],
+        # "vr_boosted_e": [vr_boosted_e],
         # "vr_boosted_no_fwd_mu": [vr_boosted_no_fwd_mu],
         # "vr_boosted_no_fwd_e": [vr_boosted_no_fwd_e],
         # "vr_qcd_enriched_mu": [vr_qcd_enriched_mu],
@@ -1045,10 +1045,10 @@ cfg = Configurator(
         # "recoil_closure_mu": [recoil_closure_mu],
         # "recoil_closure_e": [recoil_closure_e],
 
-        "boosted_e": [msd_window_cut_e],
-        "boosted_mu": [msd_window_cut_mu],
-        "resolved_mu":  [whad_window_cut_bveto_mu],
-        "resolved_e": [whad_window_cut_bveto_e],
+        # "boosted_e": [msd_window_cut_e],
+        # "boosted_mu": [msd_window_cut_mu],
+        # "resolved_mu":  [whad_window_cut_bveto_mu],
+        # "resolved_e": [whad_window_cut_bveto_e],
         
     },
     calibrators=default_calibrators_sequence+[MuonsRochesterCalibrator],
@@ -1057,22 +1057,22 @@ cfg = Configurator(
         "common": {
             "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger_run2","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr", "sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging", "LHEScaleWeight", "LHEPdfWeight"],
             "bycategory": {
-                "resolved_mu":           ["muon_inverttight_to_fake"],
-                "resolved_e":            ["electron_inverttight_to_fake"],
+                # "resolved_mu":           ["muon_inverttight_to_fake"],
+                # "resolved_e":            ["electron_inverttight_to_fake"],
                 "ttbar_cr_resolved_mu":  ["muon_inverttight_to_fake"],
                 "ttbar_cr_resolved_e":   ["electron_inverttight_to_fake"],
                 "w_cr_mu":               ["muon_inverttight_to_fake"],
                 "w_cr_e":                ["electron_inverttight_to_fake"],
-                "vr_mu":                 ["muon_inverttight_to_fake"],
-                "vr_e":                  ["electron_inverttight_to_fake"],
-                "boosted_mu":            ["muon_inverttight_to_fake_boosted"],
-                "boosted_e":             ["electron_inverttight_to_fake_boosted"],
-                "ttbar_cr_boosted_mu":   ["muon_inverttight_to_fake_boosted"],
-                "ttbar_cr_boosted_e":    ["electron_inverttight_to_fake_boosted"],
-                "w_cr_boosted_mu":       ["muon_inverttight_to_fake_boosted"],
-                "w_cr_boosted_e":        ["electron_inverttight_to_fake_boosted"],
-                "vr_boosted_mu":         ["muon_inverttight_to_fake_boosted"],
-                "vr_boosted_e":          ["electron_inverttight_to_fake_boosted"],
+                # "vr_mu":                 ["muon_inverttight_to_fake"],
+                # "vr_e":                  ["electron_inverttight_to_fake"],
+                # "boosted_mu":            ["muon_inverttight_to_fake_boosted"],
+                # "boosted_e":             ["electron_inverttight_to_fake_boosted"],
+                # "ttbar_cr_boosted_mu":   ["muon_inverttight_to_fake_boosted"],
+                # "ttbar_cr_boosted_e":    ["electron_inverttight_to_fake_boosted"],
+                # "w_cr_boosted_mu":       ["muon_inverttight_to_fake_boosted"],
+                # "w_cr_boosted_e":        ["electron_inverttight_to_fake_boosted"],
+                # "vr_boosted_mu":         ["muon_inverttight_to_fake_boosted"],
+                # "vr_boosted_e":          ["electron_inverttight_to_fake_boosted"],
             }
         },
         # LHEScaleWeight/LHEPdfWeight only apply to the QCD diboson (QCD_LO_SM_MJJ) and signal (dipoleRecoil EWK) samples
@@ -1090,22 +1090,22 @@ cfg = Configurator(
             "common": {
                 "inclusive": [],
                 "bycategory": {
-                    "resolved_mu":           ["muon_inverttight_to_fake"],
-                    "resolved_e":            ["electron_inverttight_to_fake"],
+                    # "resolved_mu":           ["muon_inverttight_to_fake"],
+                    # "resolved_e":            ["electron_inverttight_to_fake"],
                     "ttbar_cr_resolved_mu":  ["muon_inverttight_to_fake"],
                     "ttbar_cr_resolved_e":   ["electron_inverttight_to_fake"],
                     "w_cr_mu":               ["muon_inverttight_to_fake"],
                     "w_cr_e":                ["electron_inverttight_to_fake"],
-                    "vr_mu":                 ["muon_inverttight_to_fake"],
-                    "vr_e":                  ["electron_inverttight_to_fake"],
-                    "boosted_mu":            ["muon_inverttight_to_fake_boosted"],
-                    "boosted_e":             ["electron_inverttight_to_fake_boosted"],
-                    "ttbar_cr_boosted_mu":   ["muon_inverttight_to_fake_boosted"],
-                    "ttbar_cr_boosted_e":    ["electron_inverttight_to_fake_boosted"],
-                    "w_cr_boosted_mu":       ["muon_inverttight_to_fake_boosted"],
-                    "w_cr_boosted_e":        ["electron_inverttight_to_fake_boosted"],
-                    "vr_boosted_mu":         ["muon_inverttight_to_fake_boosted"],
-                    "vr_boosted_e":          ["electron_inverttight_to_fake_boosted"],
+                    # "vr_mu":                 ["muon_inverttight_to_fake"],
+                    # "vr_e":                  ["electron_inverttight_to_fake"],
+                    # "boosted_mu":            ["muon_inverttight_to_fake_boosted"],
+                    # "boosted_e":             ["electron_inverttight_to_fake_boosted"],
+                    # "ttbar_cr_boosted_mu":   ["muon_inverttight_to_fake_boosted"],
+                    # "ttbar_cr_boosted_e":    ["electron_inverttight_to_fake_boosted"],
+                    # "w_cr_boosted_mu":       ["muon_inverttight_to_fake_boosted"],
+                    # "w_cr_boosted_e":        ["electron_inverttight_to_fake_boosted"],
+                    # "vr_boosted_mu":         ["muon_inverttight_to_fake_boosted"],
+                    # "vr_boosted_e":          ["electron_inverttight_to_fake_boosted"],
                 }
             },
         },

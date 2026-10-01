@@ -429,7 +429,7 @@ for _y in parameters.fj_taggers.keys():
         if os.path.exists(_fj_file):
             _fj_tagger_csets[_y][_tag] = correctionlib.CorrectionSet.from_file(_fj_file)
 
-_FJ_SOURCES = ["stat", "pileup", "sf_btag",
+_FJ_SOURCES = ["stat", "PileupWeight", "sf_btag",
                "sf_partonshower_isr", "sf_partonshower_fsr", "JES", "JER"]
 
 

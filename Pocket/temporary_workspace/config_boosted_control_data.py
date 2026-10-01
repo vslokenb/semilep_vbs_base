@@ -460,9 +460,9 @@ cfg = Configurator(
             #"WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_17",
             #"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8",
-            "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
             #"DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_17", 
-            "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
+            # "DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8", 
 
             # "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
@@ -473,8 +473,8 @@ cfg = Configurator(
             # "DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
             # "DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8",
 
-            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
-            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
+            # "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8", 
+            # "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8", 
             # "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8", 
             # "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8",
             # "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8", 

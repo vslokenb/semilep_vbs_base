@@ -2,7 +2,7 @@ default_jets_calibration:
   factory_config_clib:
     AK4PFchs:
       2016_PreVFP:
-        json_path: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/jet_jerc_2016prevfp.json.gz
+        json_path: ${cvmfs:Run2-2016preVFP-UL-NanoAODv9,JME,jet_jerc.json.gz}
         jec_mc: Summer19UL16APV_V7_MC
         jec_data:
           B: Summer19UL16APV_RunBCD_V7_DATA
@@ -10,37 +10,37 @@ default_jets_calibration:
           D: Summer19UL16APV_RunBCD_V7_DATA
           E: Summer19UL16APV_RunEF_V7_DATA
           F: Summer19UL16APV_RunEF_V7_DATA
-        jer: Summer20UL16APV_JRV3_MC
+        jer: Summer20UL16APV_JRV5_MC
         level: L1L2L3Res
 
       2016_PostVFP:
-        json_path: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/jet_jerc_2016postvfp.json.gz
+        json_path: ${cvmfs:Run2-2016postVFP-UL-NanoAODv9,JME,jet_jerc.json.gz}
         jec_mc: Summer19UL16_V7_MC
         jec_data: Summer19UL16_RunFGH_V7_DATA
-        jer: Summer20UL16_JRV3_MC
+        jer: Summer20UL16_JRV5_MC
         level: L1L2L3Res
 
       "2017":
-        json_path: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/jet_jerc_2017.json.gz
+        json_path: ${cvmfs:Run2-2017-UL-NanoAODv9,JME,jet_jerc.json.gz}
         jec_mc: Summer19UL17_V5_MC
         jec_data:
           B: Summer19UL17_RunB_V5_DATA
           C: Summer19UL17_RunC_V5_DATA
-          D: Summer19UL17_RunD_V5_DATA
-          E: Summer19UL17_RunE_V5_DATA
-          F: Summer19UL17_RunF_V5_DATA
-        jer: Summer19UL17_JRV2_MC
+          D: Summer20UL17_RunD_V5_DATA
+          E: Summer20UL17_RunE_V5_DATA
+          F: Summer20UL17_RunF_V5_DATA
+        jer: Summer19UL17_JRV4_MC
         level: L1L2L3Res
-
+      
       "2018":
-        json_path:  ${cvmfs:Run2-2018-UL-NanoAODv9,JME,jet_jerc.json.gz}
+        json_path: ${cvmfs:Run2-2018-UL-NanoAODv9,JME,jet_jerc.json.gz}
         jec_mc: Summer19UL18_V5_MC
         jec_data:
           A: Summer19UL18_RunA_V5_DATA
           B: Summer19UL18_RunB_V5_DATA
           C: Summer19UL18_RunC_V5_DATA
           D: Summer19UL18_RunD_V5_DATA
-        jer: Summer19UL18_JRV2_MC
+        jer: Summer19UL18_JRV3_MC
         level: L1L2L3Res
 
 
@@ -107,7 +107,7 @@ default_jets_calibration:
         level: L1L2L3Res
 
       "2018":
-        json_path: /cvmfs/cms-griddata.cern.ch/cat/metadata/JME/Run2-2018-UL-NanoAODv9/latest/fatJet_jerc.json.gz
+        json_path: ${cvmfs:Run2-2018-UL-NanoAODv9,JME,fatJet_jerc.json.gz}
         jec_mc: "${default_jets_calibration.factory_config_clib.AK4PFchs.2018.jec_mc}"
         jec_data: "${default_jets_calibration.factory_config_clib.AK4PFchs.2018.jec_data}"
         jer: "${default_jets_calibration.factory_config_clib.AK4PFchs.2018.jer}"
@@ -692,4 +692,4 @@ jets_calibration:
   # the key default_jets_calibration.variations.full_variations contains the full setup of JET variations.
   # setup `jets_calibration.variations == "${default_jets_calibration.variations.full_variations}"` to use all variations
   # variations: "${default_jets_calibration.variations.full_variations}"
-  variations: "${default_jets_calibration.variations.total_variation}"
+  variations: "${default_jets_calibration.variations.full_variations}"

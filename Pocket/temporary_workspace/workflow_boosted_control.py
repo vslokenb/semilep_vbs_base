@@ -56,34 +56,24 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         # Good Leptons
 
-        tight_criteria = SimpleNamespace(
-            object_preselection = {
-                "Muon": {
-                    "pt": 26.0,
-                    "eta": 2.4,
-                    "id": "tightId",
-                    "iso": 0.15,
-                }
-            }
-        )
-
-        ev["MuonGood_0"]     = lepton_selection(ev, "Muon", tight_criteria)
+        # Matched to workflow_v9: params-driven muon selection instead of a
+        # hardcoded SimpleNamespace, so object_preselection_run2_v9.yaml governs
+        # both workflows and cannot silently drift.
+        ev["MuonGood_0"]     = lepton_selection(ev, "Muon", self.params)
         mu = ev.MuonGood_0
-        mask_muon_ip = (
-            (np.abs(mu.dxy) < 0.2) & (np.abs(mu.dz) < 0.5)
-        )
-
-        ev["MuonGood"] = mu[mask_muon_ip]
-        mask_good_ele_kin = ( ev.Electron.pt > 35 ) & ( np.abs(ev.Electron.eta) < 2.4) & ( ev.Electron.cutBased >= 3 )
-        ev["ElectronGood_0"] = ev.Electron[mask_good_ele_kin]
-        ele = ev.ElectronGood_0
-        mask_ele_ip = (
-            (np.abs(ele.dxy) < 0.05) & (np.abs(ele.eta) < 1.5) & (np.abs(ele.dz) < 0.1)
+        mask1 = (
+            (np.abs(mu.dxy) < 0.2) & (np.abs(mu.eta) < 1.479) & (np.abs(mu.dz) < 0.5)
         ) | (
-            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.5) & (np.abs(ele.eta) < 2.4) & (np.abs(ele.dz) < 0.2)
+            (np.abs(mu.dxy) < 0.2) & (np.abs(mu.eta) >= 1.479) & (np.abs(mu.eta) < 2.4) & (np.abs(mu.dz) < 0.5)
         )
-
-        ev["ElectronGood"] = ele[mask_ele_ip]
+        ev["MuonGood"] = mu[mask1]
+        ele = ev.Electron
+        mask2 = (
+            (np.abs(ele.dxy) < 0.05) & (np.abs(ele.eta) < 1.479) & (np.abs(ele.dz) < 0.1)
+        ) | (
+            (np.abs(ele.dxy) < 0.1) & (np.abs(ele.eta) >= 1.479) & (np.abs(ele.eta) < 2.4) & (np.abs(ele.dz) < 0.2)
+        )
+        ev["ElectronGood"] = ele[mask2 & (ele.pt > 38) & (ele.cutBased >= 3)]
         veto_criteria = SimpleNamespace(
             object_preselection = {
                 "Muon": {
@@ -98,7 +88,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         medium_criteria = SimpleNamespace(
             object_preselection = {
                 "Muon": {
-                    "pt": 26.0,
+                    "pt": 30.0,
                     "eta": 2.4,
                     "id": "mediumId",
                     "iso": 500.0,
@@ -109,7 +99,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         loose_criteria = SimpleNamespace(
             object_preselection = {
                 "Muon": {
-                    "pt": 26.0,
+                    "pt": 30.0,
                     "eta": 2.4,
                     "id": "looseId",
                     "iso": 500.0,
@@ -124,9 +114,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["MuonLoose"]     = lepton_selection(ev, "Muon", loose_criteria)
 
 
-        mask_ele_loose = (ev.Electron.pt > 35) & (np.abs(ev.Electron.eta) < 2.4) & (ev.Electron.cutBased >=1 )
+        mask_ele_loose = (ev.Electron.pt > 38) & (np.abs(ev.Electron.eta) < 2.4) & (ev.Electron.cutBased >=1 )
         ev["ElectronLoose"] = ev.Electron[mask_ele_loose]
-        mask_ele_medium = (ev.Electron.pt > 35) & (np.abs(ev.Electron.eta) < 2.4) & (ev.Electron.cutBased >=2 )
+        mask_ele_medium = (ev.Electron.pt > 38) & (np.abs(ev.Electron.eta) < 2.4) & (ev.Electron.cutBased >=2 )
         ev["ElectronMedium"] = ev.Electron[mask_ele_medium]
         mask_ele_veto = (ev.Electron.pt > 10) & (np.abs(ev.Electron.eta) < 2.4) & (ev.Electron.cutBased >=1 )
         ev["ElectronVeto"]     = ev.Electron[mask_ele_veto]
@@ -184,8 +174,9 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             ev.JetGood_1 = ev.JetGood_0#veto_jer_forward_unmatched(ev.JetGood_0,self.params.jets_calibration.variations[JEC_type][self._year])
         else:
             ev.JetGood_1 = ev.JetGood_0
-        mask_jet_cleaning = (ev.JetGood_1.pt>50) | (abs(ev.JetGood_1.eta)<2.5)
-        ev["JetGood"] = ev.JetGood_1[mask_jet_cleaning]
+        # Matched to workflow_v9: no extra forward/low-pt jet veto here.
+        # mask_jet_cleaning = (ev.JetGood_1.pt>50) | (abs(ev.JetGood_1.eta)<2.5)
+        ev["JetGood"] = ev.JetGood_1
 
 
 
@@ -213,8 +204,10 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["JetGoodCentral"] = ev.JetGood[abs(ev.JetGood.eta)<2.4]
 
         #TODO: jet_selection_nanoaodv12 only used for 2022, check other versions for other years.
-        #ev["FatJetGood"], _ = jet_selection(ev,"FatJet", self.params, self._year, "LeptonGood")
-        ev["FatJetGood"] = ev.FatJet[abs(ev.FatJet.eta)<2.4]
+        # Matched to workflow_v9: params-driven FatJet selection (pt 200, eta 2.4,
+        # jetId 2, msd 40, dr_lepton 0.8 from object_preselection_run2_v9.yaml)
+        # instead of a bare eta cut.
+        ev["FatJetGood"], _ = jet_selection(ev,"FatJet", self.params, self._year, "LeptonGood")
         ev["FatJetGood", "idx"] = ak.local_index(ev.FatJetGood, axis=1)
         dR_fatjets_lep = ev.FatJetGood.metric_table(ev.LeptonGood)
         mask_lepjet_cleaning = ak.prod(dR_fatjets_lep > 0.8, axis=2) == 1
@@ -244,22 +237,23 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         ev["JetGood"] = ev.JetGood[mask_jet_cleaning]
         ev["JetGood", "idx"] = ak.local_index(ev.JetGood, axis=1)
-
+        ev["CentralJets"] = ev.JetGood[np.abs(ev.JetGood.eta) < 2.5]
         # b-tagging
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.15)
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.1355)
         #ev["BJet_csv"] = ev.JetGood[b_maskT]
         #ev["BJet_csv"] = ev.JetGood[b_mask]
         ev["BJetTight"] = btagging(
-            ev.JetGood[np.abs(ev.JetGood.eta) < 2.5],
+            ev.CentralJets,
             self.params.btagging.working_point[self._year],
             wp="H",
         )
         ev["BJetLoose"] = btagging(
-            ev.JetGood[np.abs(ev.JetGood.eta) < 2.5],
+            ev.CentralJets,
             self.params.btagging.working_point[self._year],
             wp=self.params.object_preselection.Jet.btag.wp,
         )
+
 
 
         # ------------- W Leptonic -------------
@@ -304,7 +298,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nJetGood"]      = ak.num(ev.JetGood)
         ev["nJetGoodCentral"]      = ak.num(ev.JetGoodCentral)
         ev["nBoostCandidate"] = ak.num(ev.candidate_boost)
-
+        ev["nCentralJets"]      = ak.num(ev.CentralJets)
         ev["nBJetTight"]     = ak.num(ev.BJetTight)
         ev["nBJetLoose"]     = ak.num(ev.BJetLoose)
 

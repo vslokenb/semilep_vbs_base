@@ -8,15 +8,15 @@ from pocket_coffea.lib.jets import compute_jetId
 
 # ---------- Skim: ≥1 leptón  (mu/e) ----------
 def nLepton_skim(events, params, **kwargs):
-    good_elec = events.Electron[events.Electron.pt > 35]
-    good_muon = events.Muon[events.Muon.pt > 25]
+    good_elec = events.Electron[events.Electron.pt > 38]
+    good_muon = events.Muon[events.Muon.pt > 30]
    
     return (ak.num(good_elec) + ak.num(good_muon) >= 1)
 
 nLepton_skim_cut = Cut(name="nLepton_skim", params={}, function=nLepton_skim)
 
 def nJet_skim(events, params, **kwargs):
-    good_jet =events.Jet[( ( ( abs(events.Jet.eta)<2.5 ) | (abs(events.Jet.eta)>3 ) ) & (events.Jet.pt > 30)) | ( ( ( abs(events.Jet.eta)>2.5 ) & (abs(events.Jet.eta)<3 ) ) & (events.Jet.pt > 50)) ]
+    good_jet =events.Jet[events.Jet.pt > 30]
     good_fatjet =events.FatJet[( ( ( abs(events.FatJet.eta)<2.5 ) | (abs(events.FatJet.eta)>3 ) ) & (events.FatJet.pt > 30)) | ( ( ( abs(events.FatJet.eta)>2.5 ) & (abs(events.FatJet.eta)<3 ) ) & (events.FatJet.pt > 50)) ]
     return (ak.num(good_jet) + ak.num(good_fatjet) >= 0)
 

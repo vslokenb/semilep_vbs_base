@@ -8,7 +8,7 @@ jet_scale_factors:
     # Collection used to apply btag SF and ctag SF
     jet_collection:
       btag: CentralJets
-      ctag: CentralJets
+      ctag: JetGood
       puId: JetGood
       
     btagSF:

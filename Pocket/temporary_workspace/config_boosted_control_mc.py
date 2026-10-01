@@ -510,8 +510,8 @@ cfg = Configurator(
             #########
             ## SOME DATA
             #########
-            "SingleMuon", ## 2017B Single Muon dataset
-            "SingleElectron",
+            # "SingleMuon", ## 2017B Single Muon dataset
+            # "SingleElectron",
             #"Muon"
             ],
             "year": ["2017", "2016_PreVFP", "2016_PostVFP"]

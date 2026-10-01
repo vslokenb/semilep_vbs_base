@@ -8,7 +8,7 @@ from pocket_coffea.lib.weights.common.common import SF_L1prefiring
 from pocket_coffea.lib.weights.common.weights_run2_UL import SF_ele_trigger
 from pocket_coffea.parameters import defaults
 from pocket_coffea.lib.columns_manager import ColOut
-
+import warnings
 from pocket_coffea.lib.calibrators.legacy.legacy_calibrators import MuonsRochesterCalibrator, ElectronsScaleSmearingLegacyCalibrator
 from pocket_coffea.lib.calibrators.common import default_calibrators_sequence
 
@@ -95,7 +95,7 @@ parameters = defaults.merge_parameters_from_files(
     f"{localdir}/params/triggers.yaml",
     f"{localdir}/params/plotting.yaml",
     f"{localdir}/params/pileup.yaml",
-    # f"{localdir}/params/jets_calibration.yaml",
+    f"{localdir}/params/jets_calibration.yaml",
     f"{localdir}/params/lepton_scale_factors.yaml",
     f"{localdir}/params/jet_scale_factors.yaml",
     f"{localdir}/params/classifiers.yaml",
@@ -239,19 +239,80 @@ class LHEScaleWeightWrapper(WeightWrapper):
             down=[member(1), member(3)],
         )
 
+_REPL_LO, _REPL_HI = 1, 101
+_N_REPL = _REPL_HI - _REPL_LO
+
+
+def replica_envelope(vals, n_members):
+    """Per-event mean and RMS over the PDF replica members.
+
+    vals      : (n_events, 100) replica weights, already padded with 1.0
+    n_members : (n_events,) how many LHEPdfWeight members the event really has
+
+    Members the sample does not have are excluded rather than counted as 1.0 --
+    a 33-member sample padded to 100 would otherwise get 68 identical entries
+    at exactly 1.0, which pulls the mean toward 1 and shrinks the RMS by roughly
+    sqrt(32/100). The padding still has to happen for the indexing to work, so
+    the mask is what makes the reduction correct.
+
+    Returns (mean, rms) with mean=1, rms=0 for events with fewer than two
+    usable replicas, where a spread is not defined.
+    """
+    vals = np.asarray(vals, dtype=float)
+    n_members = np.asarray(n_members)
+
+    idx = np.arange(_REPL_LO, _REPL_HI)[None, :]
+    valid = (idx < n_members[:, None]) & np.isfinite(vals)
+    count = valid.sum(axis=1)
+
+    masked = np.where(valid, vals, np.nan)
+    # An event with 0 or 1 usable replicas makes nanmean/nanstd emit
+    # "Mean of empty slice" / "Degrees of freedom <= 0". Those rows are
+    # replaced below, and left unsuppressed they are printed once per chunk
+    # for every short-member sample.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        mean = np.nanmean(masked, axis=1)
+        # ddof=1: the replicas are a sample from the PDF distribution.
+        rms = np.nanstd(masked, axis=1, ddof=1)
+
+    enough = count >= 2
+    mean = np.where(enough & np.isfinite(mean), mean, 1.0)
+    rms = np.where(enough & np.isfinite(rms), rms, 0.0)
+    return mean, rms
 
 class LHEPdfWeightWrapper(WeightWrapper):
     """LHE PDF and alpha_S uncertainties from LHEPdfWeight.
+
     For the standard 103-member set:
-      [1]-[100]: PDF eigenvariations (up=w[:,i], down=2-w[:,i])
+      [1]-[100]: PDF replicas
       [101]/[102]: alpha_S up/down.
+
+    The 100 replicas are reduced to a SINGLE 'pdf' variation per event, from
+    their mean and RMS:
+
+        up   = mean + rms
+        down = mean - rms
+
+    rather than being stored as 100 independent variations. They are replicas
+    drawn from one PDF distribution, not orthogonal eigenvectors, so treating
+    each as its own nuisance both overcounts the uncertainty and gives the fit
+    100 knobs that are not independent.
+
+    Note this is a PER-EVENT reduction, so a bin's uncertainty comes out as
+    sum_i w_i * rms_i. That is the fully-correlated limit -- it assumes every
+    event in a bin moves together under a replica. The per-bin replica RMS,
+    RMS_k(sum_i w_i r_i^(k)), is smaller wherever the replicas decorrelate
+    across events, so this is the conservative direction.
+
     Samples with shorter sets (101 members: no alpha_S; 33 members: fewer
-    eigenvectors) get unit weights for the missing members.
+    replicas) use only the members they have; alpha_S gets unit weights when
+    absent.
     """
     name = "LHEPdfWeight"
     has_variations = True
     isMC_only = True
-    _variations = [f"pdf_{i}" for i in range(1, 101)] + ["alpha_S"]
+    _variations = ["pdf", "alpha_S"]
 
     def __init__(self, parameters, metadata):
         super().__init__(parameters, metadata)
@@ -273,24 +334,22 @@ class LHEPdfWeightWrapper(WeightWrapper):
         # pad so indices up to 102 always exist; padded members -> 1.0
         w = ak.fill_none(ak.pad_none(w_raw, 103, axis=1, clip=False), 1.0)
 
-        def member(i, transform=None):
-            vals = ak.to_numpy(w[:, i])
-            if transform is not None:
-                vals = transform(vals)
+        def member(i):
             # only trust members the sample actually has
-            return np.where(n > i, vals, 1.0)
+            return np.where(n > i, ak.to_numpy(w[:, i]), 1.0)
 
-        pdf_up   = [member(i)                    for i in range(1, 101)]
-        pdf_down = [member(i, lambda v: 2 - v)   for i in range(1, 101)]
-        alphas_up   = member(101)
-        alphas_down = member(102)
+        replicas = ak.to_numpy(w[:, _REPL_LO:_REPL_HI])
+        mean, rms = replica_envelope(replicas, n)
+
+        pdf_up = mean + rms
+        pdf_down = np.maximum(mean - rms, 0.0)
 
         return WeightDataMultiVariation(
             name=self.name,
-            nominal=np.ones(size),
+            nominal=ones,
             variations=self._variations,
-            up=pdf_up + [alphas_up],
-            down=pdf_down + [alphas_down],
+            up=[pdf_up, member(101)],
+            down=[pdf_down, member(102)],
         )
 
 
@@ -587,6 +646,76 @@ class FatJetWvsQCDWeight(WeightWrapper):
             shape_variation=shape_variation,
         )
 
+
+
+
+def _top_pt_sf(pt):
+    # per-top data/NLO ratio, numbers from TOP-23-008
+    return (0.103 * np.exp(-0.0118 * pt) - 0.000134 * pt + 0.973) * (0.991 + 0.000075 * pt)
+
+
+def top_pt_reweighting(events):
+    """sqrt(SF(pt_top) * SF(pt_antitop)) from the hard-process last-copy tops.
+
+    Same gen selection as the RDF version: pdgId == +/-6 with statusFlags
+    bit 8 (fromHardProcess) and bit 13 (isLastCopy), taking the first match.
+    The RDF [0] would crash on an event without both tops; here such events
+    (which should not occur in TT samples) get weight 1 instead.
+    """
+    gp = events.GenPart
+    hard_last = ((gp.statusFlags & (1 << 8)) != 0) & ((gp.statusFlags & (1 << 13)) != 0)
+    top_pt     = ak.firsts(gp[(gp.pdgId == 6)  & hard_last].pt)
+    antitop_pt = ak.firsts(gp[(gp.pdgId == -6) & hard_last].pt)
+    has_pair   = ~(ak.is_none(top_pt) | ak.is_none(antitop_pt))
+    top_pt     = ak.fill_none(top_pt, 0.0)
+    antitop_pt = ak.fill_none(antitop_pt, 0.0)
+    sf = np.sqrt(_top_pt_sf(top_pt) * _top_pt_sf(antitop_pt))
+    return ak.to_numpy(ak.where(has_pair, sf, 1.0))
+
+
+class TopPtReweight(WeightWrapper):
+    name = "top_pt_reweight"
+    has_variations = True
+    isMC_only = True
+    # True  -> yield-preserving shape correction (renormalized per chunk)
+    # False -> raw TOP-23-008 weight, changes the ttbar normalization too
+    renorm = True
+
+    def compute(self, events, size, shape_variation):
+        sf = top_pt_reweighting(events)
+        is_nominal = (shape_variation == "nominal")
+
+        if not self.renorm:
+            if not is_nominal:
+                # Nominal value still applied -- only the up/down templates are skipped.
+                return WeightData(self.name, sf)
+            return WeightData(self.name, sf, sf**2, np.ones(size))
+
+        # Same renormalization scheme as sf_qgtagging / sf_fj_*: the constant
+        # is a property of the chunk, computed on the nominal pass and reused
+        # on shape-variation passes (which see a different post-preselection
+        # event set), so the correction never shifts the overall normalization.
+        # Each template (nominal / up / down) is renormalized separately, so
+        # up and down are pure shape variations around the nominal as well.
+        w = _gen_norm_weight(events, size)
+        sum_w = np.sum(w)
+        if not hasattr(self, "_norm_cache"):
+            self._norm_cache = {}
+
+        def _renorm(sf_event, key):
+            norm = _renorm_constant(w, sf_event, sum_w, self._norm_cache, key,
+                                    is_nominal, "toppt", shape_variation)
+            return sf_event * norm
+
+        nominal = _renorm(sf, "central")
+        if not is_nominal:
+            # Nominal value still applied -- only the up/down templates are skipped.
+            return WeightData(self.name, nominal)
+        up   = _renorm(sf**2, "up")           # reweighting applied twice
+        down = _renorm(np.ones(size), "down") # no reweighting (norm is exactly 1)
+        return WeightData(self.name, nominal, up, down)
+
+
 cfg = Configurator(
     parameters=parameters,
     datasets={
@@ -646,6 +775,7 @@ cfg = Configurator(
                 "WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8",  # done
                 "WZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
                 "ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8",  # done
+                "WGToLNuG_TuneCP5_13TeV-madgraphMLM-pythia8",
                 "ZZZ_TuneCP5_13TeV-amcatnlo-pythia8",  # done
 
                 "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
@@ -757,167 +887,183 @@ cfg = Configurator(
         
     },
 
-    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger]+ [LHEScaleWeightWrapper, LHEPdfWeightWrapper]+[FatJetTau21Weight,FatJetWvsQCDWeight,QGTaggingWeight],
+    weights_classes=common_weights + [MuonGoodLeadWeight, ElectronGoodLeadWeight] + [PileupWeight] + [SF_L1prefiring] + [wjet_reweight]+[SF_ele_trigger]+ [LHEScaleWeightWrapper, LHEPdfWeightWrapper]+[FatJetTau21Weight,FatJetWvsQCDWeight,QGTaggingWeight]+[TopPtReweight],
     weights={
         "common": {
-            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger_run2","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr","sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
+            "inclusive": ["genWeight", "lumi", "XS", "PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger_run2","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr","sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging", "LHEScaleWeight", "LHEPdfWeight"],
         },
         # LHEScaleWeight/LHEPdfWeight only apply to the QCD diboson (QCD_LO_SM_MJJ) and signal (dipoleRecoil EWK) samples
         "bysample": {
-            "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
+            "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8": {
+                "inclusive": ["top_pt_reweight"],
             },
-            "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
-            },
-            "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                "bycategory": {}
+            "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8": {
+                "inclusive": ["top_pt_reweight"],
             },
         },
+        # "bysample": {
+        #     "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        #     "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+        #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+        #         "bycategory": {}
+        #     },
+        # },
     },
     calibrators=default_calibrators_sequence+[MuonsRochesterCalibrator]+[ElectronsScaleSmearingLegacyCalibrator],
     variations={
         "weights": {
             "common": {
-                "inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger_run2","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr","sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging"],
+                "inclusive": ["PileupWeight", "sf_mu_id","sf_mu_iso","sf_ele_id","sf_ele_reco","sf_mu_trigger","sf_ele_trigger_run2","sf_L1prefiring","sf_jet_puId","sf_partonshower_isr", "sf_partonshower_fsr","sf_btag","sf_fj_WvsQCD","sf_fj_tau21","sf_qgtagging", "LHEScaleWeight", "LHEPdfWeight"],
             },
             "bysample": {
-                "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
+                "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8": {
+                    "inclusive": ["top_pt_reweight"],
                 },
-                "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
-                },
-                "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
-                    "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
-                    "bycategory": {}
+                "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8": {
+                    "inclusive": ["top_pt_reweight"],
                 },
             },
+            # "bysample": {
+            #     "WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            #     "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8": {
+            #         "inclusive": ["LHEScaleWeight", "LHEPdfWeight"],
+            #         "bycategory": {}
+            #     },
+            # },
         },
         "shape": {"common": {"inclusive": ['jet_calibration', 'muons_rochester','electron_scale_smearing_legacy']}}
 
@@ -989,6 +1135,21 @@ cfg = Configurator(
         "dR_fj_vbs2":     HistConf([Axis(coll="events", field="vbs2_fj_dR",   bins=40, start=0.0, stop=7.0,  label=r"$\Delta R(AK8, j_{forward_2})$")]),
         "jet_eta":        HistConf([Axis(coll="JetGood", field="eta",          bins=48, start=-4.8, stop=4.8, label="JetGood eta")]),
         "jet_id":         HistConf([Axis(coll="JetGood", field="jetId",        bins=10, start=0,   stop=10,   label="Jet id")]),
+
+        # eta / pt / deepFlavQG split by jet pseudorapidity class
+        # (CentralJets |eta|<2.4, MiddleJets 2.4<|eta|<3.0, ForwardJets |eta|>3.0)
+        "central_jet_eta":   HistConf([Axis(coll="CentralJets", field="eta",            bins=24, start=-2.4, stop=2.4, label=r"$\eta$ (central jets, $|\eta|<2.4$)")]),
+        "central_jet_pt":    HistConf([Axis(coll="CentralJets", field="pt",             bins=60, start=0,    stop=300, label=r"$p_T$ (central jets) [GeV]")]),
+        "central_jet_qg":    HistConf([Axis(coll="CentralJets", field="btagDeepFlavQG", bins=20, start=0,    stop=1,   label="deepFlavQG (central jets)")]),
+
+        "middle_jet_eta":    HistConf([Axis(coll="MiddleJets",  field="eta",            bins=24, start=-3.0, stop=3.0, label=r"$\eta$ (middle jets, $2.4<|\eta|<3.0$)")]),
+        "middle_jet_pt":     HistConf([Axis(coll="MiddleJets",  field="pt",             bins=60, start=0,    stop=300, label=r"$p_T$ (middle jets) [GeV]")]),
+        "middle_jet_qg":     HistConf([Axis(coll="MiddleJets",  field="btagDeepFlavQG", bins=20, start=0,    stop=1,   label="deepFlavQG (middle jets)")]),
+
+        "forward_jet_eta":   HistConf([Axis(coll="ForwardJets", field="eta",            bins=48, start=-4.8, stop=4.8, label=r"$\eta$ (forward jets, $|\eta|>3.0$)")]),
+        "forward_jet_pt":    HistConf([Axis(coll="ForwardJets", field="pt",             bins=60, start=0,    stop=300, label=r"$p_T$ (forward jets) [GeV]")]),
+        "forward_jet_qg":    HistConf([Axis(coll="ForwardJets", field="btagDeepFlavQG", bins=20, start=0,    stop=1,   label="deepFlavQG (forward jets)")]),
+
         "jet_rel_iso":    HistConf([Axis(coll="LeptonGood", field="jetRelIso", bins=50, start=0,   stop=2,    label="Jet iso in lep")]),
         "dxy_mu":         HistConf([Axis(coll="LeptonGood", field="dxy",       bins=50, start=0,   stop=0.5,  label="dxy mu")]),
         "dxy_ele":        HistConf([Axis(coll="LeptonGood", field="dxy",       bins=50, start=0,   stop=0.2,  label="dxy ele")]),
@@ -1192,3 +1353,4 @@ cfg = Configurator(
         # "lepton1_pt":  HistConf([Axis(coll="lepton1", field="pt",  bins=100, start=0,    stop=500, label="lepton1 pt")]),
     },
 )
+

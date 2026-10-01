@@ -194,7 +194,35 @@ lepton_scale_factors:
             scale: "Scale"
             smear: "SmearAndSyst"
           et_dependent: true
-    
+    scale_unc_legacy:
+      apply:
+        '2016_PreVFP':  True
+        '2016_PostVFP': True
+        '2017':         True
+        '2018':         True
+        '2022_preEE':   False
+        '2022_postEE':  False
+        '2023_preBPix': False
+        '2023_postBPix': False
+        '2024':         False
+        '2025':         False
+      correctionlib_config:
+        '2016_PreVFP':
+          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2016preVFP.json.gz
+          correction_name: "UL-EGM_ScaleUnc"
+          year_key: "2016preVFP"
+        '2016_PostVFP':
+          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2016postVFP.json.gz
+          correction_name: "UL-EGM_ScaleUnc"
+          year_key: "2016postVFP"
+        '2017':
+          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2017.json.gz
+          correction_name: "UL-EGM_ScaleUnc"
+          year_key: "2017"
+        '2018':
+          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2018.json.gz
+          correction_name: "UL-EGM_ScaleUnc"
+          year_key: "2018"
     # The trigger SF configuration is expected to have this structure
     # needs to be provided by the user.
     trigger_sf:

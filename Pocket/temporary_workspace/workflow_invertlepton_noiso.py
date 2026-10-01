@@ -402,21 +402,22 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
             )
         
         # b-tagging 
-        ev['CentralJets']= ev.JetGood[np.abs(ev.JetGood.eta) < 2.4]
-
-        #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.15)
+        ev['CentralJets']= ev.JetGood[np.abs(ev.JetGood.eta) < 2.5]
+        ev['MiddleJets']= ev.JetGood[(np.abs(ev.JetGood.eta) > 2.4) & (np.abs(ev.JetGood.eta) < 3.0)]
+        ev['ForwardJets']= ev.JetGood[np.abs(ev.JetGood.eta) > 3.0]
+        b_mask = (np.abs(ev.CentralJets.eta) < 2.5) & (ev.CentralJets.btagDeepB > 0.1522)
         #b_mask = (np.abs(ev.JetGood.eta) < 2.5) & (ev.JetGood.btagDeepB > 0.1355)
         #ev["BJet_csv"] = ev.JetGood[b_maskT]
         #ev["BJet_csv"] = ev.JetGood[b_mask]
-        ev["BJetTight"] = btagging(
-            ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4],
-            self.params.btagging.working_point[self._year],
-            wp="H",
-        )
-        ev["BJetLoose"] = btagging(
-            ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.4],
+        ev["BJetGood"] = btagging(
+            ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.5],
             self.params.btagging.working_point[self._year],
             wp=self.params.object_preselection.Jet.btag.wp,
+        )
+        ev["BJetTight"] = btagging(
+            ev.CentralJets[np.abs(ev.CentralJets.eta) < 2.5],
+            self.params.btagging.working_point[self._year],
+            wp='H',
         )
         #ev["BJet_genmatch"] =ev.JetGood[(np.abs(ev.JetGood.eta) < 2.4) & (np.abs(ev.JetGood.partonFlavour) == 5)]
         ev["JetGood_tagger_check"]= ev.JetGood[(np.abs(ev.JetGood.eta) < 2.4)]
@@ -556,10 +557,10 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
 
         ## EVALUTE B JET DISTANCE
         cj = ak.zip({
-            "pt": ev.BJetLoose.pt,
-            "eta": ev.BJetLoose.eta,
-            "phi": ev.BJetLoose.phi,
-            "mass": ev.BJetLoose.mass,
+            "pt": ev.BJetGood.pt,
+            "eta": ev.BJetGood.eta,
+            "phi": ev.BJetGood.phi,
+            "mass": ev.BJetGood.mass,
         }, with_name="Momentum4D")
 
         fj = ak.zip({
@@ -650,7 +651,7 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["lead_wlep_w_resolved_deta"] = np.abs(lead_lep.eta - whad.eta)
 
 
-        deltaR = lead_lep.metric_table(ev["BJetLoose"])
+        deltaR = lead_lep.metric_table(ev["BJetGood"])
 
         # Flatten last two axes to get all lep-bjet pairs per event (usually just n_bjets per event)
         deltaR_per_event = ak.flatten(deltaR, axis=2)
@@ -973,8 +974,8 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         ev["nJetGood30"]      = ak.num(ev.JetGood)
         ev["nJetGoodCentral"]      = ak.num(ev.JetGoodCentral)
         ev["nBJetTight"]     = ak.num(ev.BJetTight)
-        ev["nBJetGood"]     = ak.num(ev.BJetLoose)
-        ev["nBJetLoose"]     = ak.num(ev.BJetLoose)
+        ev["nBJetGood"]     = ak.num(ev.BJetGood)
+        # ev["nBJetGood"]     = ak.num(ev.BJetGood)
         ev["nCentralJetsGood"] = ak.num(ev.CentralJetsGood)
         ev["nCentralJets"] = ak.num(ev.CentralJets)
         ev["nFatJetGood"] = ak.num(ev.FatJetGood)
