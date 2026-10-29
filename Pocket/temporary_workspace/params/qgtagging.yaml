@@ -1,10 +1,10 @@
 qgtagging:
 
   2016_PreVFP:
-    file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/QGSF-Run2/UL16_preVFP_shape_sf.json.gz
+    file: ${config_dir:}/QGSF-Run2/UL16_preVFP_shape_sf.json.gz
   2016_PostVFP:
-    file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/QGSF-Run2/UL16_postVFP_shape_sf.json.gz
+    file: ${config_dir:}/QGSF-Run2/UL16_postVFP_shape_sf.json.gz
   "2017":
-    file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/QGSF-Run2/UL17_shape_sf.json.gz
+    file: ${config_dir:}/QGSF-Run2/UL17_shape_sf.json.gz
   "2018":
-    file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/QGSF-Run2/UL18_shape_sf.json.gz
+    file: ${config_dir:}/QGSF-Run2/UL18_shape_sf.json.gz

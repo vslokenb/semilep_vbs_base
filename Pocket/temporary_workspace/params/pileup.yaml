@@ -1,6 +1,6 @@
 pileupJSONfiles::
   '2017':
-    file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/puWeights_17.json
+    file: ${config_dir:}/puWeights_17.json
     name: Collisions17_UltraLegacy_goldenJSON
     variations:
       up: ["up"]

@@ -208,19 +208,19 @@ lepton_scale_factors:
         '2025':         False
       correctionlib_config:
         '2016_PreVFP':
-          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2016preVFP.json.gz
+          file: ${config_dir:}/EGM_ScaleUnc_2016preVFP.json.gz
           correction_name: "UL-EGM_ScaleUnc"
           year_key: "2016preVFP"
         '2016_PostVFP':
-          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2016postVFP.json.gz
+          file: ${config_dir:}/EGM_ScaleUnc_2016postVFP.json.gz
           correction_name: "UL-EGM_ScaleUnc"
           year_key: "2016postVFP"
         '2017':
-          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2017.json.gz
+          file: ${config_dir:}/EGM_ScaleUnc_2017.json.gz
           correction_name: "UL-EGM_ScaleUnc"
           year_key: "2017"
         '2018':
-          file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/EGM_ScaleUnc_2018.json.gz
+          file: ${config_dir:}/EGM_ScaleUnc_2018.json.gz
           correction_name: "UL-EGM_ScaleUnc"
           year_key: "2018"
     # The trigger SF configuration is expected to have this structure
@@ -228,19 +228,19 @@ lepton_scale_factors:
     trigger_sf:
       2016_PreVFP:
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL16preVFP_pocketcoffea.json.gz
+        file: ${config_dir:}/ElectronTriggerSF_UL16preVFP_pocketcoffea.json.gz
         path: HLT_SF_Ele27_WPTight_Gsf
       2016_PostVFP:
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL16postVFP_pocketcoffea.json.gz
+        file: ${config_dir:}/ElectronTriggerSF_UL16postVFP_pocketcoffea.json.gz
         path: HLT_SF_Ele27_WPTight_Gsf
       '2017':
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL17_pocketcoffea.json.gz
+        file: ${config_dir:}/ElectronTriggerSF_UL17_pocketcoffea.json.gz
         path: HLT_SF_Ele35_WPTight_Gsf
       '2018':
         name: ElectronTriggerSF
-        file: /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/ElectronTriggerSF_UL18_pocketcoffea.json.gz
+        file: ${config_dir:}/ElectronTriggerSF_UL18_pocketcoffea.json.gz
         path: HLT_SF_Ele32_WPTight_Gsf
       2022_preEE:
         2022_preEE:

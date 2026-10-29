@@ -3,21 +3,21 @@ fj_taggers:
   # used as placeholder for all years for now
   2016_PreVFP:
     fj_tau21_SF:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+      file: ${config_dir:}/output_boosted_control_16pre/fj_tau21_SF.json.gz
     fj_WvsQCD_SF_tau21cut:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+      file: ${config_dir:}/output_boosted_control_16pre/fj_WvsQCD_SF_tau21cut.json.gz
   2016_PostVFP:
     fj_tau21_SF:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+      file: ${config_dir:}/output_boosted_control_16post/fj_tau21_SF.json.gz
     fj_WvsQCD_SF_tau21cut:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+      file: ${config_dir:}/output_boosted_control_16post/fj_WvsQCD_SF_tau21cut.json.gz
   "2017":
     fj_tau21_SF:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+      file: ${config_dir:}/output_boosted_control_17/fj_tau21_SF.json.gz
     fj_WvsQCD_SF_tau21cut:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+      file: ${config_dir:}/output_boosted_control_17/fj_WvsQCD_SF_tau21cut.json.gz
   "2018":
     fj_tau21_SF:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_tau21_SF.json.gz
+      file: ${config_dir:}/fj_tau21_SF.json.gz
     fj_WvsQCD_SF_tau21cut:
-      file: /home/vsloken-fnal/work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fj_WvsQCD_SF_tau21cut.json.gz
+      file: ${config_dir:}/fj_WvsQCD_SF_tau21cut.json.gz

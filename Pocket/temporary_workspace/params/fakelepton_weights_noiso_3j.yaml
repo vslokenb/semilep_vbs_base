@@ -1,8 +1,119 @@
 fakeleptonweights:
+ "2016_PreVFP":
+    Muon:
+      file:
+        - ${config_dir:}/fakeweight_2016preVFP_v1.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_mu_down_nominal
+    Electron:
+      file:
+        - ${config_dir:}/fakeweight_2016preVFP_v1.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_e_down_nominal
+    Boosted_Muon:
+      file:
+        - ${config_dir:}/fakeweight_2016preVFP_v1.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_boosted_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_boosted_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_boosted_mu_down_nominal
+    Boosted_Electron:
+      file:
+        - ${config_dir:}/fakeweight_2016preVFP_v1.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_boosted_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_boosted_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2016_PreVFP_qcd_enriched_boosted_e_down_nominal
+ "2016_PostVFP":
+    Muon:
+      file:
+        - ${config_dir:}/fakeweight_2016postVFP_v1.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_mu_down_nominal
+    Electron:
+      file:
+        - ${config_dir:}/fakeweight_2016postVFP_v1.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_e_down_nominal
+    Boosted_Muon:
+      file:
+        - ${config_dir:}/fakeweight_2016postVFP_v1.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_boosted_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_boosted_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_boosted_mu_down_nominal
+    Boosted_Electron:
+      file:
+        - ${config_dir:}/fakeweight_2016postVFP_v1.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_boosted_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_boosted_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2016_PostVFP_qcd_enriched_boosted_e_down_nominal
+ "2017":
+    Muon:
+      file:
+        - ${config_dir:}/fakeweight_2017_v1.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2017_qcd_enriched_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2017_qcd_enriched_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2017_qcd_enriched_mu_down_nominal
+    Electron:
+      file:
+        - ${config_dir:}/fakeweight_2017_v1.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2017_qcd_enriched_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2017_qcd_enriched_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2017_qcd_enriched_e_down_nominal
+    Boosted_Muon:
+      file:
+        - ${config_dir:}/fakeweight_2017_v1.root
+      nominal:
+        - muon_pt_eta_weights_merged_merged_2017_qcd_enriched_boosted_mu_nominal
+      up:
+        - muon_pt_eta_weights_merged_merged_2017_qcd_enriched_boosted_mu_up_nominal
+      down:
+        - muon_pt_eta_weights_merged_merged_2017_qcd_enriched_boosted_mu_down_nominal
+    Boosted_Electron:
+      file:
+        - ${config_dir:}/fakeweight_2017_v1.root
+      nominal:
+        - electron_pt_eta_weights_merged_merged_2017_qcd_enriched_boosted_e_nominal
+      up:
+        - electron_pt_eta_weights_merged_merged_2017_qcd_enriched_boosted_e_up_nominal
+      down:
+        - electron_pt_eta_weights_merged_merged_2017_qcd_enriched_boosted_e_down_nominal
  "2018":
     Muon:
       file:
-        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
+        - ${config_dir:}/fakeweight_2018_v1.root
       nominal:
         - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_mu_nominal
       up:
@@ -11,7 +122,7 @@ fakeleptonweights:
         - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_mu_down_nominal
     Electron:
       file:
-        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
+        - ${config_dir:}/fakeweight_2018_v1.root
       nominal:
         - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_e_nominal
       up:
@@ -20,7 +131,7 @@ fakeleptonweights:
         - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_e_down_nominal
     Boosted_Muon:
       file:
-        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
+        - ${config_dir:}/fakeweight_2018_v1.root
       nominal:
         - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_mu_nominal
       up:
@@ -29,10 +140,10 @@ fakeleptonweights:
         - muon_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_mu_down_nominal
     Boosted_Electron:
       file:
-        - /work/users/vsloken-fnal/semilep_vbs_base/Pocket/temporary_workspace/fr_2018_jun24.root
+        - ${config_dir:}/fakeweight_2018_v1.root
       nominal:
         - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_nominal
       up:
         - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_up_nominal
       down:
-        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_down_nominal 
+        - electron_pt_eta_weights_merged_merged_2018_qcd_enriched_boosted_e_down_nominal
