@@ -1,0 +1,169 @@
+# VBSfit input configuration
+# Structure: years -> dataset type (background/signal/data) -> process name -> file(s)
+#
+# NOTE: the input list provided only file names, not full paths.
+#       Set BASE_DIR below to the directory holding these .coffea files.
+#       Signal/background split follows the VBS convention:
+#         - EWK (dipoleRecoil_EWK) VBS samples -> signal
+#         - QCD VBS samples + all other MC      -> background
+
+# BASE_DIR: /eos/home-v/vslokenb/vbs_semilep/sensitivities
+
+years:
+  2018:
+
+    background:
+      DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018.coffea
+
+      DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018.coffea
+
+      WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8_2018.coffea
+
+      TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_2018.coffea
+
+      TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_2018.coffea
+
+      ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2018.coffea
+
+      ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2018.coffea
+
+      ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2018.coffea
+
+      ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2018.coffea
+
+      ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2018.coffea
+
+      ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2018.coffea
+
+      ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2018.coffea
+
+      GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_GluGluWWToLNuQQ_TuneCP5_13TeV_madgraph-pythia8_2018.coffea
+
+      WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WZTo3LNu_mllmin01_NNPDF31_TuneCP5_13TeV_powheg_pythia8_2018.coffea
+
+      ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018.coffea
+
+      WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018.coffea
+
+      WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018.coffea
+
+      WZZ_TuneCP5_13TeV-amcatnlo-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WZZ_TuneCP5_13TeV-amcatnlo-pythia8_2018.coffea
+
+      ZZZ_TuneCP5_13TeV-amcatnlo-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ZZZ_TuneCP5_13TeV-amcatnlo-pythia8_2018.coffea
+
+      # QCD-induced VBS samples (treated as background)
+      WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WminusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WminusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WminusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusTo2JWminusToLNuJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusTo2JZTo2LJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusToLNuWminusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusToLNuWplusTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusToLNuZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ZTo2LZTo2JJJ_QCD_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      nonprompt:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/nonp_2018_sep7_v26.coffea 
+
+    signal:
+      # EWK-induced VBS samples (dipoleRecoil_EWK)
+      WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WminusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusToLNuWplusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusTo2JWminusToLNuJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusToLNuWminusTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WminusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WminusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusTo2JZTo2LJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_WplusToLNuZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+      ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8:
+        file: /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8_2018.coffea
+
+    data:
+      EGamma:
+        # Used for electron signal regions: resolved_e, boosted_e and their CRs
+        files:
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_EGamma_2018_EraA.coffea
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_EGamma_2018_EraB.coffea
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_EGamma_2018_EraC.coffea
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_EGamma_2018_EraD.coffea
+
+      SingleMuon:
+        # Used for muon signal regions: resolved_mu, boosted_mu and their CRs
+        files:
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_SingleMuon_2018_EraA.coffea
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_SingleMuon_2018_EraB.coffea
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_SingleMuon_2018_EraC.coffea
+          - /eos/home-v/vslokenb/vbs_semilep/sensitivities/latest/output_SingleMuon_2018_EraD.coffea

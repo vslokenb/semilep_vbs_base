@@ -1,0 +1,6 @@
+# Flat-signal BDT binning (~equal signal yield per bin)
+# derived from histograms/histograms_native_2018.root by make_binning_scan.py
+boosted_e: [0.0, 0.5, 0.75, 0.875, 1.0]
+boosted_mu: [0.0, 0.55, 0.775, 0.9, 1.0]
+resolved_e: [0.0, 0.55, 0.775, 0.9, 1.0]
+resolved_mu: [0.0, 0.55, 0.75, 0.9, 1.0]

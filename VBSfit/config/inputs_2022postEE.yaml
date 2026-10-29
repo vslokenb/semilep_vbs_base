@@ -1,0 +1,178 @@
+# VBSfit input configuration
+# Structure: years -> dataset type (background/signal/data) -> process name -> file(s)
+
+years:
+  2022_postEE:
+
+    background:
+      WtoLNu-2Jets_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-40to100_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-40to100_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-40to100_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-40to100_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-100to200_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-100to200_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-100to200_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-100to200_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-200to400_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-200to400_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-200to400_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-200to400_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-400to600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-400to600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-400to600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-400to600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WtoLNu-2Jets_PTLNu-600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WtoLNu-2Jets_PTLNu-600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-40to100_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-40to100_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-100to200_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-100to200_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-200to400_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-200to400_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-400to600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-400to600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-600_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-40to100_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-40to100_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-100to200_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-100to200_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-200to400_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-200to400_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-400to600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-400to600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      DYto2L-2Jets_MLL-50_PTLL-600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_DYto2L-2Jets_MLL-50_PTLL-600_2J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+      
+      TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8_2022_postEE_norm.coffea
+
+      TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8_2022_postEE_norm.coffea
+
+      TbarBQ_t-channel_4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TbarBQ_t-channel_4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8_2022_postEE_norm.coffea
+
+      TBbarQ_t-channel_4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TBbarQ_t-channel_4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8_2022_postEE_norm.coffea
+
+      TBbartoLplusNuBbar-s-channel-4FS_TuneCP5_13p6TeV_amcatnlo-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TBbartoLplusNuBbar-s-channel-4FS_TuneCP5_13p6TeV_amcatnlo-pythia8_2022_postEE.coffea
+
+      TbarBtoLminusNuB-s-channel-4FS_TuneCP5_13p6TeV_amcatnlo-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TbarBtoLminusNuB-s-channel-4FS_TuneCP5_13p6TeV_amcatnlo-pythia8_2022_postEE.coffea
+
+      TBbarto2Q-s-channel_TuneCP5_13p6TeV_powheg-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TBbarto2Q-s-channel_TuneCP5_13p6TeV_powheg-pythia8_2022_postEE.coffea
+
+      TbarWplus_DR_AtLeastOneLepton_TuneCP5_13p6TeV_powheg-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TbarWplus_DR_AtLeastOneLepton_TuneCP5_13p6TeV_powheg-pythia8_2022_postEE_norm.coffea
+
+      TWminus_DR_AtLeastOneLepton_TuneCP5_13p6TeV_powheg-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_TWminus_DR_AtLeastOneLepton_TuneCP5_13p6TeV_powheg-pythia8_2022_postEE_norm.coffea
+
+      WW_TuneCP5_13p6TeV_pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WW_TuneCP5_13p6TeV_pythia8_2022_postEE_norm.coffea
+
+      WZ_TuneCP5_13p6TeV_pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WZ_TuneCP5_13p6TeV_pythia8_2022_postEE_norm.coffea
+
+      ZZ_TuneCP5_13p6TeV_pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_ZZ_TuneCP5_13p6TeV_pythia8_2022_postEE_norm.coffea
+
+      WWZ_4F_TuneCP5_13p6TeV_amcatnlo-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WWZ_4F_TuneCP5_13p6TeV_amcatnlo-pythia8_2022_postEE_norm.coffea
+
+      WWW_4F_TuneCP5_13p6TeV_amcatnlo-madspin-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WWW_4F_TuneCP5_13p6TeV_amcatnlo-madspin-pythia8_2022_postEE.coffea
+
+      WZZ_TuneCP5_13p6TeV_amcatnlo-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WZZ_TuneCP5_13p6TeV_amcatnlo-pythia8_2022_postEE.coffea
+
+      ZZZ_TuneCP5_13p6TeV_amcatnlo-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_ZZZ_TuneCP5_13p6TeV_amcatnlo-pythia8_2022_postEE.coffea
+
+      VBFtoLNu_TuneCP5_13p6TeV_madgraph-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_VBFtoLNu_TuneCP5_13p6TeV_madgraph-pythia8_2022_postEE.coffea
+
+      WGtoLNuG-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WGtoLNuG-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE.coffea
+
+      ZGto2LG-1Jets_ntgc_5f_TuneCP5_13p6TeV_madgraphMLM-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_ZGto2LG-1Jets_ntgc_5f_TuneCP5_13p6TeV_madgraphMLM-pythia8_2022_postEE.coffea
+
+      nonprompt:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_nonprompt_2022_postEE.coffea
+
+    signal:
+      ssWWunpolarized_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_ssWWunpolarized_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      osWWunpolarized_Wptojj_Wmtolv_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_osWWunpolarized_Wptojj_Wmtolv_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      osWWunpolarized_Wptolv_Wmtojj_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_osWWunpolarized_Wptolv_Wmtojj_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WZunpolarized_Wmtolv_Ztojj_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WZunpolarized_Wmtolv_Ztojj_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+      WZunpolarized_Wptolv_Ztojj_TuneCP5_13p6TeV_amcatnloFXFX-pythia8:
+        file: /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_WZunpolarized_Wptolv_Ztojj_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_2022_postEE_norm.coffea
+
+    data:
+      EGamma:
+        # Used for electron signal regions: resolved_e, boosted_e and their CRs
+        files:
+          - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_EGamma_2022_EraE.coffea
+          - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_EGamma_2022_EraF.coffea
+          - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_EGamma_2022_EraG.coffea
+
+      Muon:
+        # Used for muon signal regions: resolved_mu, boosted_mu and their CRs
+        files:
+          - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_Muon_2022_EraE.coffea
+          - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_Muon_2022_EraF.coffea
+          - /afs/cern.ch/work/j/jinw/public/semilep_vbs_base/Pocket/run3/output_VBS_data2022postEE_evaluateML_v2/output_Muon_2022_EraG.coffea
