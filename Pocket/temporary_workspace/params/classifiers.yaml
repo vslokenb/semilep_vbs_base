@@ -95,30 +95,50 @@ classifiers:
       - ${config_dir:}/bdt_qg/bdt_resolved_e_9_iter_376.json
   "2017":
     boosted_mu:
-      - ${config_dir:}/bdt_2017/bdt_boosted_mu_0_iter_268.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_mu_1_iter_203.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_mu_2_iter_182.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_mu_3_iter_228.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_mu_4_iter_258.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_0_iter_199.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_1_iter_74.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_2_iter_133.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_3_iter_108.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_4_iter_127.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_5_iter_120.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_6_iter_146.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_7_iter_171.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_8_iter_145.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_9_iter_116.json
     boosted_e:
-      - ${config_dir:}/bdt_2017/bdt_boosted_e_0_iter_158.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_e_1_iter_169.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_e_2_iter_149.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_e_3_iter_157.json
-      - ${config_dir:}/bdt_2017/bdt_boosted_e_4_iter_238.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_0_iter_98.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_1_iter_106.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_2_iter_86.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_3_iter_46.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_4_iter_193.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_5_iter_82.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_6_iter_140.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_7_iter_82.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_8_iter_159.json
+      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_9_iter_101.json
     resolved_mu:
-      - ${config_dir:}/bdt_2017/bdt_resolved_mu_0_iter_377.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_mu_1_iter_470.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_mu_2_iter_286.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_mu_3_iter_276.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_mu_4_iter_362.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_0_iter_381.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_1_iter_256.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_2_iter_352.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_3_iter_264.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_4_iter_380.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_5_iter_285.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_6_iter_410.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_7_iter_362.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_8_iter_301.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_mu_9_iter_340.json
 
     resolved_e:
-      - ${config_dir:}/bdt_2017/bdt_resolved_e_0_iter_246.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_e_1_iter_268.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_e_2_iter_267.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_e_3_iter_263.json
-      - ${config_dir:}/bdt_2017/bdt_resolved_e_4_iter_217.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_0_iter_283.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_1_iter_264.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_2_iter_267.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_3_iter_324.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_4_iter_229.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_5_iter_244.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_6_iter_310.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_7_iter_229.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_8_iter_306.json
+      - ${config_dir:}/bdt_qg/bdt_resolved_e_9_iter_376.json
 
   "2018":
     boosted_mu:
