@@ -28,6 +28,7 @@ of it on the **Purdue Analysis Facility (Purdue AF)**. Its outputs (`.coffea` hi
 14. [Run-provenance directories](#14-run-provenance-directories)
 15. [Troubleshooting history worth remembering](#15-troubleshooting-history-worth-remembering)
 16. [What is (not) tracked in this repository](#16-what-is-not-tracked-in-this-repository)
+17. [Kubernetes executor test — FIRST ITERATION](#17-kubernetes-executor-test--first-iteration)
 
 ---
 
@@ -79,7 +80,8 @@ apptainer exec ... bash run_inside_inverted.sh                                  
 | `build_datasets.sh [dir]` | `pocket-coffea build-datasets --cfg <f> --overwrite` for every discovery JSON (skips `*_replicas.json`). |
 | `run_mix_years.sh <dir>`, `submit_mix_years.sh` | Run `mix_years.py <dir>` (merge all `.coffea` of a directory) locally / as a SLURM array job. |
 
-Run-option files (`custom_full_opt.yaml`, `custom_nonprompt_opt.yaml`, `my_run_options.yaml`) set
+Run-option files (`custom_full_opt.yaml`, `custom_nonprompt_opt.yaml`, `my_run_options.yaml`; plus
+`custom_k8s_opt.yaml` for the first-iteration Kubernetes executor test, §17) set
 `scaleout`, `cores-per-worker`, `mem-per-worker`, `chunksize`, … — **read §11 before changing them**: several
 settings in the committed files predate the measurements in §11 (e.g. `queue:` and `custom-setup-commands:`
 are inert for `dask@purdue-af`, `--overwrite` is silently ignored, and workers × cores above ~50 overloads
@@ -692,3 +694,56 @@ single-file run-provenance directories (§14).
   `watch_v30_ps.sh`, `poll_fnal_and_launch.sh`, `make_v29_manifest.py`, `push_v29_to_lxplus.sh`);
 * the PocketCoffea fork itself (this workspace imports it from `PYTHONPATH`): the Purdue executor allowlist
   patch and the `adapted_chunksize` fix of §11.3/§11.5 are changes in that checkout, not in this repository.
+
+---
+
+## 17. Kubernetes executor test — FIRST ITERATION
+
+**Status: this is the first iteration of a new Kubernetes executor, under test. Nothing here is a
+validated production path yet** — the Purdue AF Dask recipe of §2/§11 remains the production route until
+the test cases below have been run and the outputs validated.
+
+The executor lives in the `kubernetes-executor-test` branch of the PocketCoffea fork
+(`github.com/vslokenb/PocketCoffea`; documentation in its `docs/running.md`, "Kubernetes executors"
+section). Two modes:
+
+| Executor string | What it is |
+|---|---|
+| `k8sjobs@kubernetes` | **primary mode**: one self-contained `batch/v1` Job per chunk-group (the condor manual-jobs model on Kubernetes). One Indexed Job covers the whole splitting; per-job manifests allow `--recreate-jobs`. Only `kubectl` is needed on the submit host. |
+| `dask@kubernetes` | Dask cluster via the dask-kubernetes operator (needs the operator CRDs in the cluster and `pip install pocket_coffea[kubernetes]`). Kept simple — no Gateway-style babysitting. |
+
+**Why**: the goal is an order-of-magnitude speedup over the 50-CPU interactive Dask baseline. Projected
+(from the §11 measurements): ~1.4× at equal cores from utilization + per-pass overheads, near-linear with
+pod quota up to a ~8–12× practical ceiling — **provided the inputs are NOT read through the XRootD site
+cap** (pre-stage skims to the cluster PVC, or run an in-cluster XCache) and merged input files stay at
+~250–500k events (splitting is file-atomic: one bigger merged file = one longer job). Failure isolation is
+per chunk-group (`backoffLimitPerIndex`, Kubernetes >= 1.29): a `KilledWorker`-style loss costs one job,
+not a pass. GPUs can be requested per pod (`gpus-per-worker`) for `device="cuda"` xgboost inference tests.
+
+**Operating contract** (differs from Purdue Dask): the jobs dir, the output dir and the voms proxy must be
+visible inside the pods at the **same absolute paths** as on the submit host (`pvc-name`/`pvc-mount-path`
+in the run options, or facility auto-mounts); `worker-image` must be a **registry** image, not a
+`/cvmfs/unpacked` path. Job state uses the usual `job_{i}.idle/.running/.done/.failed` flag files, and pod
+logs are mirrored to `logs/job_<timestamp>.<i>.{out,err}` so `--recreate-jobs auto|<ids>`
+(including the XRootD input-rewrite, `--blocklist-sites`, `--use-redirector`) works as on condor.
+`check-jobs` does **not** work on a k8s jobs dir (it expects condor `.sub` files and the condor event
+log) — monitor with `kubectl get pods` / `kubectl logs` and the flag files instead.
+
+**Initial test cases**, in order — run them before trusting the executor with a campaign:
+
+1. **Unit tests** (no cluster): in the PocketCoffea branch,
+   `pytest tests/test_kubernetes_jobs.py tests/test_kubernetes_proxy_staging.py` — 18 tests covering
+   manifests, `job.sh` generation (`bash -n` checked), split-by-category, dry-run, resubmission incl. the
+   XRootD rewrite. Passing as of 2026-11-06.
+2. **Dry-run manifest inspection** (no cluster): the committed `custom_k8s_opt.yaml` has `dry-run: true` —
+   `pocket-coffea run --cfg config_validation.py -o k8s_test_dry -e k8sjobs@kubernetes -ro custom_k8s_opt.yaml`
+   writes `jobs_all.yaml`, `job_{i}.yaml`, `job.sh`, `chunksizes.txt` into the jobs dir for inspection.
+3. **Smallest real pass**: one data era of `config_validation.py` with `--limit-files 1`
+   (1 variation, trivial compute) — checks image pull, shared-mount contract, proxy, output copy-back.
+4. **Light MC group** (a g05-style group, ~30 small samples) with full systematics — validate yields and a
+   few variation templates against the equivalent `dask@purdue-af` output of the same group.
+5. **Heavy group** (`TTToSemiLeptonic` alone) — stresses memory and per-index failure isolation; exercise
+   `--recreate-jobs auto` on whatever fails.
+
+None of cases 3–5 has been run yet; that is the point of this branch. Record measurements (wall-clock,
+pod counts, failure modes) here as they come in, the way §11 does for Purdue.

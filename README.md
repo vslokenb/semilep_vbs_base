@@ -246,6 +246,14 @@ Copies of `mix_years.py` also live in `Pocket/temporary_workspace/` (used by `ru
   2016 results are essentially unaffected. Treat 2017/2018 fit results made before that re-run as
   provisional.
 * The luminosity uncertainty is set to 1.073 for all four year-eras (`LUMI_UNC_BY_YEAR`, `make_datacards.py`).
+* **2026-11-06 — Kubernetes executor, FIRST ITERATION TEST** (branch `kubernetes-executor-test`, here and
+  in the PocketCoffea fork): new `k8sjobs@kubernetes` / `dask@kubernetes` executors aiming at an
+  order-of-magnitude speedup over the 50-CPU interactive Dask baseline. Run options in
+  `Pocket/temporary_workspace/custom_k8s_opt.yaml` (committed with `dry-run: true`); use case, operating
+  contract and the initial test-case ladder are in
+  [`Pocket/temporary_workspace/README.md` §17](Pocket/temporary_workspace/README.md#17-kubernetes-executor-test--first-iteration).
+  Only the no-cluster test cases (unit tests, dry-run manifests) have been exercised so far — not yet a
+  production path.
 
 ---
 

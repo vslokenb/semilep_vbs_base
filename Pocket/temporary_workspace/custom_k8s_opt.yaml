@@ -1,0 +1,44 @@
+# Run options for the FIRST-ITERATION Kubernetes executor test
+# (`--executor k8sjobs@kubernetes`). See README §17 and the PocketCoffea
+# docs/running.md "Kubernetes executors" section on the
+# `kubernetes-executor-test` branch of github.com/vslokenb/PocketCoffea.
+#
+# Submit host needs only `kubectl` + a kubeconfig; per-index failure isolation
+# needs Kubernetes >= 1.29. The jobs dir, the output dir and the voms proxy
+# must be visible inside the pods at the SAME absolute paths as on the submit
+# host: set pvc-name/pvc-mount-path, or rely on the facility auto-mounting the
+# shared filesystem.
+
+# Registry image (NOT a /cvmfs/unpacked apptainer path): pods pull it.
+worker-image: gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-stable
+namespace: null             # null = kubeconfig default
+kubernetes-context: null
+pvc-name: null              # e.g. the claim that holds /work
+pvc-mount-path: null        # e.g. /work
+
+scaleout: 50                # max concurrently running pods (Job parallelism)
+max-events-per-job: 500000  # ~10 chunks/job ~= 1 h: cheap retries, good packing.
+                            # NOTE splitting is file-atomic - merged input files
+                            # bigger than this become one oversized job each.
+chunksize: 50000            # measured sweet spot; 5000 is catastrophic (per-chunk
+                            # fixed cost: 40 BDT model loads + ~150 variations)
+cores-per-worker: 1         # iterative inside the pod; >1 switches to futures
+mem-per-worker: 12GiB       # per-pod request/limit (measured peak ~6.3 GiB/worker)
+gpus-per-worker: null       # e.g. 1 for xgboost device="cuda" inference tests
+
+job-deadline: null          # activeDeadlineSeconds is JOB-LEVEL: on the main
+                            # Indexed Job it caps the WHOLE submission (all
+                            # waves), not each chunk-group; per chunk-group it
+                            # applies only to resubmitted single jobs. Leave
+                            # null unless you want a collective wall-clock cap.
+ttl-seconds-after-finished: 604800   # auto-clean finished Job objects after 7 days
+backoff-limit: 0            # resubmit with --recreate-jobs auto instead
+skip-bad-files: false
+eos-prefix: null            # set root://cmseos.fnal.gov//eos/uscms if output under /eos/
+
+# FIRST ITERATION SAFETY: generates jobs_all.yaml / job_{i}.yaml / job.sh /
+# chunksizes.txt for inspection WITHOUT submitting. To actually submit, set
+# this to false HERE (or in another -ro yaml). NOTE: a CLI `--dry-run false`
+# does NOT work -- the runner stores the literal string "false", which is
+# truthy, so dry-run would stay on.
+dry-run: true
