@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ps *)",
+      "Bash(tail *)",
+      "Bash(find *)",
+      "Bash(ls *)",
+      "mcp__purdue-af-agentic-interface__list_dask_clusters",
+      "mcp__purdue-af-agentic-interface__get_dask_cluster_info",
+      "mcp__purdue-af-agentic-interface__get_dask_cluster_usage",
+      "mcp__purdue-af-agentic-interface__query_dask_logs",
+      "mcp__purdue-af-agentic-interface__get_facility_health",
+      "mcp__purdue-af-agentic-interface__get_session_status"
+    ]
+  }
+}

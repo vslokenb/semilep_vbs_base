@@ -1,0 +1,46 @@
+diff --git a/pocket_coffea/executors/executors_purdue_af.py b/pocket_coffea/executors/executors_purdue_af.py
+index 1f0e5ba5..eaa1eb3d 100644
+--- a/pocket_coffea/executors/executors_purdue_af.py
++++ b/pocket_coffea/executors/executors_purdue_af.py
+@@ -21,7 +21,17 @@ class DaskGatewayExecutorFactory(ExecutorFactoryABC):
+             "PYTHONPATH",
+             "LD_LIBRARY_PATH",
+             "X509_CERT_DIR",
+-            "PATH"
++            "PATH",
++            # One dask task already occupies a core. Without these the
++            # processor's BLAS/OpenMP layer grabs ~22 threads PER TASK
++            # (measured: 10m12s wall vs 224m user on one 4.8k-event chunk),
++            # so concurrent tasks spin against each other. Parallelism must
++            # come from many tasks, not from threads inside one task.
++            "OMP_NUM_THREADS",
++            "OPENBLAS_NUM_THREADS",
++            "MKL_NUM_THREADS",
++            "NUMEXPR_NUM_THREADS",
++            "VECLIB_MAXIMUM_THREADS",
+         ]
+         for var in propagate_env:
+             if var in os.environ:
+diff --git a/pocket_coffea/scripts/runner.py b/pocket_coffea/scripts/runner.py
+index 45e181f7..85a762ca 100644
+--- a/pocket_coffea/scripts/runner.py
++++ b/pocket_coffea/scripts/runner.py
+@@ -375,13 +375,17 @@ def run(cfg,  custom_run_options, outputdir, test, limit_files,
+             logging.info("Total number of events: %d", n_events_tot)
+ 
+             adapted_chunksize = adapt_chunksize(n_events_tot, run_options)
++            # Never go below 5000 events/chunk: for a very small dataset the
++            # adapted value collapses to a few hundred events and per-chunk
++            # overhead then dominates.
++            adapted_chunksize = max(adapted_chunksize, 5000)
+             if adapted_chunksize != run_options["chunksize"]:
+                 logging.info(f"Reducing chunksize from {run_options['chunksize']} to {adapted_chunksize} for dataset(s) {group_name}")
+ 
+             # Get the coffea Runner wrapped with error logging
+             run = get_runner(
+                 executor=executor,
+-                chunksize=run_options["chunksize"],
++                chunksize=adapted_chunksize,
+                 maxchunks=run_options["limit-chunks"],
+                 skipbadfiles=run_options['skip-bad-files'],
+                 schema=processor.NanoAODSchema,

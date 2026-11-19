@@ -1,0 +1,476 @@
+diff --git a/Pocket/temporary_workspace/config_inverted.py b/Pocket/temporary_workspace/config_inverted.py
+index 07f755c..caa08b6 100644
+--- a/Pocket/temporary_workspace/config_inverted.py
++++ b/Pocket/temporary_workspace/config_inverted.py
+@@ -88,7 +88,7 @@ localdir = os.path.dirname(os.path.abspath(__file__))
+ 
+ 
+ default_parameters = defaults.get_default_parameters()
+-defaults.register_configuration_dir("config_dir", localdir + "/params")
++defaults.register_configuration_dir("config_dir", localdir)
+ parameters = defaults.merge_parameters_from_files(
+     default_parameters,
+     f"{localdir}/params/object_preselection_run2_v9.yaml",
+@@ -908,6 +908,12 @@ cfg = Configurator(
+             # f"{localdir}/datasets/skimmed.json",
+             f"{localdir}/datasets/skimmed_rescale.json",
+             f"{localdir}/datasets/rare_skim.json",
++            # rare VBS/VV/VVV/ZG/WZ skims for 2016_PreVFP/2016_PostVFP/2017 (75 entries)
++            f"{localdir}/datasets/skimmed_dataset_definition_rare1617_fixed.json",
++            # single-top + ttW/ttZ skims for 2016_PreVFP/2016_PostVFP/2017 (21 entries)
++            f"{localdir}/datasets/skimmed_dataset_definition_top1617.json",
++            # TTToSemiLeptonic 2016_PreVFP: exists at FNAL, never merged into skimmed_rescale
++            f"{localdir}/datasets/TTToSemiLeptonic_2016_PreVFP_skim.json",
+         ],
+ 
+         "filter": {
+@@ -927,6 +933,8 @@ cfg = Configurator(
+                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",  # done
+ 
+                 "SingleMuon",  # done (all eras)
++
++                "SingleElectron",  # 2016/2017 electron primary dataset (EGamma is 2018-only)
+                 "EGamma",  # done (all eras)
+ 
+                 "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+@@ -969,7 +977,7 @@ cfg = Configurator(
+                 "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+ 
+             ],
+-            "year": ["2018"],
++            "year": ["2018", "2017", "2016_PostVFP", "2016_PreVFP"],
+         },
+     },
+     workflow=VBSSemileptonicProcessor,
+diff --git a/Pocket/temporary_workspace/config_validation.py b/Pocket/temporary_workspace/config_validation.py
+index 8cbb2e5..de53f0e 100644
+--- a/Pocket/temporary_workspace/config_validation.py
++++ b/Pocket/temporary_workspace/config_validation.py
+@@ -88,7 +88,7 @@ localdir = os.path.dirname(os.path.abspath(__file__))
+ 
+ 
+ default_parameters = defaults.get_default_parameters()
+-defaults.register_configuration_dir("config_dir", localdir + "/params")
++defaults.register_configuration_dir("config_dir", localdir)
+ parameters = defaults.merge_parameters_from_files(
+     default_parameters,
+     f"{localdir}/params/object_preselection_run2_v9.yaml",
+@@ -739,6 +739,12 @@ cfg = Configurator(
+             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
+             f"{localdir}/datasets/rare_skim.json",
+             f"{localdir}/datasets/skimmed_rescale.json",
++            # rare VBS/VV/VVV/ZG/WZ skims for 2016_PreVFP/2016_PostVFP/2017 (75 entries)
++            f"{localdir}/datasets/skimmed_dataset_definition_rare1617_fixed.json",
++            # single-top + ttW/ttZ skims for 2016_PreVFP/2016_PostVFP/2017 (21 entries)
++            f"{localdir}/datasets/skimmed_dataset_definition_top1617.json",
++            # TTToSemiLeptonic 2016_PreVFP: exists at FNAL, never merged into skimmed_rescale
++            f"{localdir}/datasets/TTToSemiLeptonic_2016_PreVFP_skim.json",
+         ],
+ 
+         "filter": {
+@@ -758,13 +764,15 @@ cfg = Configurator(
+                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",  # done
+ 
+                 "SingleMuon",  # done (all eras)
++
++                "SingleElectron",  # 2016/2017 electron primary dataset (EGamma is 2018-only)
+                 "EGamma",  # done (all eras)
+ 
+-                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",  # done
+-                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
+-                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
+-                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
+-                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
++                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
++                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
++                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
++                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
++                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+ 
+                 "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
+                 "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
+@@ -800,7 +808,7 @@ cfg = Configurator(
+                 "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
+ 
+             ],
+-            "year": ["2018"],
++            "year": ["2018", "2017", "2016_PostVFP", "2016_PreVFP"],
+             "nfiles": {
+                 "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8": 50,
+                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8": 50,
+diff --git a/Pocket/temporary_workspace/params/classifiers.yaml b/Pocket/temporary_workspace/params/classifiers.yaml
+index 0b69321..67579b6 100644
+--- a/Pocket/temporary_workspace/params/classifiers.yaml
++++ b/Pocket/temporary_workspace/params/classifiers.yaml
+@@ -1,188 +1,189 @@
+ classifiers:
+   "2016_PreVFP":
+     boosted_mu:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_0_iter_199.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_1_iter_74.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_2_iter_133.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_3_iter_108.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_4_iter_127.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_5_iter_120.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_6_iter_146.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_7_iter_171.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_8_iter_145.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_9_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_0_iter_152.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_1_iter_225.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_2_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_3_iter_120.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_4_iter_109.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_5_iter_147.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_6_iter_167.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_7_iter_132.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_8_iter_175.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_9_iter_183.json
+     boosted_e:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_0_iter_98.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_1_iter_106.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_2_iter_86.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_3_iter_46.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_4_iter_193.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_5_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_6_iter_140.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_7_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_8_iter_159.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_9_iter_101.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_0_iter_76.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_1_iter_115.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_2_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_3_iter_83.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_4_iter_187.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_5_iter_181.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_6_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_7_iter_140.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_8_iter_97.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_9_iter_98.json
+     resolved_mu:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_0_iter_381.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_1_iter_256.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_2_iter_352.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_3_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_4_iter_380.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_5_iter_285.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_6_iter_410.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_7_iter_362.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_8_iter_301.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_9_iter_340.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_1_iter_341.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_2_iter_313.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_3_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_4_iter_401.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_5_iter_254.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_6_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_7_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_8_iter_403.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_9_iter_420.json
+ 
+     resolved_e:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_0_iter_283.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_1_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_2_iter_267.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_3_iter_324.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_4_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_5_iter_244.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_6_iter_310.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_7_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_8_iter_306.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_9_iter_376.json
+-
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_1_iter_334.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_2_iter_346.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_3_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_4_iter_243.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_5_iter_258.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_6_iter_247.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_7_iter_324.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_8_iter_393.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_9_iter_311.json
+ 
+   "2016_PostVFP":
+     boosted_mu:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_0_iter_199.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_1_iter_74.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_2_iter_133.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_3_iter_108.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_4_iter_127.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_5_iter_120.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_6_iter_146.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_7_iter_171.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_8_iter_145.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_9_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_0_iter_152.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_1_iter_225.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_2_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_3_iter_120.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_4_iter_109.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_5_iter_147.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_6_iter_167.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_7_iter_132.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_8_iter_175.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_9_iter_183.json
+     boosted_e:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_0_iter_98.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_1_iter_106.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_2_iter_86.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_3_iter_46.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_4_iter_193.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_5_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_6_iter_140.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_7_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_8_iter_159.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_9_iter_101.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_0_iter_76.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_1_iter_115.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_2_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_3_iter_83.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_4_iter_187.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_5_iter_181.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_6_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_7_iter_140.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_8_iter_97.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_9_iter_98.json
+     resolved_mu:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_0_iter_381.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_1_iter_256.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_2_iter_352.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_3_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_4_iter_380.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_5_iter_285.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_6_iter_410.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_7_iter_362.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_8_iter_301.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_9_iter_340.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_1_iter_341.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_2_iter_313.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_3_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_4_iter_401.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_5_iter_254.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_6_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_7_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_8_iter_403.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_9_iter_420.json
+ 
+     resolved_e:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_0_iter_283.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_1_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_2_iter_267.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_3_iter_324.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_4_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_5_iter_244.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_6_iter_310.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_7_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_8_iter_306.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_9_iter_376.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_1_iter_334.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_2_iter_346.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_3_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_4_iter_243.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_5_iter_258.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_6_iter_247.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_7_iter_324.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_8_iter_393.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_9_iter_311.json
++
+   "2017":
+     boosted_mu:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_0_iter_199.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_1_iter_74.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_2_iter_133.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_3_iter_108.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_4_iter_127.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_5_iter_120.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_6_iter_146.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_7_iter_171.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_8_iter_145.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_9_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_0_iter_152.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_1_iter_225.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_2_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_3_iter_120.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_4_iter_109.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_5_iter_147.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_6_iter_167.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_7_iter_132.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_8_iter_175.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_9_iter_183.json
+     boosted_e:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_0_iter_98.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_1_iter_106.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_2_iter_86.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_3_iter_46.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_4_iter_193.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_5_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_6_iter_140.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_7_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_8_iter_159.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_9_iter_101.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_0_iter_76.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_1_iter_115.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_2_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_3_iter_83.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_4_iter_187.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_5_iter_181.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_6_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_7_iter_140.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_8_iter_97.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_9_iter_98.json
+     resolved_mu:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_0_iter_381.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_1_iter_256.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_2_iter_352.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_3_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_4_iter_380.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_5_iter_285.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_6_iter_410.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_7_iter_362.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_8_iter_301.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_9_iter_340.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_1_iter_341.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_2_iter_313.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_3_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_4_iter_401.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_5_iter_254.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_6_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_7_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_8_iter_403.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_9_iter_420.json
+ 
+     resolved_e:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_0_iter_283.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_1_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_2_iter_267.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_3_iter_324.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_4_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_5_iter_244.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_6_iter_310.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_7_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_8_iter_306.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_9_iter_376.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_1_iter_334.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_2_iter_346.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_3_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_4_iter_243.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_5_iter_258.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_6_iter_247.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_7_iter_324.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_8_iter_393.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_9_iter_311.json
+ 
+   "2018":
+     boosted_mu:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_0_iter_199.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_1_iter_74.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_2_iter_133.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_3_iter_108.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_4_iter_127.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_5_iter_120.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_6_iter_146.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_7_iter_171.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_8_iter_145.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_mu/bdt_boosted_mu_9_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_0_iter_152.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_1_iter_225.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_2_iter_116.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_3_iter_120.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_4_iter_109.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_5_iter_147.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_6_iter_167.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_7_iter_132.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_8_iter_175.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_mu_9_iter_183.json
+     boosted_e:
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_0_iter_98.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_1_iter_106.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_2_iter_86.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_3_iter_46.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_4_iter_193.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_5_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_6_iter_140.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_7_iter_82.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_8_iter_159.json
+-      - ${config_dir:}/outputs/bdt_model_2018_boosted_e/bdt_boosted_e_9_iter_101.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_0_iter_76.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_1_iter_115.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_2_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_3_iter_83.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_4_iter_187.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_5_iter_181.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_6_iter_142.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_7_iter_140.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_8_iter_97.json
++      - ${config_dir:}/bdt_nov13/bdt_boosted_e_9_iter_98.json
+     resolved_mu:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_0_iter_381.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_1_iter_256.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_2_iter_352.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_3_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_4_iter_380.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_5_iter_285.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_6_iter_410.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_7_iter_362.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_8_iter_301.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_mu_9_iter_340.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_1_iter_341.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_2_iter_313.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_3_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_4_iter_401.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_5_iter_254.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_6_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_7_iter_299.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_8_iter_403.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_mu_9_iter_420.json
+ 
+     resolved_e:
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_0_iter_283.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_1_iter_264.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_2_iter_267.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_3_iter_324.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_4_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_5_iter_244.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_6_iter_310.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_7_iter_229.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_8_iter_306.json
+-      - ${config_dir:}/bdt_qg/bdt_resolved_e_9_iter_376.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_0_iter_300.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_1_iter_334.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_2_iter_346.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_3_iter_336.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_4_iter_243.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_5_iter_258.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_6_iter_247.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_7_iter_324.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_8_iter_393.json
++      - ${config_dir:}/bdt_nov13/bdt_resolved_e_9_iter_311.json
++
+diff --git a/Pocket/temporary_workspace/workflow_v9.py b/Pocket/temporary_workspace/workflow_v9.py
+index f2df7c8..34d0a81 100644
+--- a/Pocket/temporary_workspace/workflow_v9.py
++++ b/Pocket/temporary_workspace/workflow_v9.py
+@@ -773,6 +773,16 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
+         n_leptons = max(1, int(np.max(ak.num(lepton_sorted, axis=1))))
+         for i in range(n_leptons):  # max number of good leptons in any event
+             ev[f'lepton{i+1}'] = ak.firsts(lepton_sorted[:, i:i+1])
++
++        # jetcentral1..N: pt-leading CentralJetsGood as indexed columns, exactly
++        # mirroring the jet{i}/fatjet{i}/lepton{i} pattern above. The bdt_nov13
++        # classifiers take jetcentral1..4_btagDeepFlavQG as input features, and
++        # without these the BDT evaluation raises
++        #   AttributeError: no field named 'jetcentral1'
++        cjets_sorted = ev.CentralJetsGood[ak.argsort(ev.CentralJetsGood.pt, ascending=False)]
++        n_cjets = max(4, int(np.max(ak.num(cjets_sorted, axis=1))))
++        for i in range(n_cjets):
++            ev[f'jetcentral{i+1}'] = ak.firsts(cjets_sorted[:, i:i+1])
+         
+         # object_names = [name for name in ev.fields if name.startswith(("jet", "fatjet", "lepton"))]
+         names=['jet1','jet2','jet3','jet4','jet5','jet6', 'lepton1', 'DeepMETResolutionTune','fatjet1']

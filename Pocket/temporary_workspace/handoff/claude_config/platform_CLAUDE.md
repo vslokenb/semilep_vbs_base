@@ -1,0 +1,241 @@
+<!-- BEGIN PURDUE AF — managed, edits inside are overwritten -->
+## Purdue Analysis Facility — platform context
+
+You are in a Purdue AF session: a JupyterHub pod on the Purdue Geddes Kubernetes
+cluster, running as the user with their storage mounted. **Rules** below are
+enforced by the platform or its administrators and fail if broken; **guidance**
+is what usually works best — deviate when the user has a reason.
+
+The `purdue-af-agentic-interface` MCP server is registered and authenticated as
+this user, so it needs no token handling. It is self-describing: call a tool and
+follow its result rather than planning a whole sequence up front. Prefer it to
+the shell wherever the platform tracks something centrally — the shell will
+answer confidently and wrongly:
+
+- **Storage and quotas** — `query_storage_usage`, never `du`/`df`. It reports
+  usage against each per-user quota, which neither command knows about. Treat
+  every quota as a hard limit.
+- **Logs** — `query_notebook_logs` / `query_dask_logs`, never tailing files.
+  They come from Loki and outlive the pod that produced them.
+- **Session and cluster state** — the tools, never `kubectl` or `ps`. A session
+  has no permission to see its own pod object.
+
+### Session
+
+`list_af_profiles` carries the resource options (CPU, memory, GPU, interface),
+the exact option keys to pass when starting a session, and which GPUs are free
+right now.
+
+**Rules.** The CPU and memory chosen at start are reserved for the session;
+anything above them is used only while the node has spare capacity, so size work
+to the reserved amount. Sessions holding any GPU are culled after 24 h idle, all
+others after 14 days. A session without a GPU has no `nvidia-smi` and no visible
+CUDA device, so code must fall back to CPU rather than assume one appeared;
+training that needs a GPU goes to a Ray cluster instead (Scale-out below),
+which only such a session can use.
+Restarting or stopping the session kills every process in it — including an
+agent running inside it — while `/home`, `/work` and `/depot` survive untouched.
+
+### Storage
+
+Which volumes a worker can see is what most often breaks an otherwise correct
+job — a path that works in the notebook may not exist on the worker.
+
+| Path | Access | Visible to Slurm jobs | Visible to Dask Gateway workers | Visible to Ray clusters |
+| --- | --- | --- | --- | --- |
+| `/home/<username>/` | read/write | no | no | no |
+| `/work/users/<username>/` | read/write | no | yes | yes |
+| `/work/projects/<project>/` | read/write | no | yes | yes |
+| `/depot/cms/` | group-owned; read/write for Purdue accounts, read-only for others | yes | yes | yes |
+| `/eos/purdue/` | read-only POSIX mount, for browsing; read/write over XRootD (`gfal`/`xrdcp`) | no | not to be relied on | read-only |
+| `/cvmfs/` | read-only | yes | yes | yes |
+| `/eos/cern/` (CERNBox) | read/write, mounted on request | no | no | no |
+
+Worker code must never depend on the EOS mount. Slurm jobs have no `/eos`
+at all, and the mount on Dask Gateway workers is not something to build on:
+read EOS data over XRootD — better still through XCache — rather than as a
+file path. The POSIX mount in the session is read-only and useful mainly for
+looking around.
+
+The session's own username is `whoami` (also `$NB_USER`) and `$HOME` is
+`/home/<username>`; build paths from those rather than guessing the name.
+Home-directory shortcuts are symlinks: `~/work` → `/work/`, `~/eos-purdue` →
+`/eos/purdue`, `~/depot/users` → `/depot/cms/users`. Several paths can reach one
+directory through symlinks — check with `realpath` before treating two of them
+as copies.
+
+**Rules.** `/home` has a 25 GB quota, and exceeding it prevents the session from
+starting at all — the next spawn fails, not merely the write.
+`/work/users/<username>/` has a 100 GB quota; administrators follow up with users
+above it rather than the filesystem refusing writes, so treat it as a hard limit
+too. `/eos/purdue/` cannot be written through the POSIX mount; write there with
+`gfal-copy` or `xrdcp`. `/home` and `/work` do not exist inside Slurm jobs.
+
+**Scope.** The user's own directories — `/work/users/<username>/` and
+`/depot/cms/users/<username>/` — and the project directories they actually work
+in are all fair game. Working in a project directory is normal; the two shared
+volumes just differ in whether the filesystem can be trusted to say which one
+is theirs:
+
+- `/depot/cms/<project>/` is group-owned, so permissions already answer the
+  question. A write that succeeds there is one the user is entitled to make.
+- `/work/projects/` has no group ownership behind it. Unless an owner has
+  restricted their own directory, the session can write into project
+  directories belonging to people the user has nothing to do with, so a write
+  succeeding is no evidence it was wanted. Stay in the project the user named;
+  if none has been named, ask rather than infer one from what happens to be
+  writable.
+
+Never write into another user's directory. Be strictest about deleting — prefer
+moving something aside inside the user's own space — and when a task looks like
+it needs a path outside these, name the path and say why instead of acting on
+your own initiative.
+
+**Guidance.** Keep code, environments and outputs off `/home` — it is small and
+invisible to every worker. `/work/users/<username>/` is the usual home for a
+project; use `/depot` when Slurm jobs have to read it. Writing many files to
+`/depot` at once degrades it for everyone, so stage to `/tmp` on the worker and
+copy once. None of `/home`, `/work` or `/depot` is unlimited and the last two
+are shared, so check `query_storage_usage` before writing a large output rather
+than after filling a volume.
+
+### Software environments
+
+Pixi is the platform's package manager, and `pixi` here is a wrapper, not
+upstream pixi — it enforces the rules below rather than reporting them.
+
+Analysis work goes in the shared global environment at `/work/pixi/global/`
+unless the user asks for something else: it is maintained for exactly that. The
+base environment at `/opt/pixi` is the image's own plumbing — it is what puts
+the tools below on PATH — and analysis code should not be run in it.
+
+Running Python follows from that. Inside a project that has a built pixi
+environment, use that project's own — `pixi run python …` from the project
+directory, or its project-aware kernel. Anywhere else, use the global
+environment's interpreter directly:
+
+    /work/pixi/global/.pixi/envs/default/bin/python
+
+Bare `python`/`python3` is the base environment, so it is never the answer to
+"run this script". Prefer that interpreter path over `pixi run --manifest-path
+/work/pixi/global`, which can try to re-solve and write into the shared
+environment. In a notebook, the equivalent choice is the kernel: the
+project-aware one, or the global one.
+
+**Rules.** Project commands (`add`, `install`, `shell`, `update`, `init`,
+`remove`, …) **refuse to run on a project under `/home/`**; the wrapper exits
+with an error naming the directory. This is deliberate — pixi environments are
+large and would exhaust the home quota. `PIXI_HOME` and `PIXI_CACHE_DIR` are
+preset under `/work/users/<username>/` for the same reason, and pointing them
+back under `/home` is refused too. The wrapper likewise refuses project
+commands aimed at the platform's own environments — `/opt/pixi`, the image's
+base env, and `/work/pixi/global`, the shared one — because both are built
+outside the session and a package added to either is lost. Activating them
+(`pixi shell`) is fine; changing them is not. A pixi or conda environment becomes a
+Jupyter kernel only if it has `ipykernel` installed and sits in a world-readable
+directory, which `/depot/cms/private/` directories are not. Environments used
+from Slurm jobs must live on `/depot`, the only writable volume those jobs see.
+
+**Guidance.** Create the project under `/work/users/<username>/` and run `pixi
+init` / `pixi add` there; put it on `/depot` instead when Slurm jobs must
+import it. To build on the shared environment, copy its manifest into a project
+of your own; to change it for everyone, it is generated from
+`pixi/global/pixi.toml` in the platform repository.
+
+**On PATH in a terminal:** `pixi`, `conda`, `rucio`, `kinit`, `gfal-*`,
+`voms-proxy-init`, `xrdcp`/`xrdfs`, `sbatch`, `squeue`. ROOT is deliberately not
+in the base environment — it belongs to an analysis environment, so expect it
+from the global env or a project env, never from the bare session.
+
+Besides `python3` ("Python (pixi global)"), the image ships a "Python (pixi
+project-aware)" kernel that runs the Pixi project containing the notebook, and
+fails every cell when there is none; conda and user-created kernels appear as
+they are installed.
+
+CERNBox is mounted with `eos-connect`, a shell alias for
+`source /etc/jupyter/eos-connect.sh`; aliases exist only in interactive shells,
+so use the `source` form from a script. The session image has CUDA 12.4 and
+cuDNN 8.9.7.29; ML packages must match those versions.
+
+### Data access
+
+**Rules.** Remote CMS data is read over XRootD and requires a valid VOMS proxy
+(`voms-proxy-init`); without one, reads fail with an authentication error rather
+than a missing file. A proxy expires, so a long job can start fine and fail
+partway — check with `voms-proxy-info` and renew rather than assuming
+yesterday's is still valid. XCache does not serve tape-only files; those need a
+Rucio replication rule first. Rucio-subscribed datasets land under
+`/eos/purdue/store/mc/` or `/eos/purdue/store/data/`, never in user directories.
+CRAB outputs land in `/eos/purdue/store/user/<cern-username>` — the CERN
+username, which differs from the Purdue one, so a path built from the session's
+own username will not exist.
+
+**Guidance.** For repeated reads of one remote dataset, prefer the XCache prefix
+`root://xcache.cms.rcac.purdue.edu/`; it also removes the need to know which site
+holds the file. A dataset does not need to be at Purdue to be read.
+
+### Scale-out
+
+| Method | Available to | Workers see |
+| --- | --- | --- |
+| Local Dask cluster | all users | the session itself; bounded by its reserved cores |
+| Dask Gateway | all users | `/work`, `/depot`, `/cvmfs` |
+| Ray cluster (GPU training) | all users, from a session without a GPU | `/work`, `/depot`, `/eos/purdue` (read-only), `/cvmfs` |
+| Slurm batch (`sbatch`) | Purdue accounts, account `cms` | `/depot`, `/cvmfs` |
+| CRAB | all CMS users | WLCG |
+
+`list_dask_cluster_options` carries the gateway's option keys and limits.
+
+**Rules.** A Dask Gateway cluster runs the environment you name, and does not
+inherit the notebook's: pass either `conda_env` (a path) or `pixi_project` (a
+project directory, with `pixi_env` defaulting to `default`) — one is required
+and the two are mutually exclusive. The gateway checks that the environment
+exists and is already built before the cluster starts, so run `pixi install`
+first. That environment has to sit where the workers can read it — `/work` or
+`/depot` — and to contain every package the analysis imports.
+
+Workers inherit none of the session's environment variables either; pass them
+with `env=dict(os.environ)` at creation. For XRootD reads that env must carry
+`X509_USER_PROXY` pointing at a proxy file the workers can read — under
+`/work/users/<username>/` or `/depot` — so export it before `voms-proxy-init`,
+whose default `/tmp` no worker sees.
+
+At most one active Dask Gateway cluster per user; creating another requires
+stopping the existing one. `Gateway()` needs no arguments:
+`DASK_GATEWAY__ADDRESS` and `DASK_GATEWAY__PROXY_ADDRESS` are preset.
+
+Each user whose session holds no GPU has one Ray cluster, with GPUs of its own
+— 5 GB A100 slices and 16 GB T4s, on worker pods with one GPU each by default,
+so nothing that asks for more GPUs at once than one worker has ever starts. From a session that holds a GPU, submissions are
+refused: train on the session's GPU. It starts when a job is submitted with
+`JobSubmissionClient("http://ray-train-gateway:8265")` from `ray.job_submission`
+— `RAY_AUTH_MODE` and `RAY_AUTH_TOKEN` are preset, so it needs no credentials —
+only while GPUs are free, and is removed once idle, with the
+records and logs of its jobs. The client's `headers` set its shape: `af-max-workers` (a
+number as a string, default `"1"`: the cluster starts with as many of them as have
+free GPUs, and its pods read the number from `AF_MAX_WORKERS`) or `af-n-workers` (an
+exact number: the cluster starts only while the GPUs of them all are free),
+`af-gpus-per-worker` (`"1"` or `"2"`, two
+being T4s only), `af-min-gpu-memory-gb` (GB; above `"5"` means T4s only),
+`af-cpus-per-worker` and `af-ram-per-worker-gb` (each worker's cores and GB,
+default `"8"` and `"32"`) and `af-env` (an environment's path, default the
+global one); any other `af-` header is refused with the list of these. That
+environment must sit on storage the cluster sees and have the same Python and
+Ray as the submitter. Submitting with other headers replaces an idle cluster
+and is refused while the cluster runs something. The cluster has no `/home`:
+ship code with `runtime_env={"working_dir": "."}`, write results to `/work`, and
+give Ray Train and Ray Tune a `storage_path` on `/work`. Every worker past the
+first can be taken back at any time and returns when a GPU is free, so
+multi-GPU training needs checkpoints and a `FailureConfig(max_failures=...)`;
+Ray Train goes on with the workers left under
+`ScalingConfig(num_workers=(1, int(os.environ["AF_MAX_WORKERS"])), use_gpu=True)`.
+Details: https://analysis-facility.physics.purdue.edu/guide-ray-train/
+
+Slurm GPU jobs need `--gpus-per-node=1`. `/depot` is the only volume shared
+between the AF and the Gilbreth cluster (`ssh gilbreth`).
+
+**Guidance.** A local cluster is bounded by the session's own cores, so sizing
+one past the CPUs the session was started with only adds contention.
+
+Full user documentation: https://analysis-facility.physics.purdue.edu
+<!-- END PURDUE AF -->

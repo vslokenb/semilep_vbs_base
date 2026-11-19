@@ -1,0 +1,336 @@
+================================================================================
+PocketCoffea on the Purdue Analysis Facility — working notes
+Source material for a README. Written from the v29 (2017 semilep/columnar) and
+v30 (2018 validation/inverted) campaigns, Oct 2026.
+Everything below was measured in this environment, not taken from docs.
+================================================================================
+
+--------------------------------------------------------------------------------
+1. ENVIRONMENT / INVOCATION
+--------------------------------------------------------------------------------
+Container  : /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/
+             pocketcoffea:lxplus-el9-latest   (run via `apptainer exec`)
+Binds      : -B /work/users/<user>/ -B /cvmfs -B /cvmfs/cms-griddata.cern.ch
+             -B /cvmfs/cms.cern.ch -B /tmp -B /etc/sysconfig/
+Python env : conda activate /work/users/<user>/envs/my-env
+Code       : PYTHONPATH=/work/users/<user>/latest_poco/PocketCoffea
+             (this local checkout SHADOWS the pip-installed pocket_coffea in
+             my-env — always verify which file is actually executing:
+                python -c "import pocket_coffea.scripts.runner as m; print(m.__file__)")
+
+Proxy      : voms-proxy-init writes to /tmp/x509up_u<uid>, which DASK WORKERS
+             CANNOT SEE. Copy it somewhere worker-visible and export:
+                cp /tmp/x509up_u<uid> /work/users/<user>/
+                export X509_USER_PROXY=/work/users/<user>/x509up_u<uid>
+             The executor refuses a proxy not under /work/ or /depot/.
+             A stale copy here silently broke two separate runs. Check with:
+                voms-proxy-info -file <path> -timeleft
+
+Logging    : set PYTHONUNBUFFERED=1 in the launcher. stdout to a file is
+             block-buffered, so a run that stalls BEFORE the progress bar emits
+             nothing at all and looks identical to one that just started. This
+             cost ~70 min of misdiagnosis twice.
+
+--------------------------------------------------------------------------------
+2. --process-separately (-ps) : THE BIGGEST STRUCTURAL CHOICE
+--------------------------------------------------------------------------------
+WITHOUT -ps (one fileset for all datasets in the invocation):
+  + all datasets' chunks enter the graph at once -> cluster actually fills
+    (measured: graph 24 tasks -> 2748 tasks for the same work)
+  - ONE output_all.coffea per invocation; a cross-dataset merge at the end
+  - a failure aborts the whole invocation
+  - results from completed datasets sit in worker memory until the merge, so a
+    single lost worker forces mass recomputation (observed: 2520 -> 2445
+    released, repeatedly, never converging)
+
+WITH -ps:
+  + one output_<dataset>.coffea per dataset; NO cross-dataset merge at all
+  + runs with exit_on_error=False -> a failed dataset is logged to
+    failed_jobs.json and the loop CONTINUES
+  + a lost worker costs one dataset, not the whole group
+  + resume is trivial: re-run only datasets whose .coffea is missing
+  - only one dataset's chunks are runnable at a time, so small datasets cannot
+    saturate the cluster
+  - one dask cluster is created per invocation but REUSED across all datasets
+    in it (no per-dataset spin-up cost)
+
+VERDICT from this campaign: -ps is what actually finishes. The grouped non-ps
+approach was measurably faster per task but never produced a single output in
+~20 h of trying; -ps produced 34/53 datasets in 18 h with zero errors.
+
+--------------------------------------------------------------------------------
+3. DASK / CLUSTER BEHAVIOUR  (hard-won)
+--------------------------------------------------------------------------------
+*** Client.scheduler_info() IS A CACHED SNAPSHOT taken at connect time. ***
+On short-lived probe connections it reports whatever existed when you connected
+and NEVER updates. This produced a completely fictitious "hard 5-worker cap"
+that several hours of work were built on. ALWAYS ask the scheduler itself:
+
+    def snap(dask_scheduler):
+        ws = dask_scheduler.workers
+        return (len(ws), sum(w.nthreads for w in ws.values()))
+    client.run_on_scheduler(snap)
+
+(note: the callable's parameter MUST be named `dask_scheduler`.)
+
+*** The GIL means worker_cores buys almost nothing. ***
+A dask worker is ONE process; worker_cores -> nthreads inside it. Coffea
+processing is Python-level enough that N threads in one process deliver ~1
+core of throughput. Measured:
+    12 workers x 8 cores = 96 cores  -> 13.5 cores busy (14% utilisation)
+    50 workers x 1 core  = 50 cores  -> 49.4 cores busy (99% utilisation)
+THROUGHPUT TRACKS WORKER COUNT, NOT CORE COUNT. Buy processes, not threads.
+Confirmed independently by the stats table: "Throughput per Worker" is the
+meaningful column.
+
+*** Only ONE active cluster per user. *** Stop the old one before starting a new
+one, or the new run blocks.
+
+*** Gateway options (list_dask_cluster_options): conda_env | pixi_project,
+worker_cores (max 64), worker_memory (max 64 GiB), env. No walltime, no queue —
+`queue: workday` in a run-options yaml is INERT for dask@purdue-af.
+
+*** dask@purdue-af NEVER reads `custom-setup-commands`. *** Those are for the
+condor/lxplus executors. Worker env comes from a FIXED ALLOWLIST in
+executors_purdue_af.py: NB_UID, NB_GID, PYTHONPATH, LD_LIBRARY_PATH,
+X509_CERT_DIR, PATH (+X509_USER_PROXY). To get any other variable to the
+workers you must add it to that list. (We added OMP_NUM_THREADS etc. there.)
+
+*** Hand-rolled Gateway().new_cluster() requires NB_UID and NB_GID in env=
+or it is rejected. The executor supplies these automatically.
+
+--------------------------------------------------------------------------------
+4. RUN OPTIONS THAT MATTER
+--------------------------------------------------------------------------------
+scaleout          number of workers. CLI `-s/--scaleout N` OVERRIDES the yaml
+                  (runner.py: `if scaleout != None: run_options["scaleout"]=...`)
+cores-per-worker  nthreads per worker process — see GIL note; 1 is often best
+mem-per-worker    GiB per worker. Per-task budget = mem / cores-per-worker.
+                  2 GiB/task caused KilledWorker; 4-6 GiB/task was safe.
+chunksize         events per task. Drives per-task memory directly.
+                  50000 -> KilledWorker under high concurrency; 20000 was stable.
+tree-reduction    merge fan-in. Default 20 OOM'd on columnar output; 4 was safe.
+retries           *** DEFAULT IS 10 AND IT HIDES FAILURES ***
+                  On a dropped scheduler connection coffea silently RESUBMITS
+                  THE WHOLE COMPUTATION. Symptom: progress bar pinned at 99%
+                  for hours while the task counter resets (e.g. 291 -> 0).
+                  Set retries: 1 to see the real error in ~60 s; 3 is a
+                  reasonable compromise that absorbs a transient blip.
+limit-files       takes the FIRST N files of each dataset. *** A cap >= the
+                  dataset's file count is a silent NO-OP *** — this burned three
+                  "retries" on a 24-file dataset using caps of 60 and 30.
+                  ALWAYS derive the cap from the actual file count.
+                  It does NOT bias yields: sum_genweights is accumulated from
+                  the events actually processed, so normalisation stays correct
+                  and only statistical precision is lost. Capped and uncapped
+                  outputs can be mixed.
+
+--------------------------------------------------------------------------------
+5. A REAL UPSTREAM BUG WORTH CARRYING
+--------------------------------------------------------------------------------
+runner.py computes `adapted_chunksize = adapt_chunksize(...)` — whose documented
+purpose is to shrink the chunk so every worker gets at least one — logs it, then
+passes the UNADAPTED run_options["chunksize"] to the runner. Both the -ps and
+non-ps branches do this. Effect: a 34k-event dataset ran as ONE chunk on ONE
+core. Patch (in the -ps branch):
+    adapted_chunksize = max(adapted_chunksize, 5000)   # floor: avoid tiny chunks
+    ...
+    run = get_runner(..., chunksize=adapted_chunksize, ...)
+Also note `--overwrite` is accepted but SILENTLY IGNORED (the click command sets
+ignore_unknown_options=True), so it never did anything.
+
+--------------------------------------------------------------------------------
+6. DATA ACCESS
+--------------------------------------------------------------------------------
+Skims live at root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/
+Healthy single-stream read: 1.29 GiB in ~8-18 s (~75-170 MB/s).
+
+*** XCache DOES NOT SERVE THESE FILES. *** root://xcache.cms.rcac.purdue.edu/
+fronts central CMS data under /store/mc and /store/data only; private group
+skims under /store/group/ fail outright (cold and warm both). Don't plan on it.
+
+*** CONCURRENT OPEN LIMIT. *** Concurrent reads = workers x cores-per-worker.
+  100 concurrent opens -> "OSError: XRootD error: [ERROR] Operation expired"
+                          on file open, killing 3 of 4 groups
+   50 concurrent opens -> zero errors over 18 h
+Keep concurrent opens around 50 against this origin.
+
+*** Distinguishing an FNAL outage from self-inflicted load: *** stat a central
+path through the redirector. During a real outage:
+    xrdfs cmsxrootd.fnal.gov stat /store/mc            -> OK in 644 ms
+    xrdfs cmseos.fnal.gov    stat <our skim>           -> timeout 50 s
+    xrdfs cmseos.fnal.gov    ls /eos/uscms/store       -> timeout 40 s
+i.e. FNAL serving fine generally while OUR namespace hangs. TCP to port 1094
+stayed open throughout, so a port check proves nothing.
+
+--------------------------------------------------------------------------------
+7. FAILURE MODES SEEN, AND WHAT EACH ACTUALLY MEANT
+--------------------------------------------------------------------------------
+"KilledWorker ... on 4 different workers"        per-task OOM. Lower chunksize
+  on a VBSSemileptonicProcessor-* task           and/or raise mem-per-worker.
+                                                 Budget >= 4 GiB/task.
+
+"KilledWorker ... on a reduce-* task"            the MERGE is OOM'ing. Lower
+                                                 tree-reduction (20 -> 4).
+
+"FutureCancelledError ... reduce-* cancelled     INTERMITTENT scheduler
+ for reason: scheduler-connection-lost"          connection drop. NOT memory
+                                                 (peak was 3-8 GiB of 32).
+                                                 With retries:10 this silently
+                                                 restarts everything. Identical
+                                                 at 219/60/30/25 files, so
+                                                 --limit-files does NOT fix it;
+                                                 shorter jobs reduce exposure.
+
+"OSError: XRootD error: [ERROR] Operation        too many concurrent file opens
+ expired" on file open                           against FNAL. Reduce
+                                                 workers x cores-per-worker.
+
+"ConfigKeyError: Missing key 2016_PostVFP"       a params yaml (e.g.
+                                                 classifiers.yaml) lacks a year
+                                                 block. Add it.
+
+"IndexError: Index not available in Category     a correctionlib category key
+ for input argument 0 val: PileupWeight_up"      listed in a variations/sources
+                                                 list that the SF file doesn't
+                                                 contain. Remove it from the
+                                                 sources list; don't rename the
+                                                 weight.
+
+Progress bar pinned at 99% for hours             usually NOT the reduce. The bar
+                                                 is not scaled to task count.
+                                                 Check released/queued directly;
+                                                 we saw "99%" with 456 ordinary
+                                                 processing tasks outstanding.
+
+--------------------------------------------------------------------------------
+8. MONITORING THAT ACTUALLY WORKS
+--------------------------------------------------------------------------------
+Trust, in order: (1) output files on disk, (2) the scheduler's task-state
+counters via run_on_scheduler, (3) per-worker cpu/memory, (4) the log text.
+DO NOT trust the progress bar for completion fraction.
+
+The one counter that distinguishes progress from thrashing is `released`:
+  climbing            -> real progress
+  flat with high CPU  -> long tasks (fine)
+  flat with ~0% CPU   -> blocked on I/O, or the origin is down
+  DECREASING          -> work is being discarded and recomputed; a worker died
+                         or the whole computation was resubmitted
+
+Watchdog rules learned the hard way:
+  * a watchdog must NEVER delete or kill. One early watcher compared
+    str(cluster.status) (which returns "2") against "RUNNING", never matched,
+    killed a healthy run at its timer, and its teardown rm -rf'd a COMPLETED
+    output directory.
+  * watch the thing that signals trouble, not the thing you're curious about.
+    A watcher armed only on "worker count scales up" timed out saying "no
+    change" while three groups failed unnoticed over the next seven hours.
+  * verify a launch actually took (pgrep after starting) instead of assuming.
+  * `grep -c ... || echo 0` can emit TWO lines and break every later integer
+    comparison — quote and sanitise counters.
+
+--------------------------------------------------------------------------------
+9. MEASURED THROUGHPUT (use these, not guesses)
+--------------------------------------------------------------------------------
+config_validation 2018 (histogram-only), one dataset, -ps:
+    2,559,441 events in 32.05 min -> 1331 events/s total, 26.6 ev/s/worker
+config_semilep 2017 (columnar + classifier), one dataset:
+    4,702,538 events in 45.90 min -> 1708 events/s total, 34.2 ev/s/worker
+Steady-state -ps cadence at 50 workers: ~10 min (small) to ~2 h (large) per
+dataset; 30 datasets in ~14.5 h.
+
+*** DO NOT extrapolate throughput from a single chunk run with `-t/--test` or
+`--limit-chunks 1`. *** That pays all the one-time setup (correction loading,
+processor construction) and understated the real rate by 5.5x here, which
+produced a 550 h "ETA" against a true ~20 h.
+*** DO NOT extrapolate from an early progress burst either *** — small datasets
+in a group finish first and the tail is much slower.
+
+--------------------------------------------------------------------------------
+10. COLUMNAR OUTPUT (ColOut) COST
+--------------------------------------------------------------------------------
+config_semilep with a full ColOut block: 2.23 KB/event.
+  33,908 events  ->  74 MB
+  45 datasets    ->  77.6 GiB total
+Histogram-only configs (validation/inverted have NO populated `columns` block):
+  ~115 MB per dataset, 4.7 GB for 34 datasets.
+If columnar output is on, size the disk FIRST: /work is 100 GB per user and a
+full 2017 MC campaign projected to ~476 GB uncapped.
+
+--------------------------------------------------------------------------------
+11. SCRIPT PATTERNS IN THIS WORKSPACE
+--------------------------------------------------------------------------------
+run_v30_2018.sh          chain: per-config passes, per-dataset resume, splits a
+                         separate capped pass for ttbar (--limit-files is global
+                         to one invocation, so capped datasets need their own).
+run_inside_v30.sh        the actual `pocket-coffea run` call; sets env that the
+                         executor allowlist will forward; takes scaleout and an
+                         optional limit-files.
+v30_missing.py           computes which DATASET KEYS still lack an output file.
+                         Resume must work on dataset keys, not sample names:
+                         data samples expand into per-era datasets (EGamma ->
+                         EGamma_2018_EraA..D), so they are not 1:1.
+watch_v30_ps.sh          read-only watcher: alerts on each dataset written, any
+                         failure, and chain exit.
+poll_fnal_and_launch.sh  waits for FNAL to serve again (2 consecutive stats plus
+                         one real read) then launches; never deletes anything.
+make_v29_manifest.py     builds a manifest from the filesystem + dataset jsons
+                         WITHOUT unpickling the outputs (77.6 GiB is far too
+                         much to load just to read sum_genweights).
+push_v29_to_lxplus.sh    rsync-if-available else resumable scp loop; note there
+                         is NO rsync anywhere on the AF (not in the base env,
+                         global pixi, my-env, or the container) — only scp.
+
+--------------------------------------------------------------------------------
+12. OUTPUT STRUCTURE (for downstream / Combine)
+--------------------------------------------------------------------------------
+With -ps: one output_<dataset>.coffea per dataset, NO output_all.coffea.
+Top-level keys:
+  sum_genweights, sum_signOf_genweights   keyed by DATASET
+  sumw, sumw2        [category][dataset][sample][variation]
+  cutflow            keyed by DATASET
+  variables          hist objects
+  columns            keyed by SAMPLE  (note: different key level!)
+  datasets_metadata  by_dataset / by_datataking_period
+Merging slices of one dataset: keep the SAME dataset key in each slice json and
+coffea.processor.accumulate sums sum_genweights/cutflow/sumw and concatenates
+columns — the result is structurally identical to one full run. Merge with the
+my-env interpreter (numpy 1.26); the global pixi env's numpy 2 writes pickles
+the downstream scripts cannot read.
+
+--------------------------------------------------------------------------------
+13. DATASET DEFINITION GOTCHAS
+--------------------------------------------------------------------------------
+* Configurator.load_datasets does `filesets[key] = ds` iterating the json list
+  in order, so THE LAST JSON WINS for a duplicate dataset key. This is a clean
+  way to override one dataset (e.g. a file-range slice) without touching the
+  others — append the override json last.
+* SingleElectron exists for 2016/2017 only; 2018 uses EGamma. Check the data
+  sample actually covers each year or electron categories silently come out
+  empty. (This was missed once and produced empty 2016/2017 electron channels.)
+* The same dataset key can appear in several jsons with different file counts
+  and different nevents (skimmed vs unskimmed vs redirector variants). Confirm
+  which json the config actually loads.
+
+--------------------------------------------------------------------------------
+14. GATEWAY HOSTNAME DRIFT (bites every run until patched upstream)
+--------------------------------------------------------------------------------
+PocketCoffea's executor_options_defaults.yaml hardcodes, for dask@purdue-af:
+    gateway-address:       "http://dask-gateway-k8s.geddes.rcac.purdue.edu/"
+    gateway-proxy-address: "traefik-dask-gateway-k8s.cms.geddes.rcac.purdue.edu:8786"
+As of Nov 2026 those names NO LONGER RESOLVE (the facility dropped the "-k8s").
+The current names are in the session env:
+    DASK_GATEWAY__ADDRESS=http://dask-gateway.geddes.rcac.purdue.edu
+    DASK_GATEWAY__PROXY_ADDRESS=traefik-dask-gateway.cms.geddes.rcac.purdue.edu:8786
+but executors_purdue_af.py builds Gateway() from run_options['gateway-address'],
+NOT from the env, so exporting the variables does nothing. Override in the
+run-options yaml:
+    gateway-address: "http://dask-gateway.geddes.rcac.purdue.edu"
+    gateway-proxy-address: "traefik-dask-gateway.cms.geddes.rcac.purdue.edu:8786"
+Symptom: aiohttp ClientConnectorDNSError "Cannot connect to host
+dask-gateway-k8s... Name or service not known" ~2 min after launch, which looks
+like a config problem with whatever you just changed. Check first with:
+    getent hosts dask-gateway.geddes.rcac.purdue.edu
+    getent hosts dask-gateway-k8s.geddes.rcac.purdue.edu
+A bare Gateway() (no args) still works because it reads the env vars — so
+"the client can list clusters but the run cannot create one" is the signature.

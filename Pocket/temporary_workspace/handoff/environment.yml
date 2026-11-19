@@ -1,0 +1,27 @@
+# Minimal portable environment for config_validation / config_inverted.
+# Conda only places python; everything else comes as pip wheels, so this
+# solves on any linux-64 host (glibc >= 2.17), unlike a full pinned export.
+# pocket-coffea itself is NOT listed: install the fork editable afterwards,
+# which also pulls its own declared dependencies (dask, correctionlib,
+# omegaconf, hist, vector, law, ...):
+#
+#   conda env create -f environment.yml          # add -p <path> to choose where
+#   conda activate vbs-semilep                   # or the <path> given to -p
+#   git clone -b nonprompt https://github.com/vslokenb/PocketCoffea.git
+#   pip install -e ./PocketCoffea
+#
+# Inside apptainer/singularity, source the conda hook first (the container
+# shell never reads ~/.bashrc): source /usr/local/etc/profile.d/conda.sh
+name: vbs-semilep
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - coffea==0.7.29
+      - xgboost==3.2.0
+      - onnxruntime==1.24.4
+      - scikit-learn==1.8.0
+      - parsl==2026.3.30
+      - rucio-clients==39.4.1
