@@ -16,6 +16,8 @@ NanoAOD skims ──► PocketCoffea processing ──► .coffea outputs ──
 |---|---|
 | Running/maintaining the event processing (selections, weights, nonprompt estimate, BDT) | [`Pocket/temporary_workspace/README.md`](Pocket/temporary_workspace/README.md) |
 | Building histograms/datacards and running the fits (per year or full Run 2) | [`VBSfit/README.md`](VBSfit/README.md) |
+| **Setting up the area for a new user, or handing the pipeline to another person or Claude agent** | [`Pocket/temporary_workspace/handoff/README.md`](Pocket/temporary_workspace/handoff/README.md) (bundle: setup guide, runbook, measured notes, env spec, patches) |
+| Operating a production campaign (launch, monitor, recover) | [`Pocket/temporary_workspace/PIPELINE_RUNBOOK.md`](Pocket/temporary_workspace/PIPELINE_RUNBOOK.md) and [`GRID_WORKFLOW_NOTES.txt`](Pocket/temporary_workspace/GRID_WORKFLOW_NOTES.txt) |
 | Installing PocketCoffea | [Installing PocketCoffea](#installing-pocketcoffea) (below) |
 
 ---
@@ -68,6 +70,8 @@ live next to each `Cut`.)
 `boosted_mu`, `boosted_e`); the event score `bdt_<category>` is the mean of the fold predictions and is
 histogrammed natively in 40 uniform bins on [0, 1]. The models are listed per year in
 `Pocket/temporary_workspace/params/classifiers.yaml` and evaluated *inside* the PocketCoffea workflow.
+The current set is **`bdt_nov13/`** (trained 2026-11-13, used for all four year-eras). Its inputs include
+`jetcentral1..4_btagDeepFlavQG`, which `workflow_v9.py` builds as indexed central-jet columns.
 
 **Fit.** A simultaneous fit of the SR BDT shapes and the two CRs (each a **single counting bin**), with
 free-floating background normalizations `norm_top_<topology>` and `norm_wjet_<topology>` (range
@@ -89,6 +93,9 @@ semilep_vbs_base/
 ├── README.md                     ← you are here
 ├── Pocket/
 │   ├── temporary_workspace/      ★ the live PocketCoffea analysis workspace  → its own README
+│   │   ├── handoff/                  onboarding/handoff bundle (setup guide, runbook, notes, patches)
+│   │   ├── PIPELINE_RUNBOOK.md       operator runbook for production campaigns
+│   │   └── GRID_WORKFLOW_NOTES.txt   measured Purdue AF / Dask / XRootD behaviour
 │   ├── run2_UL/                    tutorial-era Run-2 UL example config (see its README)
 │   ├── run2_studies/               tutorial-era studies example (see its README)
 │   ├── Tutorial_Pocket_VBS_semilep/  introductory PocketCoffea VBS tutorial (see its README)
@@ -143,8 +150,16 @@ flowchart LR
 6. **VBSfit** turns these coffea files into ROOT histograms and Combine datacards, runs the fits per
    year, and finally combines the four year-eras.
 
-Per-year outputs follow a manifest-driven layout (`<stage>_<YEAR>_<GROUP>/output_all.coffea`; see the
-workspace README) so each year is processed and fitted independently and combined only at the very end.
+Each year is processed and fitted independently and combined only at the very end. There are two output
+layouts:
+
+| Campaign | Layout | Run mode |
+|---|---|---|
+| v28 (what `VBSfit/config/inputs_v28_*.yaml` currently consumes) | `cr_v28_<YEAR>_gNN/output_all.coffea`, `nonp_v28_<YEAR>_gNN/…` | grouped, without `--process-separately` |
+| v30 / **v31** (current) | `<prefix>_validation_<YEAR>/output_<dataset>.coffea`, `<prefix>_inverted_<YEAR>/output_<dataset>.coffea` | `--process-separately`: one file per dataset, no `output_all.coffea`, per-dataset resume |
+
+The diagram above uses the v28 names. Feeding v31 into VBSfit needs a v31 manifest and new `inputs_*.yaml`
+files, which don't exist yet (see [§8](#8-status-notes-dated)).
 
 ---
 
@@ -156,9 +171,35 @@ workspace README) so each year is processed and fitted independently and combine
 | Skim storage | FNAL EOS `root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/` | VOMS proxy on a worker-visible path |
 | VBSfit (histograms, datacards, Combine) | **lxplus + CERN EOS** (`/eos/user/v/vslokenb/vbs_semilep/sensitivities/VBSfit`), inside `tmux` | **Two** environments, switched by the scripts: CMSSW_14_1_0_pre4 (`combine`, `text2workspace.py`, PyROOT, no uproot) and the PocketCoffea Apptainer image (`uproot`, coffea, matplotlib; no combine) |
 
-Paths such as `/work/users/vsloken-fnal/…` (Purdue) and `/eos/user/v/vslokenb/…` (lxplus) are hard-coded in
-several YAMLs and driver scripts. When moving to another cluster, grep for them and adapt (they are meant to be
-site-customized).
+### Purdue AF processing environment
+
+A production run passes through four layers. All of them must be in place:
+
+1. **AF session (host).**
+   - Provides `apptainer`.
+   - Provides the preset `JUPYTERHUB_API_TOKEN` and `DASK_GATEWAY__*` variables, used for gateway auth.
+   - Provides `NB_UID`/`NB_GID` and `X509_CERT_DIR`.
+   - Never run apptainer with `--cleanenv`: it drops the token and the gateway refuses the cluster.
+2. **Apptainer image.**
+   - Image: `/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/pocketcoffea:lxplus-el9-latest`
+   - Bind mounts: `-B /work/users/<user>/ -B /cvmfs -B /cvmfs/cms-griddata.cern.ch -B /cvmfs/cms.cern.ch -B /tmp -B /etc/sysconfig/`
+   - Supplies conda (its hook is at `/usr/local/etc/profile.d/conda.sh`, which exists only inside the image), `voms-proxy-*` and the CA certificates.
+3. **Conda env** `/work/users/<user>/envs/my-env`.
+   - Python 3.11 and coffea 0.7.29, with **numpy 1.26** (must stay below 2).
+   - Built from `Pocket/temporary_workspace/environment.yml`, **plus `xrootd` from conda-forge**, which the spec omits.
+   - The PocketCoffea fork `vslokenb/PocketCoffea@nonprompt` is checked out at `/work/users/<user>/latest_poco/PocketCoffea` and put on `PYTHONPATH`, which shadows any pip install.
+   - That checkout carries two local patches that are not pushed. They are in `handoff/patches/`.
+4. **Dask Gateway workers** (`dask@purdue-af`).
+   - Workers don't run in the image. They activate the conda env by path and receive only an allowlist of environment variables.
+   - So the env, the code, the workspace and the VOMS proxy (`/work/users/<user>/x509up_u<uid>`, never `/tmp`) must all live on `/work`.
+   - Run-options YAMLs must override `gateway-address` and `gateway-proxy-address`, because PocketCoffea's built-in `-k8s` hostnames no longer resolve.
+
+The step-by-step setup and an environment check are in
+[`handoff/AGENT_SETUP_HANDOFF.md`](Pocket/temporary_workspace/handoff/AGENT_SETUP_HANDOFF.md) §3.
+
+Paths such as `/work/users/vsloken-fnal/…` and `x509up_u2070155` (Purdue) and `/eos/user/v/vslokenb/…` (lxplus)
+are hard-coded in several YAMLs and driver scripts. When moving to another user or cluster, find and adapt them
+with `grep -rl "vsloken-fnal\|2070155\|vslokenb" --include='*.sh' --include='*.yaml' --include='*.py' .`
 
 ---
 
@@ -169,9 +210,19 @@ site-customized).
 
 ```bash
 cd Pocket/temporary_workspace
-./run_chain.sh          # validation pass, then inverted (nonprompt) pass
-./run_columns.sh        # config_semilep: columnar output for BDT training
+export X509_USER_PROXY=/work/users/<user>/x509up_u$(id -u)
+voms-proxy-init -voms cms -valid 192:00          # must outlast the campaign (~2-3 days for full Run 2)
+# confirm no Dask cluster is left over (one per user), then:
+nohup ./run_v31_all.sh > logs/run_v31_driver_$(date -u +%Y%m%d_%H%M%S).log 2>&1 &
+YEAR=2016_PreVFP PREFIX=v31 nohup ./watch_v30_year.sh 1440 > logs/watch_v31.log 2>&1 &   # read-only watcher
 ```
+
+`run_v31_all.sh` loops over the four eras. For each era it runs `config_validation.py` and then
+`config_inverted.py` (through `run_v30_year.sh` and `run_inside_v30.sh` inside apptainer), with
+`--process-separately`, up to 3 attempts per pass, and the two ttbar datasets capped at `TT_CAP` files.
+Relaunching resumes from the datasets that are still missing. For grouping, cluster sizing, failure modes and
+monitoring, follow [`PIPELINE_RUNBOOK.md`](Pocket/temporary_workspace/PIPELINE_RUNBOOK.md). Its single most
+important signal is the age of the log file's last modification.
 
 **Fit one year (lxplus)** — details in [`VBSfit/README.md`](VBSfit/README.md):
 
@@ -235,16 +286,37 @@ Copies of `mix_years.py` also live in `Pocket/temporary_workspace/` (used by `ru
 
 ## 8. Status notes (dated)
 
-*These reflect the state around 2026-10-29 and will go stale; check the commit log.*
+*State as of 2026-11-19. This will go stale; check the commit log and the workspace `logs/`.*
 
-* The VBSfit pipeline is validated end-to-end per year, and the full-Run-2 per-category combination
-  pipeline (`run_run2_fits.sh`) runs.
-* The 2017/2018 coffea productions are awaiting a re-run after an upstream PocketCoffea **JER smearing
-  fix** (unmatched jets previously received the full JER scale factor instead of stochastic smearing;
-  this distorted nominal templates and inflated the JES/JER variations, hitting 2017/2018 — where the
-  JRV2 scale factors are large in the 2.5<|η|<3 region used by the forward jets — much harder than 2016).
-  2016 results are essentially unaffected. Treat 2017/2018 fit results made before that re-run as
-  provisional.
+* **Production campaign v31 is running.** It covers full Run 2 × (`config_validation`, `config_inverted`) with
+  the `bdt_nov13` classifiers and the `workflow_v9` jetcentral patch. Outputs go to
+  `v31_{validation,inverted}_<YEAR>/` and the earlier v30 outputs are left untouched.
+
+  | era | validation | inverted |
+  |---|---|---|
+  | 2016_PreVFP | ✅ 55/55 | ✅ 55/55 |
+  | 2016_PostVFP | ✅ 51/51 | ✅ 51/51 |
+  | 2017 | ✅ 55/55 | ✅ 55/55 |
+  | 2018 | ⏳ 30/53 | pending |
+
+  The one real fault so far: a single `scheduler-connection-lost` on 2026-11-17 killed the Dask client, and
+  the attempt-2 retry recovered it.
+* **The JER smearing fix is in.** v30 and v31 run on the `latest_poco` checkout (fork `nonprompt` @ `a4704f09`),
+  which includes the upstream fix: unmatched jets now get stochastic smearing instead of the full JER scale
+  factor. It also carries the patched JES. Fit results from v28 2017/2018 inputs, made before the fix, remain
+  provisional until VBSfit is pointed at v31.
+* **Next steps after v31 finishes:**
+  - merge the per-year nonprompt output
+  - build a v31 manifest and `VBSfit/config/inputs_v31_<YEAR>.yaml`
+  - re-run the per-year fits and the Run-2 combination
+* **The workspace has uncommitted state that production depends on:** `workflow_v9.py`, `config_validation.py`,
+  `config_inverted.py`, `params/classifiers.yaml`, plus the untracked `bdt_nov13/` models. The fork also has
+  two unpushed patches. Snapshots of all of these are in `handoff/patches/`, but commit the real files before
+  relying on a clone.
+* `params/pileup.yaml` points 2017 at `puWeights_17.json`, which doesn't exist on disk. It is unresolved; see
+  `SHIPPING_MANIFEST.md`.
+* The VBSfit pipeline is validated end-to-end per year, and the full-Run-2 per-category combination pipeline
+  (`run_run2_fits.sh`) runs.
 * The luminosity uncertainty is set to 1.073 for all four year-eras (`LUMI_UNC_BY_YEAR`, `make_datacards.py`).
 
 ---
@@ -326,7 +398,10 @@ pocket-coffea            # verify
 
 For the full instructions see <https://pocketcoffea.readthedocs.io/en/stable/installation.html>.
 
-> **This analysis' working environment** (Purdue AF) additionally uses a conda environment
-> (`Pocket/temporary_workspace/environment.yml`, python 3.11) and a **local PocketCoffea checkout placed on
-> `PYTHONPATH`, which shadows the pip-installed package** — see the Purdue AF operating notes in the workspace
-> README.
+> **This analysis' working environment (Purdue AF)** also uses:
+> - a conda environment built from `Pocket/temporary_workspace/environment.yml` (Python 3.11), plus `xrootd`
+> - the PocketCoffea fork `git clone -b nonprompt https://github.com/vslokenb/PocketCoffea.git`, at commit
+>   `a4704f09` with `handoff/patches/pocketcoffea_purdue_af.patch` applied, placed on `PYTHONPATH`, which
+>   shadows any pip-installed copy
+>
+> See [§4](#4-facilities-and-environments) and `handoff/AGENT_SETUP_HANDOFF.md`.
