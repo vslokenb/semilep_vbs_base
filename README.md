@@ -17,6 +17,7 @@ NanoAOD skims ──► PocketCoffea processing ──► .coffea outputs ──
 | Running/maintaining the event processing (selections, weights, nonprompt estimate, BDT) | [`Pocket/temporary_workspace/README.md`](Pocket/temporary_workspace/README.md) |
 | Building histograms/datacards and running the fits (per year or full Run 2) | [`VBSfit/README.md`](VBSfit/README.md) |
 | **Setting up the area for a new user, or handing the pipeline to another person or Claude agent** | [`Pocket/temporary_workspace/handoff/README.md`](Pocket/temporary_workspace/handoff/README.md) (bundle: setup guide, runbook, measured notes, env spec, patches) |
+| **Building your own (possibly different-physics) analysis from these files**: skim, cuts, workflow, histogram and columnar configs, calibrations and weights, test/run strategy, run times, common errors | [`Pocket/temporary_workspace/LIGHTWEIGHT_SETUP.md`](Pocket/temporary_workspace/LIGHTWEIGHT_SETUP.md), summarised in [§5b](#5b-lightweight-setup-your-own-analysis) |
 | Operating a production campaign (launch, monitor, recover) | [`Pocket/temporary_workspace/PIPELINE_RUNBOOK.md`](Pocket/temporary_workspace/PIPELINE_RUNBOOK.md) and [`GRID_WORKFLOW_NOTES.txt`](Pocket/temporary_workspace/GRID_WORKFLOW_NOTES.txt) |
 | Installing PocketCoffea | [Installing PocketCoffea](#installing-pocketcoffea) (below) |
 
@@ -29,6 +30,7 @@ NanoAOD skims ──► PocketCoffea processing ──► .coffea outputs ──
 3. [End-to-end data flow](#3-end-to-end-data-flow)
 4. [Facilities and environments](#4-facilities-and-environments)
 5. [Quick start for each stage](#5-quick-start-for-each-stage)
+   - [5b. Lightweight setup (your own analysis)](#5b-lightweight-setup-your-own-analysis)
 6. [Top-level helper scripts](#6-top-level-helper-scripts)
 7. [Cross-cutting conventions](#7-cross-cutting-conventions)
 8. [Status notes (dated)](#8-status-notes-dated)
@@ -243,6 +245,46 @@ python3 python/make_inputs_from_manifest.py --manifest ../v28/v28_manifest.csv -
 ```bash
 ./run_binning_scan.sh --year=2018 --jobs=3
 ```
+
+---
+
+## 5b. Lightweight setup (your own analysis)
+
+You don't need the whole production chain (nonprompt estimate, SF derivations, campaign scripts) to reuse
+this framework. The minimal analysis is six pieces, each with a working example in
+`Pocket/temporary_workspace/`. The full guide, with code templates, is
+[`LIGHTWEIGHT_SETUP.md`](Pocket/temporary_workspace/LIGHTWEIGHT_SETUP.md).
+
+| Piece | Example | Role |
+|---|---|---|
+| Skim | `config_skimmer.py` | `skim=[...]` + `save_skimmed_files=<xrootd dir>`: write slimmed NanoAOD once, loosely |
+| Cuts | `custom_cut_functions.py` | `Cut(name, params, function)`, used at three stages: skim (raw collections), preselection, categories |
+| Workflow | `workflow_v9.py` | `BaseProcessorABC` subclass: object selection, derived and indexed objects, optional in-workflow ML scoring |
+| Histograms | `config_validation.py` | `Configurator` with categories, weights, variations and `HistConf` variables |
+| Columns | `config_semilep.py` | the same, plus `columns={...ColOut(...)}` per category (ML training input; ~2.2 KB/event) |
+| Calibrations and weights | `config_validation.py`, `params/*.yaml` | `Calibrator` subclasses / `default_calibrators_sequence`; `WeightLambda` and `WeightWrapper` custom weights |
+
+**Always test before scaling out**, in this order:
+1. **Import check:** `python -c "import config"`
+2. **Interactive single chunk:**
+   ```bash
+   pocket-coffea run --cfg config.py -o test -e iterative --limit-files 1 --limit-chunks 1 \
+       --filter-years 2018 --filter-datasets <one MC key>
+   ```
+   Then repeat it on one data key.
+3. **`-e futures`:** catches modules that aren't shipped to workers.
+4. **Small Dask run:** `-e dask@purdue-af -s 5 --limit-files 2 -ps`
+5. **Full campaign.**
+
+Executors at a glance:
+- `iterative` and `futures` run in your session.
+- `dask@purdue-af` runs on the AF gateway.
+- `condor@lxplus` and `condor@lpc` run on HTCondor at CERN or FNAL. They are not available on the Purdue AF.
+
+Measured heavy-config rates: about 27–34 events/s per worker, so a few hours per large dataset, about a day
+per era for both passes, and about 3–4 days for full Run 2 at 50 workers. A single-chunk test understates
+throughput about 5×, so never extrapolate from it. Common errors and their fixes are tabulated in §9 of the
+guide.
 
 ---
 

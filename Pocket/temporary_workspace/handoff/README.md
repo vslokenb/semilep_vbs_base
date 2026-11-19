@@ -15,6 +15,7 @@ Re-copy them if the originals have changed since this date.
 | 5 | `SHIPPING_MANIFEST.md` | Every param, SF, model and dataset file the production configs depend on |
 | 6 | `V28_COMBINE_HANDOFF.md` | Output `.coffea` structure and normalization for downstream/Combine |
 | 7 | `MANIFEST_V29.md` | Example per-dataset output catalogue (v29, 2017 columnar) |
+| 8 | `LIGHTWEIGHT_SETUP.md` | Building a new (any-physics) analysis from these files: skim, cuts, workflow, histogram and columnar configs, calibrations and weights, executors (`iterative`/`futures`/Dask/Condor), test ladder, run times, common errors |
 
 ## Setup inputs
 
