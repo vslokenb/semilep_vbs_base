@@ -1,0 +1,19 @@
+queue: workday
+# Right-sized for DATA passes: 1 variation, few files, trivially cheap.
+# 40 cores / 80 GiB total, vs 400 cores / 3200 GiB for the MC light-group config
+# which the gateway would not schedule.
+mem-per-worker: 8
+scaleout: 10
+cores-per-worker: 4
+chunksize: 50000
+adaptive: false
+skip-bad-files: false
+custom-setup-commands:
+  - echo $HOME
+  - source /usr/local/etc/profile.d/conda.sh
+  - conda activate /work/users/vsloken-fnal/envs/my-env
+  - export PATH="/work/users/vsloken-fnal/envs/my-env/bin:$PATH"
+  - export PYTHONPATH='/work/users/vsloken-fnal/latest_poco/PocketCoffea'
+  - echo $PYTHONPATH
+  - export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+local-virtualenv: false

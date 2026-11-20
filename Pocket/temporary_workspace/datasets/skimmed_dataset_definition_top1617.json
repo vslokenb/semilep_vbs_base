@@ -1,0 +1,485 @@
+{
+  "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM']",
+      "sample": "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "0.4062",
+      "nevents": "3702829",
+      "size": "9554740528",
+      "isSkim": "True",
+      "skim_efficiency": "0.25721229705217485",
+      "skim_rescale_genweights": "3.887839"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_10.root"
+    ]
+  },
+  "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM']",
+      "sample": "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "0.5407",
+      "nevents": "3185392",
+      "size": "8311858165",
+      "isSkim": "True",
+      "skim_efficiency": "0.2222967850279871",
+      "skim_rescale_genweights": "4.498491"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PostVFP_9.root"
+    ]
+  },
+  "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM']",
+      "sample": "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "32.45",
+      "nevents": "830853",
+      "size": "1679270996",
+      "isSkim": "True",
+      "skim_efficiency": "0.14707966011683485",
+      "skim_rescale_genweights": "6.799214"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017_3.root"
+    ]
+  },
+  "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM']",
+      "sample": "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "32.45",
+      "nevents": "365800",
+      "size": "712187888",
+      "isSkim": "True",
+      "skim_efficiency": "0.14684865515857085",
+      "skim_rescale_genweights": "6.809908"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PostVFP/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PostVFP_1.root"
+    ]
+  },
+  "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM']",
+      "sample": "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "113.4",
+      "nevents": "3276637",
+      "size": "5431979245",
+      "isSkim": "True",
+      "skim_efficiency": "0.051949915177651296",
+      "skim_rescale_genweights": "19.654764"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_9.root"
+    ]
+  },
+  "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v2/NANOAODSIM']",
+      "sample": "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "0.4062",
+      "nevents": "3602721",
+      "size": "9327444493",
+      "isSkim": "True",
+      "skim_efficiency": "0.2539556854951948",
+      "skim_rescale_genweights": "3.9376948"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_10.root"
+    ]
+  },
+  "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM']",
+      "sample": "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "67.93",
+      "nevents": "1616847",
+      "size": "2708051423",
+      "isSkim": "True",
+      "skim_efficiency": "0.052116006962351726",
+      "skim_rescale_genweights": "19.62535"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_5.root"
+    ]
+  },
+  "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM']",
+      "sample": "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "113.4",
+      "nevents": "2753294",
+      "size": "4593745045",
+      "isSkim": "True",
+      "skim_efficiency": "0.04920022873072318",
+      "skim_rescale_genweights": "20.764997"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PreVFP_7.root"
+    ]
+  },
+  "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM']",
+      "sample": "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "67.93",
+      "nevents": "3719248",
+      "size": "6442012333",
+      "isSkim": "True",
+      "skim_efficiency": "0.053289699540068486",
+      "skim_rescale_genweights": "19.169544"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_10.root"
+    ]
+  },
+  "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v2/NANOAODSIM']",
+      "sample": "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "0.5407",
+      "nevents": "3772539",
+      "size": "9879117324",
+      "isSkim": "True",
+      "skim_efficiency": "0.22025868524001818",
+      "skim_rescale_genweights": "4.540116"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2016_PreVFP_10.root"
+    ]
+  },
+  "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM']",
+      "sample": "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "32.51",
+      "nevents": "375941",
+      "size": "731660530",
+      "isSkim": "True",
+      "skim_efficiency": "0.14719694596711042",
+      "skim_rescale_genweights": "6.793558"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PostVFP/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PostVFP_1.root"
+    ]
+  },
+  "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM']",
+      "sample": "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "3.36",
+      "nevents": "681881",
+      "size": "1086537586",
+      "isSkim": "True",
+      "skim_efficiency": "0.12357393983327293",
+      "skim_rescale_genweights": "7.837994"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PreVFP/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PreVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PreVFP/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PreVFP_2.root"
+    ]
+  },
+  "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM']",
+      "sample": "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "3.36",
+      "nevents": "1735346",
+      "size": "2874659308",
+      "isSkim": "True",
+      "skim_efficiency": "0.12741160058737153",
+      "skim_rescale_genweights": "7.607381"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2017_5.root"
+    ]
+  },
+  "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM']",
+      "sample": "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "67.93",
+      "nevents": "1623655",
+      "size": "2697630196",
+      "isSkim": "True",
+      "skim_efficiency": "0.05304501943872717",
+      "skim_rescale_genweights": "19.278374"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2016_PostVFP_5.root"
+    ]
+  },
+  "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v1/NANOAODSIM']",
+      "sample": "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "113.4",
+      "nevents": "6780842",
+      "size": "11732168019",
+      "isSkim": "True",
+      "skim_efficiency": "0.05219927176431645",
+      "skim_rescale_genweights": "19.541054"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_10.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_11.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_12.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_13.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_14.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_15.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_16.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8_2017_17.root"
+    ]
+  },
+  "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM']",
+      "sample": "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "32.51",
+      "nevents": "831949",
+      "size": "1683697845",
+      "isSkim": "True",
+      "skim_efficiency": "0.14662477969686288",
+      "skim_rescale_genweights": "6.820277"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2017_3.root"
+    ]
+  },
+  "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PostVFP": {
+    "metadata": {
+      "das_names": "['/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM']",
+      "sample": "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+      "year": "2016_PostVFP",
+      "isMC": "True",
+      "xsec": "3.36",
+      "nevents": "692009",
+      "size": "1097784557",
+      "isSkim": "True",
+      "skim_efficiency": "0.12648674830926704",
+      "skim_rescale_genweights": "7.6434536"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PostVFP/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PostVFP_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PostVFP/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_2016_PostVFP_2.root"
+    ]
+  },
+  "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM']",
+      "sample": "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "0.4062",
+      "nevents": "7003595",
+      "size": "18660821235",
+      "isSkim": "True",
+      "skim_efficiency": "0.2531834307239737",
+      "skim_rescale_genweights": "3.9497058"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_10.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_11.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_12.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_13.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_14.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_15.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_16.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_17.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_18.root"
+    ]
+  },
+  "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017": {
+    "metadata": {
+      "das_names": "['/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM']",
+      "sample": "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",
+      "year": "2017",
+      "isMC": "True",
+      "xsec": "0.5407",
+      "nevents": "7006967",
+      "size": "18901456605",
+      "isSkim": "True",
+      "skim_efficiency": "0.22040634540494958",
+      "skim_rescale_genweights": "4.5370746"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_1.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_2.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_3.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_4.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_5.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_6.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_7.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_8.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_9.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_10.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_11.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_12.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_13.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_14.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_15.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_16.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_17.root",
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8_2017_18.root"
+    ]
+  },
+  "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM']",
+      "sample": "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "32.45",
+      "nevents": "332753",
+      "size": "644113113",
+      "isSkim": "True",
+      "skim_efficiency": "0.14467521739130434",
+      "skim_rescale_genweights": "6.9121304"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PreVFP/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PreVFP_1.root"
+    ]
+  },
+  "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PreVFP": {
+    "metadata": {
+      "das_names": "['/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v1/NANOAODSIM']",
+      "sample": "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+      "year": "2016_PreVFP",
+      "isMC": "True",
+      "xsec": "32.51",
+      "nevents": "332922",
+      "size": "644518423",
+      "isSkim": "True",
+      "skim_efficiency": "0.1447486956521739",
+      "skim_rescale_genweights": "6.908538"
+    },
+    "files": [
+      "root://cmseos.fnal.gov//eos/uscms/store/group/lnujj/semilep_vbs_skim/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PreVFP/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_2016_PreVFP_1.root"
+    ]
+  }
+}

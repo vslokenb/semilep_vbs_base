@@ -1,0 +1,27 @@
+queue: workday
+# SR-only, MC-only, columnar output. 2 cores/worker bounds how many tasks one
+# worker can strand (v28: 8 cores/worker caused repeated KilledWorker on ttbar).
+# 50w x 2c = 100 cores, 3200 GiB is NOT requested -- large memory asks sat
+# PENDING and were never scheduled, so 24 GiB/worker (12 GB/core) is used.
+mem-per-worker: 32
+scaleout: 50
+cores-per-worker: 2
+chunksize: 50000
+# merge 4 results at a time instead of the default 20: the output reducer
+# OOM-killed a worker at 99% with columnar ColOut arrays attached.
+tree-reduction: 4
+# Default is 10: on a discarded reduce coffea silently resubmits the whole
+# computation, which is why attempts 2 and 3 read 99% for hours and then
+# reset to zero instead of reporting an error. 1 surfaces the real failure.
+retries: 1
+adaptive: false
+skip-bad-files: false
+custom-setup-commands:
+  - echo $HOME
+  - source /usr/local/etc/profile.d/conda.sh
+  - conda activate /work/users/vsloken-fnal/envs/my-env
+  - export PATH="/work/users/vsloken-fnal/envs/my-env/bin:$PATH"
+  - export PYTHONPATH='/work/users/vsloken-fnal/latest_poco/PocketCoffea'
+  - echo $PYTHONPATH
+  - export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+local-virtualenv: false

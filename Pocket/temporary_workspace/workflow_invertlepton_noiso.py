@@ -892,6 +892,18 @@ class VBSSemileptonicProcessor(BaseProcessorABC):
         n_leptons = max(1, int(np.max(ak.num(lepton_sorted, axis=1))))
         for i in range(n_leptons):  # max number of good leptons in any event
             ev[f'lepton{i+1}'] = ak.firsts(lepton_sorted[:, i:i+1])
+
+        # jetcentral1..N: pt-leading CentralJetsGood as indexed columns, exactly
+        # mirroring the jet{i}/fatjet{i}/lepton{i} pattern above. The bdt_nov13
+        # classifiers take jetcentral1..4_btagDeepFlavQG as input features, and
+        # without these the BDT evaluation raises
+        #   AttributeError: no field named 'jetcentral1'
+        # Same patch as workflow_v9.py: config_validation uses that module,
+        # config_inverted uses THIS one, and both evaluate the same classifiers.
+        cjets_sorted = ev.CentralJetsGood[ak.argsort(ev.CentralJetsGood.pt, ascending=False)]
+        n_cjets = max(4, int(np.max(ak.num(cjets_sorted, axis=1))))
+        for i in range(n_cjets):
+            ev[f'jetcentral{i+1}'] = ak.firsts(cjets_sorted[:, i:i+1])
         
         # object_names = [name for name in ev.fields if name.startswith(("jet", "fatjet", "lepton"))]
         names=['jet1','jet2','jet3','jet4','jet5','jet6', 'lepton1', 'DeepMETResolutionTune','fatjet1']

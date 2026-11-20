@@ -1,0 +1,26 @@
+queue: workday
+# SR-only, MC-only, columnar output. 2 cores/worker bounds how many tasks one
+# worker can strand (v28: 8 cores/worker caused repeated KilledWorker on ttbar).
+# 50w x 2c = 100 cores, 3200 GiB is NOT requested -- large memory asks sat
+# PENDING and were never scheduled, so 24 GiB/worker (12 GB/core) is used.
+mem-per-worker: 24
+scaleout: 50
+cores-per-worker: 4
+chunksize: 50000
+# merge 4 results at a time instead of the default 20: the output reducer
+# OOM-killed a worker at 99% with columnar ColOut arrays attached.
+tree-reduction: 4
+# See custom_semilep_heavy.yaml: default 10 makes coffea silently resubmit the
+# whole computation on an intermittent scheduler-connection-lost.
+retries: 1
+adaptive: false
+skip-bad-files: false
+custom-setup-commands:
+  - echo $HOME
+  - source /usr/local/etc/profile.d/conda.sh
+  - conda activate /work/users/vsloken-fnal/envs/my-env
+  - export PATH="/work/users/vsloken-fnal/envs/my-env/bin:$PATH"
+  - export PYTHONPATH='/work/users/vsloken-fnal/latest_poco/PocketCoffea'
+  - echo $PYTHONPATH
+  - export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+local-virtualenv: false

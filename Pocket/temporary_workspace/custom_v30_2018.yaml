@@ -1,0 +1,33 @@
+# PocketCoffea's dask@purdue-af defaults still point at the OLD gateway
+# hostnames (dask-gateway-k8s... / traefik-dask-gateway-k8s...), which no
+# longer resolve -> ClientConnectorDNSError at cluster creation. The current
+# names are in DASK_GATEWAY__ADDRESS / DASK_GATEWAY__PROXY_ADDRESS, but the
+# executor reads run_options, not the env, so they must be overridden here.
+gateway-address: "http://dask-gateway.geddes.rcac.purdue.edu"
+gateway-proxy-address: "traefik-dask-gateway.cms.geddes.rcac.purdue.edu:8786"
+queue: workday
+# v30: config_validation / config_inverted, 2018, histogram-only (no ColOut).
+# worker can strand (v28: 8 cores/worker caused repeated KilledWorker on ttbar).
+# 50w x 2c = 100 cores, 3200 GiB is NOT requested -- large memory asks sat
+# PENDING and were never scheduled, so 24 GiB/worker (12 GB/core) is used.
+mem-per-worker: 6
+scaleout: 50
+cores-per-worker: 1
+chunksize: 20000
+# merge 4 results at a time instead of the default 20: the output reducer
+# OOM-killed a worker at 99% with columnar ColOut arrays attached.
+tree-reduction: 4
+# See custom_semilep_heavy.yaml: default 10 makes coffea silently resubmit the
+# whole computation on an intermittent scheduler-connection-lost.
+retries: 3
+adaptive: false
+skip-bad-files: false
+custom-setup-commands:
+  - echo $HOME
+  - source /usr/local/etc/profile.d/conda.sh
+  - conda activate /work/users/vsloken-fnal/envs/my-env
+  - export PATH="/work/users/vsloken-fnal/envs/my-env/bin:$PATH"
+  - export PYTHONPATH='/work/users/vsloken-fnal/latest_poco/PocketCoffea'
+  - echo $PYTHONPATH
+  - export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+local-virtualenv: false

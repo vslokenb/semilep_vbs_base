@@ -17,6 +17,9 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
+  # XRootD python bindings + xrdfs/xrdcp: uproot needs them to read the
+  # root://cmseos.fnal.gov skims. Not a pip wheel, so it must come from conda.
+  - xrootd=5.9.2
   - pip
   - pip:
       - coffea==0.7.29

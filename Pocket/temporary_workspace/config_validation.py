@@ -88,7 +88,7 @@ localdir = os.path.dirname(os.path.abspath(__file__))
 
 
 default_parameters = defaults.get_default_parameters()
-defaults.register_configuration_dir("config_dir", localdir + "/params")
+defaults.register_configuration_dir("config_dir", localdir)
 parameters = defaults.merge_parameters_from_files(
     default_parameters,
     f"{localdir}/params/object_preselection_run2_v9.yaml",
@@ -739,6 +739,12 @@ cfg = Configurator(
             # f"{localdir}/datasets/WJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_fast.json",
             f"{localdir}/datasets/rare_skim.json",
             f"{localdir}/datasets/skimmed_rescale.json",
+            # rare VBS/VV/VVV/ZG/WZ skims for 2016_PreVFP/2016_PostVFP/2017 (75 entries)
+            f"{localdir}/datasets/skimmed_dataset_definition_rare1617_fixed.json",
+            # single-top + ttW/ttZ skims for 2016_PreVFP/2016_PostVFP/2017 (21 entries)
+            f"{localdir}/datasets/skimmed_dataset_definition_top1617.json",
+            # TTToSemiLeptonic 2016_PreVFP: exists at FNAL, never merged into skimmed_rescale
+            f"{localdir}/datasets/TTToSemiLeptonic_2016_PreVFP_skim.json",
         ],
 
         "filter": {
@@ -758,13 +764,15 @@ cfg = Configurator(
                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8",  # done
 
                 "SingleMuon",  # done (all eras)
+
+                "SingleElectron",  # 2016/2017 electron primary dataset (EGamma is 2018-only)
                 "EGamma",  # done (all eras)
 
-                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",  # done
-                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
-                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",  # done
-                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
-                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",  # done
+                "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
+                "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8",
+                "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
+                "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8",
 
                 "ttWJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
                 "ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8",  # done
@@ -800,7 +808,7 @@ cfg = Configurator(
                 "ZTo2LZTo2JJJ_dipoleRecoil_EWK_LO_SM_MJJ100PTJ10_TuneCP5_13TeV-madgraph-pythia8",  # done
 
             ],
-            "year": ["2018"],
+            "year": ["2018", "2017", "2016_PostVFP", "2016_PreVFP"],
             "nfiles": {
                 "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8": 50,
                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8": 50,
